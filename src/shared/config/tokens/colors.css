@@ -61,10 +61,13 @@
   --warning: var(--color-yellow);
 }
 
-.dark {
-  --background: var(--color-black);
-  --surface: var(--color-natural-900);
-  --foreground: var(--color-white);
+/* 다크모드: OS 설정을 따름 (Tailwind dark: 변형, theme-color 와 같은 기준) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--color-black); /* 변경 시 shared/config/theme.ts 도 수정 */
+    --surface: var(--color-natural-900);
+    --foreground: var(--color-white);
+  }
 }
 
 @theme inline {
