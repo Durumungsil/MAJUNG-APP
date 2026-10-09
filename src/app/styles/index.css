@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@import "../../shared/config/tokens/colors.css";
+@import "../../shared/config/tokens/typography.css";
+@import "../../shared/config/tokens/safe-area.css";
+@import "../../shared/config/tokens/spacing.css";
+
+@layer base {
+  body {
+    @apply bg-background font-sans text-s text-foreground;
+  }
+}

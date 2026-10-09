@@ -1,0 +1,81 @@
+@theme {
+  --color-white: #fffefe;
+  --color-black: #1d1d1d;
+
+  --color-primary-100: #f2f9ff;
+  --color-primary-200: #ecf7ff;
+  --color-primary-300: #d7eeff;
+  --color-primary-400: #7ec7ff;
+  --color-primary-500: #71b3e6;
+  --color-primary-600: #659fcc;
+  --color-primary-700: #5f95bf;
+  --color-primary-800: #4c7799;
+  --color-primary-900: #395a73;
+  --color-primary-1000: #2c4659;
+
+  --color-secondary-100: #fffef8;
+  --color-secondary-200: #fffef4;
+  --color-secondary-300: #fffce9;
+  --color-secondary-400: #fff5b8;
+  --color-secondary-500: #e6dda6;
+  --color-secondary-600: #ccc493;
+  --color-secondary-700: #bfb88a;
+  --color-secondary-800: #99936e;
+  --color-secondary-900: #736e53;
+  --color-secondary-1000: #595640;
+
+  --color-natural-100: #fafafa;
+  --color-natural-200: #f8f8f8;
+  --color-natural-300: #f0f0f0;
+  --color-natural-400: #cfcfcf;
+  --color-natural-500: #bababa;
+  --color-natural-600: #a6a6a6;
+  --color-natural-700: #9b9b9b;
+  --color-natural-800: #7c7c7c;
+  --color-natural-900: #5d5d5d;
+  --color-natural-1000: #484848;
+
+  --color-red: #ff1c30;
+  --color-yellow: #ffd960;
+  --color-green: #5db057;
+
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #556070;
+  --color-text-muted: #8490a1;
+}
+
+:root {
+  color-scheme: light;
+
+  --background: var(--color-white);
+  --surface: var(--color-natural-100);
+
+  --foreground: var(--color-text-primary);
+  --text-sub: var(--color-text-secondary);
+  --text-disabled: var(--color-text-muted);
+
+  --primary: var(--color-primary-400);
+
+  --border: var(--color-natural-400);
+
+  --error: var(--color-red);
+  --success: var(--color-green);
+  --warning: var(--color-yellow);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+
+  --color-foreground: var(--foreground);
+  --color-sub: var(--text-sub);
+  --color-disabled: var(--text-disabled);
+
+  --color-primary: var(--primary);
+
+  --color-border: var(--border);
+
+  --color-danger: var(--error);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+}

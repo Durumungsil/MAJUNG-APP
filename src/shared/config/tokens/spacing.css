@@ -1,0 +1,8 @@
+@theme {
+  --spacing-gutter: 2rem; /* 32px */
+}
+
+@utility px-page {
+  padding-left: calc(var(--spacing-gutter) + var(--safe-left));
+  padding-right: calc(var(--spacing-gutter) + var(--safe-right));
+}
