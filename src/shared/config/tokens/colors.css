@@ -45,7 +45,7 @@
 }
 
 :root {
-  --background: var(--color-white); /* 변경 시 shared/config/theme.ts 도 수정 */
+  --background: var(--color-white);
   --surface: var(--color-natural-100);
 
   --foreground: var(--color-text-primary);
@@ -62,7 +62,7 @@
 }
 
 .dark {
-  --background: var(--color-black); /* 변경 시 shared/config/theme.ts 도 수정 */
+  --background: var(--color-black);
   --surface: var(--color-natural-900);
   --foreground: var(--color-white);
 }

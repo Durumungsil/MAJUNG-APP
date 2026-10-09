@@ -32,7 +32,6 @@
   --text-xxs--line-height: 1.6;
 }
 
-/* text-point: 크기/행간(@theme) + 폰트 패밀리를 한 번에 적용 */
 @utility text-point {
   font-family: var(--font-point);
 }
