@@ -45,6 +45,8 @@
 }
 
 :root {
+  color-scheme: light;
+
   --background: var(--color-white);
   --surface: var(--color-natural-100);
 
@@ -59,15 +61,6 @@
   --error: var(--color-red);
   --success: var(--color-green);
   --warning: var(--color-yellow);
-}
-
-/* 다크모드는 OS 설정을 따름 */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: var(--color-black);
-    --surface: var(--color-natural-900);
-    --foreground: var(--color-white);
-  }
 }
 
 @theme inline {
