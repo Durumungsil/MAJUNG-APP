@@ -85,15 +85,15 @@ pnpm format:check
 - 마중은 **기억에 남는 컨셉**이 목표임. 임의로 "무난한 SaaS 스타일"로 바꾸지 말 것
 - UI 문구는 **Figma 또는 팀 확정 문구**만 사용. 캐릭터/화자 설정은 없으므로 특정 인격으로 말하는 문구를 만들지 말 것
 
-## 폰트 3종
+## 폰트 2종
 
 | Font           | 용도                                 | 변수 / 클래스                 |
 | -------------- | ------------------------------------ | ----------------------------- |
-| `Bakso Menu`   | **로고 전용**                        | `--font-logo` / `font-logo`   |
 | `Ok Mallang B` | **제목, 강조 문구**                  | `--font-title` / `font-title` |
 | `LeeSeoyun`    | **기본 본문** (설명, 버튼, 폼, 기타) | `--font-body` / `font-body`   |
 
-- 이 3개 외 폰트 금지 (템플릿의 Geist는 제거 대상). `Bakso Menu`는 로고에만 사용
+- 이 2개 외 폰트 금지 (템플릿의 Geist는 제거 대상)
+- **로고는 폰트가 아니라 Figma 이미지 에셋**으로 가져와 컴포넌트로 감싸서 사용 (로고 폰트를 따로 로드하지 말 것)
 - 파일은 `src/shared/assets/fonts/`, `next/font/local`로 **`app/layout.tsx`에서 한 번만** 로드. **파일명에 공백 금지** (`OkMallangB-Regular.ttf` ✅)
 - **폰트 토큰은 `@theme inline`으로 선언할 것.** 예: `@theme inline { --font-body: var(--font-lee-seoyun); }`. 일반 `@theme`에 `var()`로 연결하면 `next/font` 변수가 안쪽 요소에 걸려 있을 때 값이 안 풀려 시스템 폰트로 조용히 폴백됨. `next/font`의 `variable` 이름과 `--font-*` 참조도 같은 이름이어야 함
 - weight 파일이 따로 없으면 `font-bold`로 굵기를 흉내내지 말 것. 강조는 **폰트 패밀리를 바꿔서** 표현
