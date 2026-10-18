@@ -19,7 +19,11 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className={`${fontVariables} antialiased`}>
-      <body className="flex min-h-dvh flex-col">{children}</body>
+      <body className="min-h-dvh">
+        <div className="relative mx-auto flex min-h-dvh w-full max-w-mobile flex-col bg-background">
+          {children}
+        </div>
+      </body>
     </html>
   );
 }

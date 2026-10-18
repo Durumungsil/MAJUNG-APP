@@ -1,7 +1,6 @@
 @theme inline {
   --font-sans: var(--font-primary), system-ui, -apple-system, sans-serif;
   --font-point: var(--font-secondary), var(--font-primary), sans-serif;
-  --font-mono: var(--font-code), ui-monospace, monospace;
 }
 
 @theme {
@@ -30,6 +29,13 @@
 
   --text-xxs: 0.75rem;
   --text-xxs--line-height: 1.6;
+
+  /* 모드 선택 카드 (Ok Mallang B) */
+  --text-mode-lg: 2.5rem;
+  --text-mode-lg--line-height: 1.32;
+
+  --text-mode-sm: 1.25rem;
+  --text-mode-sm--line-height: 1.4;
 }
 
 @utility text-point {

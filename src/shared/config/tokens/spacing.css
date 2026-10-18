@@ -1,5 +1,6 @@
 @theme {
   --spacing-gutter: 2rem; /* 32px */
+  --container-mobile: 25.125rem; /* 402px */
 }
 
 @utility px-page {
