@@ -10,7 +10,16 @@ import {
 } from "../lib/validate-max-members";
 import type { GroupFormValues } from "../model/types";
 
+type GroupFormLayout = "create" | "edit";
+
+/** 수정 화면은 기존 값을 muted 톤으로 보여줌 (Figma 기준) */
+const FIELD_CLASS: Record<GroupFormLayout, string | undefined> = {
+  create: undefined,
+  edit: "text-text-muted",
+};
+
 type GroupFormProps = {
+  layout: GroupFormLayout;
   defaultValues?: Partial<GroupFormValues>;
   dateLabels: { start: string; end: string };
   submitLabel: string;
@@ -29,6 +38,7 @@ function readFormValues(form: HTMLFormElement): GroupFormValues {
 }
 
 export default function GroupForm({
+  layout,
   defaultValues,
   dateLabels,
   submitLabel,
@@ -37,6 +47,7 @@ export default function GroupForm({
   const id = useId();
   const [maxMembers, setMaxMembers] = useState(defaultValues?.maxMembers ?? "");
   const showHint = exceedsMaxMembers(maxMembers);
+  const fieldClass = FIELD_CLASS[layout];
 
   function handleMaxMembersChange(event: ChangeEvent<HTMLInputElement>) {
     setMaxMembers(sanitizeMaxMembersInput(event.target.value));
@@ -50,11 +61,12 @@ export default function GroupForm({
   }
 
   return (
-    <form onSubmit={handleFormSubmit} className="mt-26 flex flex-1 flex-col justify-between gap-10">
-      <div className="flex flex-col gap-15">
-        <div className="flex flex-col gap-8">
+    <form onSubmit={handleFormSubmit} className="mt-12.5 flex flex-col gap-25">
+      <div className="flex flex-col gap-12.5">
+        <div className="flex flex-col gap-6">
           <FormRow label="그룹명" htmlFor={`${id}-name`}>
             <TextField
+              className={fieldClass}
               id={`${id}-name`}
               name="name"
               required
@@ -64,6 +76,7 @@ export default function GroupForm({
           </FormRow>
           <FormRow label="여행 장소" htmlFor={`${id}-destination`}>
             <TextField
+              className={fieldClass}
               id={`${id}-destination`}
               name="destination"
               required
@@ -83,6 +96,7 @@ export default function GroupForm({
             }
           >
             <TextField
+              className={fieldClass}
               id={`${id}-max-members`}
               name="maxMembers"
               inputMode="numeric"
@@ -96,9 +110,10 @@ export default function GroupForm({
             />
           </FormRow>
         </div>
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6">
           <FormRow label={dateLabels.start} htmlFor={`${id}-start-date`}>
             <TextField
+              className={fieldClass}
               id={`${id}-start-date`}
               name="startDate"
               required
@@ -108,6 +123,7 @@ export default function GroupForm({
           </FormRow>
           <FormRow label={dateLabels.end} htmlFor={`${id}-end-date`}>
             <TextField
+              className={fieldClass}
               id={`${id}-end-date`}
               name="endDate"
               required
@@ -117,7 +133,9 @@ export default function GroupForm({
           </FormRow>
         </div>
       </div>
-      <Button type="submit">{submitLabel}</Button>
+      <Button type="submit" size="xl">
+        {submitLabel}
+      </Button>
     </form>
   );
 }

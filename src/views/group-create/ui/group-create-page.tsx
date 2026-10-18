@@ -4,7 +4,7 @@ import { BackHeader, Screen } from "@/shared/ui";
 export default function GroupCreatePage() {
   return (
     <Screen>
-      <BackHeader backHref="/groups" title="그룹 생성하기" />
+      <BackHeader backHref="/groups" size="sm" title="그룹 생성하기" />
       <CreateGroupForm />
     </Screen>
   );

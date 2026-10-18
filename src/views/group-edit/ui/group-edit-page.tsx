@@ -13,7 +13,7 @@ export default function GroupEditPage({ groupId }: GroupEditPageProps) {
 
   return (
     <Screen>
-      <BackHeader backHref={`/groups/${group.id}`} title="그룹 수정하기" />
+      <BackHeader backHref={`/groups/${group.id}`} size="sm" title="그룹 수정하기" />
       <EditGroupForm group={group} />
     </Screen>
   );
