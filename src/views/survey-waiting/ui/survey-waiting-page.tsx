@@ -20,7 +20,7 @@ export default function SurveyWaitingPage({ groupId }: SurveyWaitingPageProps) {
           입력하고 있어요!
         </p>
       </div>
-      <Button href={`/groups/${group.id}`} className="mt-auto">
+      <Button href={`/groups/${group.id}`} size="xl" className="mt-101 h-11.25">
         그만두기
       </Button>
     </Screen>
