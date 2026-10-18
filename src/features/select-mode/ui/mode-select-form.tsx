@@ -1,25 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
+import { cn } from "@/shared/lib";
 import { Button } from "@/shared/ui";
 import { DEFAULT_MODE_INDEX, TRAVEL_MODES } from "../config/modes";
-import { getCarouselItems, shiftIndex } from "../lib/get-carousel-modes";
+import { getSwipeStep, getVisibleSlots, wrapIndex } from "../lib/carousel";
+import { useSwipe } from "../model/use-swipe";
 import ModeCard from "./mode-card";
+
+const CARD_STEP_PX = 202;
+const SWIPE_THRESHOLD_PX = 50;
+const SLOT_RADIUS = 2;
 
 type ModeSelectFormProps = {
   confirmHref: string;
 };
 
 export default function ModeSelectForm({ confirmHref }: ModeSelectFormProps) {
-  const [selectedIndex, setSelectedIndex] = useState(DEFAULT_MODE_INDEX);
-  const [prev, current, next] = getCarouselItems(TRAVEL_MODES, selectedIndex);
+  const [position, setPosition] = useState(DEFAULT_MODE_INDEX);
+  const current = TRAVEL_MODES[wrapIndex(TRAVEL_MODES.length, position)];
 
-  function handlePrevClick() {
-    setSelectedIndex((index) => shiftIndex(TRAVEL_MODES.length, index, -1));
+  function handleSwipeEnd(dragX: number) {
+    const step = getSwipeStep(dragX, SWIPE_THRESHOLD_PX);
+    setPosition((prev) => prev + step);
   }
 
-  function handleNextClick() {
-    setSelectedIndex((index) => shiftIndex(TRAVEL_MODES.length, index, 1));
+  const { dragX, dragging, swipeHandlers } = useSwipe({ onSwipeEnd: handleSwipeEnd });
+
+  function handleSlotClick(offset: number) {
+    setPosition((prev) => prev + offset);
   }
 
   return (
@@ -29,29 +38,41 @@ export default function ModeSelectForm({ confirmHref }: ModeSelectFormProps) {
           role="group"
           aria-roledescription="캐러셀"
           aria-label="여행 모드"
-          className="relative -mx-page flex w-[calc(100%+var(--spacing-gutter)*2)] items-center justify-center overflow-hidden"
+          className="relative -mx-page h-68.25 w-[calc(100%+var(--spacing-gutter)*2)] touch-pan-y overflow-hidden select-none"
+          {...swipeHandlers}
         >
-          <button
-            type="button"
-            aria-label={`${prev.name} 모드 보기`}
-            onClick={handlePrevClick}
-            className="absolute right-[calc(50%+--spacing(30.5))]"
-          >
-            <ModeCard name={prev.name} size="sm" />
-          </button>
-          <div aria-live="polite">
-            <ModeCard name={current.name} size="lg" />
-          </div>
-          <button
-            type="button"
-            aria-label={`${next.name} 모드 보기`}
-            onClick={handleNextClick}
-            className="absolute left-[calc(50%+--spacing(30.5))]"
-          >
-            <ModeCard name={next.name} size="sm" />
-          </button>
+          {getVisibleSlots(position, SLOT_RADIUS).map(({ virtualIndex, offset }) => {
+            const mode = TRAVEL_MODES[wrapIndex(TRAVEL_MODES.length, virtualIndex)];
+            const isCurrent = offset === 0;
+            const isOffscreen = Math.abs(offset) > 1;
+
+            const style: CSSProperties = {
+              transform: `translate(-50%, -50%) translateX(${offset * CARD_STEP_PX + dragX}px)`,
+            };
+
+            return (
+              <button
+                key={virtualIndex}
+                type="button"
+                aria-label={isCurrent ? `${mode.name} 모드 (선택됨)` : `${mode.name} 모드 보기`}
+                aria-hidden={isOffscreen}
+                tabIndex={isOffscreen ? -1 : 0}
+                onClick={() => handleSlotClick(offset)}
+                style={style}
+                className={cn(
+                  "absolute top-1/2 left-1/2",
+                  isCurrent ? "z-10" : "z-0",
+                  !dragging && "transition-transform duration-300 ease-out",
+                )}
+              >
+                <ModeCard name={mode.name} size={isCurrent ? "lg" : "sm"} />
+              </button>
+            );
+          })}
         </div>
-        <p className="min-h-6.5 text-center text-s text-text-muted">{current.description}</p>
+        <p aria-live="polite" className="min-h-6.5 text-center text-s text-text-muted">
+          {current.description}
+        </p>
       </div>
       <Button variant="primary" href={confirmHref}>
         모드 확정하기

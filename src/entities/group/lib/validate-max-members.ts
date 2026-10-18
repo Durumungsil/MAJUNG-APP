@@ -6,3 +6,13 @@ export function isValidMaxMembers(value: string): boolean {
   const count = Number(value);
   return count >= 1 && count <= MAX_GROUP_MEMBERS;
 }
+
+/** 입력값이 MAX_GROUP_MEMBERS를 초과하는지 (경고 문구 노출 기준) */
+export function exceedsMaxMembers(value: string): boolean {
+  return /^\d+$/.test(value) && Number(value) > MAX_GROUP_MEMBERS;
+}
+
+/** 숫자 이외의 문자를 제거함 */
+export function sanitizeMaxMembersInput(value: string): string {
+  return value.replace(/\D/g, "");
+}

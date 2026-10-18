@@ -44,7 +44,7 @@ export default function FoodPreferenceList() {
                 onChange={(event) => handleNameChange(row.key, event.target.value)}
                 placeholder="입력하세요"
                 aria-label={`선호 음식 ${index + 1}`}
-                className="w-43.25 shrink-0"
+                className="flex-1"
               />
               <StarRating
                 value={row.rating}

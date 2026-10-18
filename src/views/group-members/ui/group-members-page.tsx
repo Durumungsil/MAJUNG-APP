@@ -19,7 +19,7 @@ export default function GroupMembersPage({ groupId }: GroupMembersPageProps) {
         <BackHeader backHref={`/groups/${group.id}`} />
         <GroupTitleBar group={group} />
       </div>
-      <ul className="flex flex-col gap-5.5" aria-label="그룹 멤버">
+      <ul className="flex flex-col gap-[12px]" aria-label="그룹 멤버">
         {members.map((member) => (
           <MemberItem key={member.id} member={member} />
         ))}

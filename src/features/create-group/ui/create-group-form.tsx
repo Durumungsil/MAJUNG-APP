@@ -24,7 +24,6 @@ export default function CreateGroupForm() {
     <>
       <GroupForm
         dateLabels={{ start: "시작 시간", end: "종료 시간" }}
-        showMaxMembersHint
         submitLabel="그룹 생성하기"
         onSubmit={handleGroupSubmit}
       />

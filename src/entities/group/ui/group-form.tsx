@@ -1,15 +1,18 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
+import { useId, useState, type ChangeEvent, type FormEvent } from "react";
 import { Button, FormRow, TextField } from "@/shared/ui";
 import { MAX_GROUP_MEMBERS } from "../config/constants";
-import { isValidMaxMembers } from "../lib/validate-max-members";
+import {
+  exceedsMaxMembers,
+  isValidMaxMembers,
+  sanitizeMaxMembersInput,
+} from "../lib/validate-max-members";
 import type { GroupFormValues } from "../model/types";
 
 type GroupFormProps = {
   defaultValues?: Partial<GroupFormValues>;
   dateLabels: { start: string; end: string };
-  showMaxMembersHint?: boolean;
   submitLabel: string;
   onSubmit: (values: GroupFormValues) => void;
 };
@@ -28,23 +31,23 @@ function readFormValues(form: HTMLFormElement): GroupFormValues {
 export default function GroupForm({
   defaultValues,
   dateLabels,
-  showMaxMembersHint = false,
   submitLabel,
   onSubmit,
 }: GroupFormProps) {
   const id = useId();
-  const [maxMembersInvalid, setMaxMembersInvalid] = useState(false);
+  const [maxMembers, setMaxMembers] = useState(defaultValues?.maxMembers ?? "");
+  const showHint = exceedsMaxMembers(maxMembers);
+
+  function handleMaxMembersChange(event: ChangeEvent<HTMLInputElement>) {
+    setMaxMembers(sanitizeMaxMembersInput(event.target.value));
+  }
 
   function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const values = readFormValues(event.currentTarget);
-    const invalid = !isValidMaxMembers(values.maxMembers);
-    setMaxMembersInvalid(invalid);
-    if (invalid) return;
+    if (!isValidMaxMembers(values.maxMembers)) return;
     onSubmit(values);
   }
-
-  const showHint = showMaxMembersHint || maxMembersInvalid;
 
   return (
     <form onSubmit={handleFormSubmit} className="mt-26 flex flex-1 flex-col justify-between gap-10">
@@ -83,10 +86,12 @@ export default function GroupForm({
               id={`${id}-max-members`}
               name="maxMembers"
               inputMode="numeric"
+              pattern="[1-9][0-9]*"
               required
-              defaultValue={defaultValues?.maxMembers}
+              value={maxMembers}
+              onChange={handleMaxMembersChange}
               placeholder="최대 인원를 입력하세요"
-              aria-invalid={maxMembersInvalid}
+              aria-invalid={showHint}
               aria-describedby={showHint ? `${id}-max-members-hint` : undefined}
             />
           </FormRow>

@@ -30,11 +30,10 @@
   --text-xxs: 0.75rem;
   --text-xxs--line-height: 1.6;
 
-  /* 모드 선택 카드 (Ok Mallang B) */
-  --text-mode-lg: 2.5rem;
+  --text-mode-lg: 1.8rem;
   --text-mode-lg--line-height: 1.32;
 
-  --text-mode-sm: 1.25rem;
+  --text-mode-sm: 1.2rem;
   --text-mode-sm--line-height: 1.4;
 }
 
