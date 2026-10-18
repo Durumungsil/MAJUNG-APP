@@ -31,7 +31,7 @@ export default function JoinGroupModal({ open, onClose }: JoinGroupModalProps) {
 
   return (
     <Modal open={open} onClose={onClose} labelledBy="join-group-title" className="gap-3">
-      <h2 id="join-group-title" className="text-xl text-text-primary">
+      <h2 id="join-group-title" className="text-l text-text-primary">
         초대 코드로 입장하기
       </h2>
       <form onSubmit={handleFormSubmit} className="flex w-full items-center gap-2">
@@ -47,7 +47,7 @@ export default function JoinGroupModal({ open, onClose }: JoinGroupModalProps) {
           onChange={handleInputChange}
           className="w-45.75 min-w-0 flex-1"
         />
-        <Button type="submit" size="xs">
+        <Button type="submit" size="xs" className="h-7.75">
           확인
         </Button>
       </form>
