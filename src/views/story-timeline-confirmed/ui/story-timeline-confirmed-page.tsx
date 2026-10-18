@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getGroup } from "@/entities/group";
-import { JourneyStopCard, getJourneyStops } from "@/entities/journey";
+import { TimelineStopCard, getTimelineStops } from "@/entities/journey";
 import { TextLink } from "@/shared/ui";
 import { StoryLayout } from "@/widgets/story-layout";
 
@@ -12,7 +12,7 @@ export default function StoryTimelineConfirmedPage({ groupId }: StoryTimelineCon
   const group = getGroup(groupId);
   if (!group) notFound();
 
-  const stops = getJourneyStops(group.id);
+  const stops = getTimelineStops(group.id);
 
   return (
     <StoryLayout
@@ -23,7 +23,7 @@ export default function StoryTimelineConfirmedPage({ groupId }: StoryTimelineCon
       <ol aria-label="확정된 타임라인" className="flex flex-col gap-5">
         {stops.map((stop) => (
           <li key={stop.id}>
-            <JourneyStopCard stop={stop} />
+            <TimelineStopCard stop={stop} />
           </li>
         ))}
       </ol>

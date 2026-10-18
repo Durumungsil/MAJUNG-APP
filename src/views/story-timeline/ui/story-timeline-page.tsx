@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getGroup } from "@/entities/group";
-import { getJourneyStops } from "@/entities/journey";
+import { getTimelineStops } from "@/entities/journey";
 import { TimelineEditor } from "@/features/reorder-timeline";
 import { TextLink } from "@/shared/ui";
 import { StoryLayout } from "@/widgets/story-layout";
@@ -13,7 +13,7 @@ export default function StoryTimelinePage({ groupId }: StoryTimelinePageProps) {
   const group = getGroup(groupId);
   if (!group) notFound();
 
-  const stops = getJourneyStops(group.id);
+  const stops = getTimelineStops(group.id);
 
   return (
     <StoryLayout

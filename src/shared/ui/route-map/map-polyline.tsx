@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { LatLng } from "@/shared/model";
-import { useKakaoMapContext } from "./kakao-map-context";
+import { useRouteMapContext } from "./route-map-context";
 
 type MapPolylineProps = {
   path: LatLng[];
@@ -12,7 +12,7 @@ type MapPolylineProps = {
 };
 
 export default function MapPolyline({ path, colorClassName, strokeWeight = 4 }: MapPolylineProps) {
-  const { maps, map } = useKakaoMapContext();
+  const { maps, map } = useRouteMapContext();
   // 카카오 SDK는 색 문자열만 받으므로, 토큰 클래스를 단 요소에서 계산된 색을 읽어 넘김
   const colorProbeRef = useRef<HTMLSpanElement>(null);
   const pathKey = path.map(({ lat, lng }) => `${lat},${lng}`).join("|");

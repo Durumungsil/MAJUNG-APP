@@ -1,7 +1,7 @@
 import type { LatLng } from "@/shared/model";
 
 /** 타임라인의 한 칸. 시간은 "HH:mm" */
-export type JourneyStop = {
+export type TimelineStop = {
   id: string;
   startTime: string;
   endTime: string;

@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import type { LatLng } from "@/shared/model";
-import { useKakaoMapContext } from "./kakao-map-context";
+import { useRouteMapContext } from "./route-map-context";
 
 type MapOverlayProps = {
   position: LatLng;
@@ -14,7 +14,7 @@ type MapOverlayProps = {
 
 /** 카카오맵 CustomOverlay 위에 React 요소를 그림 */
 export default function MapOverlay({ position, zIndex = 0, children }: MapOverlayProps) {
-  const { maps, map } = useKakaoMapContext();
+  const { maps, map } = useRouteMapContext();
   const [container] = useState(() => document.createElement("div"));
   const { lat, lng } = position;
 

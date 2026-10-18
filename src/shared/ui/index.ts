@@ -7,7 +7,7 @@ export { default as CopyButton } from "./copy-button";
 export { default as DropdownMenu, type DropdownMenuItem } from "./dropdown-menu";
 export { default as FormRow } from "./form-row";
 export { default as InfoRow } from "./info-row";
-export { KakaoMap, MapOverlay, MapPolyline } from "./kakao-map";
+export { MapOverlay, MapPolyline, RouteMap } from "./route-map";
 export { default as Modal } from "./modal";
 export { default as ModeTitle } from "./mode-title";
 export { default as Screen } from "./screen";

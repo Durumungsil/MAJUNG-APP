@@ -1,7 +1,7 @@
-import type { JourneyStop } from "../model/types";
+import type { TimelineStop } from "../model/types";
 
 // TODO: AI 타임라인 API 연동 전까지 사용하는 퍼블리싱용 목 데이터
-export const MOCK_JOURNEY_STOPS: JourneyStop[] = [
+export const MOCK_TIMELINE_STOPS: TimelineStop[] = [
   {
     id: "stop-1",
     startTime: "09:00",

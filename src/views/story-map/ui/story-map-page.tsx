@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getGroup } from "@/entities/group";
-import { ScheduleHeader, getJourneyStops } from "@/entities/journey";
+import { ScheduleHeader, getTimelineStops } from "@/entities/journey";
 import { MapExplorer } from "@/features/explore-map";
 import { TextLink } from "@/shared/ui";
 
@@ -12,7 +12,7 @@ export default function StoryMapPage({ groupId }: StoryMapPageProps) {
   const group = getGroup(groupId);
   if (!group) notFound();
 
-  const stops = getJourneyStops(group.id);
+  const stops = getTimelineStops(group.id);
 
   return (
     <main className="flex flex-1 flex-col pb-[calc(var(--safe-bottom)+--spacing(11))]">

@@ -1,17 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { JourneyStop } from "@/entities/journey";
+import type { TimelineStop } from "@/entities/journey";
 import { PlaceDetailSheet, getNearbyPlaces, type Place } from "@/entities/place";
 import { MapPinIcon, RecommendPinIcon } from "@/shared/assets";
-import { KakaoMap, MapOverlay, MapPolyline, type BottomSheetSnap } from "@/shared/ui";
+import { RouteMap, MapOverlay, MapPolyline, type BottomSheetSnap } from "@/shared/ui";
 import MapMarkerButton from "./map-marker-button";
 
 /** 겹칠 때 위에 보일 순서 */
 const Z_INDEX = { nearby: 1, route: 2, activeRoute: 3 } as const;
 
 type MapExplorerProps = {
-  stops: JourneyStop[];
+  stops: TimelineStop[];
 };
 
 export default function MapExplorer({ stops }: MapExplorerProps) {
@@ -47,7 +47,7 @@ export default function MapExplorer({ stops }: MapExplorerProps) {
 
   return (
     <>
-      <KakaoMap fitPoints={routePath} label="여행 일정 지도" className="aspect-[402/674] w-full">
+      <RouteMap fitPoints={routePath} label="여행 일정 지도" className="aspect-[402/674] w-full">
         <MapPolyline path={routePath} colorClassName="text-primary-700" />
         {nearbyPlaces.map((place) => (
           <MapOverlay key={place.id} position={place.location} zIndex={Z_INDEX.nearby}>
@@ -81,7 +81,7 @@ export default function MapExplorer({ stops }: MapExplorerProps) {
             </MapOverlay>
           );
         })}
-      </KakaoMap>
+      </RouteMap>
       <PlaceDetailSheet
         place={previewPlace}
         snap={snap}

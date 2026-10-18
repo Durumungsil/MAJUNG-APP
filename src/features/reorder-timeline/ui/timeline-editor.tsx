@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { JourneyStopCard, type JourneyStop } from "@/entities/journey";
+import { TimelineStopCard, type TimelineStop } from "@/entities/journey";
 import { Button } from "@/shared/ui";
 import { reorderStopPlaces } from "../lib/reorder-stops";
 import { useLongPressReorder } from "../model/use-long-press-reorder";
 
 type TimelineEditorProps = {
-  initialStops: JourneyStop[];
+  initialStops: TimelineStop[];
   confirmHref: string;
 };
 
@@ -25,7 +25,7 @@ export default function TimelineEditor({ initialStops, confirmHref }: TimelineEd
       <ol aria-label="타임라인" className="flex flex-col gap-5 select-none">
         {stops.map((stop, index) => (
           <li key={stop.id} {...getItemProps(index)} className="[-webkit-touch-callout:none]">
-            <JourneyStopCard stop={stop} highlighted={draggingIndex === index} />
+            <TimelineStopCard stop={stop} highlighted={draggingIndex === index} />
           </li>
         ))}
       </ol>

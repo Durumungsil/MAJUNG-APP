@@ -5,19 +5,20 @@ import { KAKAO_MAP_APP_KEY } from "@/shared/config/env";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
 import { cn } from "@/shared/lib";
 import {
-  loadKakaoMapSdk,
+  getKakaoMaps,
   type KakaoMap as KakaoMapInstance,
-  type KakaoMaps,
-} from "@/shared/lib/kakao-map";
+  type KakaoMapsNamespace as KakaoMaps,
+} from "@/shared/lib/kakao-maps";
 import type { LatLng } from "@/shared/model";
-import { KakaoMapContext } from "./kakao-map-context";
+import KakaoSdkLoader from "../kakao-sdk-loader";
+import { RouteMapContext } from "./route-map-context";
 
 const DEFAULT_LEVEL = 5;
 /** 지도 생성 직후 fitPoints 범위로 옮기므로 첫 화면에는 보이지 않는 임시 중심 (서울시청) */
 const DEFAULT_CENTER: LatLng = { lat: 37.5665, lng: 126.978 };
 const BOUNDS_PADDING_PX = 48;
 
-type KakaoMapProps = {
+type RouteMapProps = {
   /** 모두 화면 안에 들어오도록 맞출 좌표들 */
   fitPoints: LatLng[];
   label: string;
@@ -40,37 +41,33 @@ function deserializePoints(key: string): LatLng[] {
   });
 }
 
-export default function KakaoMap({ fitPoints, label, className, children }: KakaoMapProps) {
+export default function RouteMap({ fitPoints, label, className, children }: RouteMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isSdkReady, setIsSdkReady] = useState(false);
   const [loaded, setLoaded] = useState<LoadedMap | null>(null);
   const [failed, setFailed] = useState(false);
-  const [attempt, setAttempt] = useState(0);
 
   // 배열 참조가 아니라 좌표 내용이 바뀔 때만 범위를 다시 맞추기 위한 키
   const fitKey = serializePoints(fitPoints);
 
+  function handleSdkReady() {
+    setIsSdkReady(true);
+  }
+
+  function handleSdkError() {
+    setFailed(true);
+  }
+
   useEffect(() => {
-    if (!KAKAO_MAP_APP_KEY) return;
-    let cancelled = false;
-
-    loadKakaoMapSdk(KAKAO_MAP_APP_KEY)
-      .then((maps) => {
-        const container = containerRef.current;
-        if (cancelled || !container) return;
-        const map = new maps.Map(container, {
-          center: new maps.LatLng(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng),
-          level: DEFAULT_LEVEL,
-        });
-        setLoaded({ maps, map });
-      })
-      .catch(() => {
-        if (!cancelled) setFailed(true);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [attempt]);
+    const maps = getKakaoMaps();
+    const container = containerRef.current;
+    if (!isSdkReady || !maps || !container) return;
+    const map = new maps.Map(container, {
+      center: new maps.LatLng(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng),
+      level: DEFAULT_LEVEL,
+    });
+    setLoaded({ maps, map });
+  }, [isSdkReady]);
 
   useEffect(() => {
     const points = deserializePoints(fitKey);
@@ -87,15 +84,16 @@ export default function KakaoMap({ fitPoints, label, className, children }: Kaka
     );
   }, [loaded, fitKey]);
 
+  // next/script는 실패한 src를 캐시해 같은 화면에서 다시 불러오지 않으므로 새로고침으로 재시도
   function handleRetryClick() {
-    setFailed(false);
-    setAttempt((prev) => prev + 1);
+    window.location.reload();
   }
 
   const showError = failed || !KAKAO_MAP_APP_KEY;
 
   return (
     <div className={cn("relative overflow-hidden bg-natural-300", className)}>
+      <KakaoSdkLoader onReady={handleSdkReady} onError={handleSdkError} />
       <div ref={containerRef} role="region" aria-label={label} className="absolute inset-0" />
       {!loaded && !showError && (
         <div aria-hidden className="absolute inset-0 animate-pulse bg-natural-300" />
@@ -117,7 +115,7 @@ export default function KakaoMap({ fitPoints, label, className, children }: Kaka
           )}
         </div>
       )}
-      {loaded && <KakaoMapContext value={loaded}>{children}</KakaoMapContext>}
+      {loaded && <RouteMapContext value={loaded}>{children}</RouteMapContext>}
     </div>
   );
 }

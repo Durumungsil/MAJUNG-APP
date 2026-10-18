@@ -1,28 +1,34 @@
-import { cn } from "@/shared/lib";
-import { formatTimeRange } from "../lib/format-time-range";
-import type { JourneyStop } from "../model/types";
+import StampImage from "@/shared/assets/images/stamp-image";
+import {
+  formatDuration,
+  formatEndedAt,
+  formatRank,
+  getDurationMinutes,
+  isJourneyStopCompleted,
+} from "../lib/journey-stop";
+import type { JourneyStop } from "../model/journey-stop";
 
-type JourneyStopCardProps = {
-  stop: Pick<JourneyStop, "startTime" | "endTime" | "placeName">;
-  highlighted?: boolean;
-  className?: string;
-};
+interface JourneyStopCardProps {
+  stop: JourneyStop;
+  isCurrent: boolean;
+}
 
-export default function JourneyStopCard({
-  stop,
-  highlighted = false,
-  className,
-}: JourneyStopCardProps) {
+export default function JourneyStopCard({ stop, isCurrent }: JourneyStopCardProps) {
   return (
-    <div
-      className={cn(
-        "flex gap-10 rounded-lg px-9 py-4 text-center text-m text-text-primary transition-colors",
-        highlighted ? "bg-primary-200" : "bg-natural-100",
-        className,
-      )}
+    <li
+      className={`flex items-center gap-6 overflow-clip rounded-lg px-5 py-4 ${isCurrent ? "bg-primary-200" : "bg-natural-100"}`}
     >
-      <span className="whitespace-nowrap">{formatTimeRange(stop)}</span>
-      <span className="min-w-0 flex-1">{stop.placeName}</span>
-    </div>
+      <div className="flex min-w-0 flex-1 flex-col gap-1 whitespace-nowrap">
+        <div className="flex justify-between text-m text-text-primary">
+          <p>{stop.placeName}</p>
+          <p>{formatRank(stop.rank)}</p>
+        </div>
+        <div className="flex justify-between text-xs text-text-muted">
+          <p>{formatDuration(getDurationMinutes(stop))}</p>
+          <p>{formatEndedAt(stop.endedAt)}</p>
+        </div>
+      </div>
+      <StampImage isCompleted={isJourneyStopCompleted(stop)} />
+    </li>
   );
 }
