@@ -1,5 +1,4 @@
 import localFont from "next/font/local";
-import { Geist_Mono } from "next/font/google";
 
 export const primaryFont = localFont({
   src: "../../shared/assets/fonts/lee-seoyun.woff2",
@@ -15,9 +14,4 @@ export const pointFont = localFont({
   display: "swap",
 });
 
-export const codeFont = Geist_Mono({
-  variable: "--font-code",
-  subsets: ["latin"],
-});
-
-export const fontVariables = `${primaryFont.variable} ${pointFont.variable} ${codeFont.variable}`;
+export const fontVariables = `${primaryFont.variable} ${pointFont.variable}`;

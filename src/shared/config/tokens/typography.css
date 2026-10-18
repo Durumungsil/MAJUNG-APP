@@ -1,7 +1,6 @@
 @theme inline {
   --font-sans: var(--font-primary), system-ui, -apple-system, sans-serif;
   --font-point: var(--font-secondary), var(--font-primary), sans-serif;
-  --font-mono: var(--font-code), ui-monospace, monospace;
 }
 
 @theme {
@@ -30,6 +29,12 @@
 
   --text-xxs: 0.75rem;
   --text-xxs--line-height: 1.6;
+
+  --text-mode-lg: 1.8rem;
+  --text-mode-lg--line-height: 1.32;
+
+  --text-mode-sm: 1.2rem;
+  --text-mode-sm--line-height: 1.4;
 }
 
 @utility text-point {
