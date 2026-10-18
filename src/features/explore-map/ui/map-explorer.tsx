@@ -14,10 +14,6 @@ type MapExplorerProps = {
   stops: JourneyStop[];
 };
 
-/**
- * 일정 장소 핀을 누르면 주변 추천 장소 핀이 나타나고,
- * 추천 핀을 누르면 장소 상세 시트를 띄움
- */
 export default function MapExplorer({ stops }: MapExplorerProps) {
   const [activeStopId, setActiveStopId] = useState<string | null>(null);
   const [previewPlace, setPreviewPlace] = useState<Place | null>(null);
