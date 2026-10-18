@@ -34,7 +34,7 @@ export default function JoinGroupModal({ open, onClose }: JoinGroupModalProps) {
       <h2 id="join-group-title" className="text-xl text-text-primary">
         초대 코드로 입장하기
       </h2>
-      <form onSubmit={handleFormSubmit} className="flex items-center gap-2">
+      <form onSubmit={handleFormSubmit} className="flex w-full items-center gap-2">
         <TextField
           size="sm"
           name="inviteCode"
@@ -45,9 +45,9 @@ export default function JoinGroupModal({ open, onClose }: JoinGroupModalProps) {
           aria-label="초대 코드"
           aria-invalid={notFound}
           onChange={handleInputChange}
-          className="w-45.75"
+          className="w-45.75 min-w-0 flex-1"
         />
-        <Button type="submit" size="sm" className="w-auto">
+        <Button type="submit" size="xs">
           확인
         </Button>
       </form>

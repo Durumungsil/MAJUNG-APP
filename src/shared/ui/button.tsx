@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/shared/lib";
 
 type ButtonVariant = "primary" | "secondary" | "tertiary";
-type ButtonSize = "lg" | "sm";
+type ButtonSize = "lg" | "sm" | "xs";
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
   primary: "bg-primary-400",
@@ -14,6 +14,8 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
 const SIZE_CLASS: Record<ButtonSize, string> = {
   lg: "w-full px-5 py-2 text-m",
   sm: "w-25 px-2.5 py-1.25 text-s",
+  /** 글자 폭에 맞춤 (입력칸 옆 확인 버튼 등) */
+  xs: "px-2.5 py-1.25 text-s",
 };
 
 type BaseProps = {
@@ -37,7 +39,7 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const classes = cn(
-    "flex items-center justify-center overflow-clip rounded-lg text-center text-black disabled:opacity-50",
+    "flex shrink-0 items-center justify-center overflow-clip rounded-lg text-center whitespace-nowrap text-black disabled:opacity-50",
     VARIANT_CLASS[variant],
     SIZE_CLASS[size],
     className,
