@@ -10,3 +10,4 @@ export { default as Modal } from "./modal";
 export { default as Screen } from "./screen";
 export { default as Spinner } from "./spinner";
 export { default as TextField } from "./text-field";
+export { default as Toast } from "./toast";
