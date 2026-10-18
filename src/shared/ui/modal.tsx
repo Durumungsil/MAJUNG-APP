@@ -7,11 +7,19 @@ type ModalProps = {
   open: boolean;
   onClose: () => void;
   labelledBy: string;
+  compact?: boolean;
   className?: string;
   children: ReactNode;
 };
 
-export default function Modal({ open, onClose, labelledBy, className, children }: ModalProps) {
+export default function Modal({
+  open,
+  onClose,
+  labelledBy,
+  compact = false,
+  className,
+  children,
+}: ModalProps) {
   useEffect(() => {
     if (!open) return;
 
@@ -38,7 +46,11 @@ export default function Modal({ open, onClose, labelledBy, className, children }
         role="dialog"
         aria-modal="true"
         aria-labelledby={labelledBy}
-        className={cn("flex flex-col items-center rounded-lg bg-white px-10 py-7", className)}
+        className={cn(
+          "flex flex-col items-center rounded-lg bg-white",
+          compact ? "p-7" : "px-10 py-7",
+          className,
+        )}
       >
         {children}
       </div>

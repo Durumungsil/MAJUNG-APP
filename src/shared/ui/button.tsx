@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/shared/lib";
 
 type ButtonVariant = "primary" | "secondary" | "tertiary";
-type ButtonSize = "lg" | "sm" | "xs";
+type ButtonSize = "xl" | "lg" | "md" | "sm" | "xs";
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
   primary: "bg-primary-400",
@@ -12,7 +12,9 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
 };
 
 const SIZE_CLASS: Record<ButtonSize, string> = {
+  xl: "w-full px-5 py-2 text-l",
   lg: "w-full px-5 py-2 text-m",
+  md: "px-5 py-1.5 text-s",
   sm: "w-25 px-2.5 py-1.25 text-s",
   /** 글자 폭에 맞춤 (입력칸 옆 확인 버튼 등) */
   xs: "px-2.5 py-1.25 text-s",
@@ -21,6 +23,7 @@ const SIZE_CLASS: Record<ButtonSize, string> = {
 type BaseProps = {
   variant?: ButtonVariant;
   size?: ButtonSize;
+  icon?: ReactNode;
   className?: string;
   children: ReactNode;
 };
@@ -34,6 +37,7 @@ type ButtonProps = BaseProps &
 export default function Button({
   variant = "secondary",
   size = "lg",
+  icon,
   className,
   children,
   ...props
@@ -42,12 +46,14 @@ export default function Button({
     "flex shrink-0 items-center justify-center overflow-clip rounded-lg text-center whitespace-nowrap text-black disabled:opacity-50",
     VARIANT_CLASS[variant],
     SIZE_CLASS[size],
+    icon !== undefined && "gap-3",
     className,
   );
 
   if (props.href !== undefined) {
     return (
       <Link className={classes} {...props}>
+        {icon}
         {children}
       </Link>
     );
@@ -56,6 +62,7 @@ export default function Button({
   const { type = "button", ...buttonProps } = props;
   return (
     <button type={type} className={classes} {...buttonProps}>
+      {icon}
       {children}
     </button>
   );
