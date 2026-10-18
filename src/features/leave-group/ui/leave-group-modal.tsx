@@ -21,9 +21,9 @@ export default function LeaveGroupModal({ groupId, open, onClose }: LeaveGroupMo
     <Modal open={open} onClose={onClose} labelledBy="leave-group-title" className="gap-5">
       <div className="flex flex-col items-center">
         <h2 id="leave-group-title" className="text-xl text-text-primary">
-          정말로 탈퇴하시나요?
+          정말 탈퇴하시겠어요?
         </h2>
-        <p className="text-xs text-text-muted">선택은 취소하실 수 없습니다</p>
+        <p className="text-xs text-text-muted">선택하면 취소할 수 없어요</p>
       </div>
       <div className="flex justify-center gap-4">
         <Button size="sm" variant="tertiary" onClick={onClose}>
