@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/shared/lib";
 
 type ButtonVariant = "primary" | "secondary" | "tertiary";
-type ButtonSize = "lg" | "sm" | "xs";
+type ButtonSize = "xl" | "lg" | "sm" | "xs";
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
   primary: "bg-primary-400",
@@ -12,6 +12,8 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
 };
 
 const SIZE_CLASS: Record<ButtonSize, string> = {
+  /** Figma 텍스트 스타일 L(20px)을 쓰는 하단 주요 버튼 */
+  xl: "w-full px-5 py-2 text-l",
   lg: "w-full px-5 py-2 text-m",
   sm: "w-25 px-2.5 py-1.25 text-s",
   /** 글자 폭에 맞춤 (입력칸 옆 확인 버튼 등) */

@@ -12,3 +12,7 @@ export { default as StarFilledIcon } from "./icons/star-filled-icon";
 export { default as StarEmptyIcon } from "./icons/star-empty-icon";
 export { default as SpinnerDotIcon } from "./icons/spinner-dot-icon";
 export { default as spinnerRingImage } from "./images/spinner-ring.png";
+export { default as BusIcon } from "./icons/bus-icon";
+export { default as ReviewStarIcon } from "./icons/review-star-icon";
+export { default as MapPinIcon } from "./icons/map-pin-icon";
+export { default as RecommendPinIcon } from "./icons/recommend-pin-icon";

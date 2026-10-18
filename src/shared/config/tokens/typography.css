@@ -6,6 +6,10 @@
 @theme {
   --text-*: initial;
 
+  /* 모드 시작 화면 제목 (STORY MODE 등) */
+  --text-display: 2.5rem;
+  --text-display--line-height: 1.32;
+
   --text-point: 1.5rem;
   --text-point--line-height: 1.6;
 
