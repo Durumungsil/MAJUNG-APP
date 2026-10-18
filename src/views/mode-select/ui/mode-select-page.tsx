@@ -13,7 +13,7 @@ export default function ModeSelectPage({ groupId }: ModeSelectPageProps) {
 
   return (
     <Screen className="overflow-x-clip">
-      <div className="flex flex-col gap-7.25">
+      <div className="flex flex-col gap-7">
         <CloseHeader closeHref={`/groups/${group.id}`} />
         <h1 className="text-xl text-text-primary">
           {group.name}로 여행을 시작해요!
