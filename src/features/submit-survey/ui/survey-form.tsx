@@ -30,7 +30,7 @@ export default function SurveyForm({ submittedHref }: SurveyFormProps) {
   }
 
   return (
-    <form onSubmit={handleFormSubmit} className="flex flex-col gap-26.5">
+    <form onSubmit={handleFormSubmit} className="flex flex-col gap-25">
       <div className="flex flex-col gap-12.5">
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-1.25">
@@ -49,7 +49,7 @@ export default function SurveyForm({ submittedHref }: SurveyFormProps) {
         </div>
 
         <div className="flex flex-col gap-12.5">
-          <div className="flex flex-col gap-7">
+          <div className="flex flex-col gap-6">
             <div className="flex items-center gap-8">
               <label htmlFor={`${id}-budget`} className="shrink-0 text-m text-black">
                 예산
@@ -89,7 +89,9 @@ export default function SurveyForm({ submittedHref }: SurveyFormProps) {
         </div>
       </div>
 
-      <Button type="submit">제출하기</Button>
+      <Button type="submit" size="xl" className="h-11.25">
+        제출하기
+      </Button>
     </form>
   );
 }

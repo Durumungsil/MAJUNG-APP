@@ -10,7 +10,7 @@ export default function TransportOptions() {
           <label
             key={option.value}
             className={cn(
-              "flex h-24 flex-1 cursor-pointer flex-col items-center justify-end rounded-lg border-2 border-transparent bg-secondary-300 p-2.5 text-xs text-black",
+              "flex h-15 flex-1 cursor-pointer flex-col items-center justify-end rounded-lg border-2 border-transparent bg-secondary-300 p-2.5 text-xs text-black",
               "has-checked:border-secondary-400 has-focus-visible:ring-1 has-focus-visible:ring-secondary-600",
             )}
           >

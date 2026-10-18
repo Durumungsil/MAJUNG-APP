@@ -12,7 +12,7 @@ export default function SurveyPage({ groupId }: SurveyPageProps) {
   if (!group) notFound();
 
   return (
-    <Screen className="gap-8.5">
+    <Screen className="gap-7">
       <CloseHeader closeHref={`/groups/${group.id}`} />
       <SurveyForm submittedHref={`/groups/${group.id}/survey/waiting`} />
     </Screen>
