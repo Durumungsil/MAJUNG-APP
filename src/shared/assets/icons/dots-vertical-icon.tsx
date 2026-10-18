@@ -6,7 +6,7 @@ type DotsVerticalIconProps = {
 export default function DotsVerticalIcon({ className }: DotsVerticalIconProps) {
   return (
     <svg
-      viewBox="0 0 24 24"
+      viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
@@ -14,7 +14,7 @@ export default function DotsVerticalIcon({ className }: DotsVerticalIconProps) {
     >
       <g>
         <path
-          d="M12 6H12.01M12 12H12.01M12 18H12.01"
+          d="M10 5H10.0083M10 10H10.0083M10 15H10.0083"
           strokeWidth="3"
           strokeLinecap="round"
           stroke="currentColor"
