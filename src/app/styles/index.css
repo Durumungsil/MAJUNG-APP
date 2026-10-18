@@ -11,3 +11,11 @@
     @apply bg-primary-100 font-sans text-s text-foreground;
   }
 }
+
+/* 가로 스와이프 영역의 스크롤바 숨김 (스크롤은 유지) */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

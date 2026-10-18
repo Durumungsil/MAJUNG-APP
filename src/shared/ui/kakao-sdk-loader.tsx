@@ -6,9 +6,10 @@ import { getKakaoMaps, getKakaoMapsSdkUrl } from "@/shared/lib/kakao-maps";
 
 interface KakaoSdkLoaderProps {
   onReady: () => void;
+  onError?: () => void;
 }
 
-export default function KakaoSdkLoader({ onReady }: KakaoSdkLoaderProps) {
+export default function KakaoSdkLoader({ onReady, onError }: KakaoSdkLoaderProps) {
   function handleScriptReady() {
     getKakaoMaps()?.load(onReady);
   }
@@ -20,6 +21,7 @@ export default function KakaoSdkLoader({ onReady }: KakaoSdkLoaderProps) {
       src={getKakaoMapsSdkUrl(KAKAO_MAP_APP_KEY)}
       strategy="afterInteractive"
       onReady={handleScriptReady}
+      onError={onError}
     />
   );
 }

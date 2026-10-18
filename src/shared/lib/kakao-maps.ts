@@ -1,17 +1,33 @@
+/** 카카오맵 JS SDK 중 마중에서 쓰는 부분만 옮긴 타입 */
 export interface KakaoLatLng {
   getLat(): number;
   getLng(): number;
 }
 
+export interface KakaoLatLngBounds {
+  extend(latLng: KakaoLatLng): void;
+}
+
 export interface KakaoMap {
   setCenter(latLng: KakaoLatLng): void;
   setLevel(level: number): void;
+  setBounds(
+    bounds: KakaoLatLngBounds,
+    paddingTop?: number,
+    paddingRight?: number,
+    paddingBottom?: number,
+    paddingLeft?: number,
+  ): void;
   relayout(): void;
 }
 
 export interface KakaoCustomOverlay {
   setMap(map: KakaoMap | null): void;
   setPosition(latLng: KakaoLatLng): void;
+}
+
+export interface KakaoPolyline {
+  setMap(map: KakaoMap | null): void;
 }
 
 export interface KakaoRoadview {
@@ -27,9 +43,10 @@ export interface KakaoRoadviewClient {
   ): void;
 }
 
-interface KakaoMapsNamespace {
+export interface KakaoMapsNamespace {
   load(callback: () => void): void;
   LatLng: new (lat: number, lng: number) => KakaoLatLng;
+  LatLngBounds: new () => KakaoLatLngBounds;
   Map: new (
     container: HTMLElement,
     options: { center: KakaoLatLng; level?: number; draggable?: boolean },
@@ -43,6 +60,12 @@ interface KakaoMapsNamespace {
     zIndex?: number;
     clickable?: boolean;
   }) => KakaoCustomOverlay;
+  Polyline: new (options: {
+    path: KakaoLatLng[];
+    strokeWeight?: number;
+    strokeColor?: string;
+    strokeOpacity?: number;
+  }) => KakaoPolyline;
   Roadview: new (container: HTMLElement) => KakaoRoadview;
   event: {
     addListener(target: KakaoRoadview, type: "init", handler: () => void): void;

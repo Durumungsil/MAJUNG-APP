@@ -12,6 +12,7 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
 };
 
 const SIZE_CLASS: Record<ButtonSize, string> = {
+  /** Figma 텍스트 스타일 L(20px)을 쓰는 하단 주요 버튼 */
   xl: "w-full px-5 py-2 text-l",
   lg: "w-full px-5 py-2 text-m",
   md: "px-5 py-1.5 text-s",
