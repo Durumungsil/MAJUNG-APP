@@ -1,4 +1,5 @@
 import { GroupCard, getGroups } from "@/entities/group";
+import { CreateGroupSuccessModal } from "@/features/create-group";
 import { SurveyRequestBanner } from "@/features/submit-survey";
 import { Screen } from "@/shared/ui";
 import GroupListHeader from "./group-list-header";
@@ -23,6 +24,7 @@ export default function GroupListPage() {
           </li>
         ))}
       </ul>
+      <CreateGroupSuccessModal />
     </Screen>
   );
 }

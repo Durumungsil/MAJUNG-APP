@@ -1,52 +1,28 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { GroupForm, type GroupFormValues } from "@/entities/group";
-import { CopyButton, Modal, TextField } from "@/shared/ui";
+import { useCreatedGroupStore } from "../model/created-group-store";
 
 const MOCK_CREATED_INVITE_CODE = "B2K9QF";
 
 export default function CreateGroupForm() {
   const router = useRouter();
-  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const setInviteCode = useCreatedGroupStore((state) => state.setInviteCode);
 
   function handleGroupSubmit(values: GroupFormValues) {
     void values;
+    // 완료 모달은 그룹 목록 화면 위에 띄움 (Figma: 그룹 생성 성공)
     setInviteCode(MOCK_CREATED_INVITE_CODE);
-  }
-
-  function handleSuccessModalClose() {
     router.push("/groups");
   }
 
   return (
-    <>
-      <GroupForm
-        dateLabels={{ start: "시작 시간", end: "종료 시간" }}
-        submitLabel="그룹 생성하기"
-        onSubmit={handleGroupSubmit}
-      />
-      <Modal
-        open={inviteCode !== null}
-        onClose={handleSuccessModalClose}
-        labelledBy="create-group-success-title"
-        className="gap-4"
-      >
-        <h2 id="create-group-success-title" className="text-xl text-text-primary">
-          그룹 생성이 완료 되었어요!
-        </h2>
-        <div className="flex w-full items-center gap-3.25">
-          <TextField
-            size="sm"
-            readOnly
-            value={inviteCode ?? ""}
-            aria-label="초대 코드"
-            className="w-47.5"
-          />
-          <CopyButton value={inviteCode ?? ""} label="초대 코드 복사" className="size-5" />
-        </div>
-      </Modal>
-    </>
+    <GroupForm
+      layout="create"
+      dateLabels={{ start: "시작 시간", end: "종료 시간" }}
+      submitLabel="그룹 생성하기"
+      onSubmit={handleGroupSubmit}
+    />
   );
 }

@@ -18,7 +18,7 @@ export default function GroupDetailPage({ groupId }: GroupDetailPageProps) {
   return (
     <Screen>
       <GroupDetailHeader groupId={group.id} role={group.myRole} />
-      <div className="mt-12.75 flex flex-col gap-11">
+      <div className="mt-8 flex flex-col gap-10">
         <GroupTitleBar group={group} />
         <dl className="flex flex-col gap-6">
           <InfoRow label="그룹 리더">
@@ -36,15 +36,15 @@ export default function GroupDetailPage({ groupId }: GroupDetailPageProps) {
           )}
         </dl>
       </div>
-      <div className={isLeader ? "mt-10.5" : "mt-auto"}>
+      <div className="mt-12.5">
         <TripPeriodCard group={group} />
       </div>
       {isLeader ? (
-        <Button href={`/groups/${group.id}/mode`} className="mt-auto">
+        <Button href={`/groups/${group.id}/mode`} size="xl" className="mt-20">
           여행 시작하기
         </Button>
       ) : (
-        <div className="mt-12.75 mb-auto">
+        <div className="mt-8">
           <AvatarStack members={members} />
         </div>
       )}

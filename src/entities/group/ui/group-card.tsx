@@ -11,7 +11,7 @@ export default function GroupCard({ group }: GroupCardProps) {
   return (
     <Link
       href={`/groups/${group.id}`}
-      className="flex flex-col gap-2 rounded-lg bg-primary-200 px-5 py-4"
+      className="flex flex-col gap-2 rounded-lg bg-primary-100 px-5 py-4"
     >
       <p className="text-m text-black">{group.name}</p>
       <div className="flex flex-col">

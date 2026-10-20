@@ -6,14 +6,14 @@ type PlusIconProps = {
 export default function PlusIcon({ className }: PlusIconProps) {
   return (
     <svg
-      viewBox="0 0 22 22"
+      viewBox="0 0 14 14"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-hidden
     >
       <path
-        d="M11 21V11M11 11V1M11 11H21M11 11H1"
+        d="M7 13V7M7 7V1M7 7H13M7 7H1"
         strokeWidth="2"
         strokeLinecap="round"
         stroke="currentColor"

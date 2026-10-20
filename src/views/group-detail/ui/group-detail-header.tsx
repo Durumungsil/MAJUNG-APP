@@ -28,17 +28,18 @@ export default function GroupDetailHeader({ groupId, role }: GroupDetailHeaderPr
   };
   const menuItems: DropdownMenuItem[] =
     role === "leader"
-      ? [{ label: "그룹 수정", href: `/groups/${groupId}/edit` }, membersItem]
-      : [{ label: "그룹 탈퇴", onSelect: handleLeaveSelect }, membersItem];
+      ? [{ label: "그룹 수정하기", href: `/groups/${groupId}/edit` }, membersItem]
+      : [{ label: "그룹 탈퇴하기", onSelect: handleLeaveSelect }, membersItem];
 
   return (
     <>
       <BackHeader
         backHref="/groups"
+        size="sm"
         right={
           <DropdownMenu
             triggerLabel="그룹 메뉴"
-            trigger={<DotsVerticalIcon className="size-6" />}
+            trigger={<DotsVerticalIcon className="size-5" />}
             items={menuItems}
           />
         }

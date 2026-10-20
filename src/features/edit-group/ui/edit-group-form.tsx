@@ -24,6 +24,7 @@ export default function EditGroupForm({ group }: EditGroupFormProps) {
         startDate: group.startDate,
         endDate: group.endDate,
       }}
+      layout="edit"
       dateLabels={{ start: "시작 일시", end: "종료 일시" }}
       submitLabel="수정 완료"
       onSubmit={handleGroupSubmit}

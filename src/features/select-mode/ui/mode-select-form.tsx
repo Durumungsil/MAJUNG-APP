@@ -32,8 +32,8 @@ export default function ModeSelectForm({ confirmHref }: ModeSelectFormProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col justify-between gap-10">
-      <div className="mt-10 flex flex-col items-center gap-19.25">
+    <div className="mt-9.75 flex flex-col gap-29.25">
+      <div className="flex flex-col items-center gap-19.25">
         <div
           role="group"
           aria-roledescription="캐러셀"
@@ -74,7 +74,7 @@ export default function ModeSelectForm({ confirmHref }: ModeSelectFormProps) {
           {current.description}
         </p>
       </div>
-      <Button variant="primary" href={confirmHref}>
+      <Button href={confirmHref} size="xl">
         모드 확정하기
       </Button>
     </div>

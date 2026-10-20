@@ -1,9 +1,9 @@
 export const MAX_FOOD_RATING = 5;
 
 export const TRANSPORT_OPTIONS = [
-  { value: "walk", label: "걷기" },
-  { value: "bus", label: "버스" },
-  { value: "subway", label: "지하철" },
+  { value: "walk", label: "도보" },
+  { value: "public-transit", label: "대중교통" },
+  { value: "car", label: "자가용" },
   { value: "airplane", label: "비행기" },
 ] as const;
 

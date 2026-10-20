@@ -16,7 +16,7 @@ const SIZE_CLASS: Record<ButtonSize, string> = {
   xl: "w-full px-5 py-2 text-l",
   lg: "w-full px-5 py-2 text-m",
   md: "px-5 py-1.5 text-s",
-  sm: "w-25 px-2.5 py-1.25 text-s",
+  sm: "px-5 py-1.25 text-s",
   /** 글자 폭에 맞춤 (입력칸 옆 확인 버튼 등) */
   xs: "px-2.5 py-1.25 text-s",
 };

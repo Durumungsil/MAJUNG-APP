@@ -8,7 +8,7 @@ type MemberItemProps = {
 
 export default function MemberItem({ member }: MemberItemProps) {
   return (
-    <li className="flex items-center gap-5 p-2.5">
+    <li className="flex items-center gap-5.25 p-2.5">
       <Avatar src={member.avatarUrl} alt="" size="md" />
       <div className="flex flex-col">
         {member.isLeader && <CrownIcon className="h-5 w-5 text-secondary-500" />}
