@@ -7,15 +7,25 @@ import { createFoodPreference, toggleRating, updateFoodPreference } from "../lib
 import type { FoodPreference } from "../model/types";
 import StarRating from "./star-rating";
 
-function createInitialRows(prefix: string): FoodPreference[] {
-  return Array.from({ length: INITIAL_FOOD_ROW_COUNT }, (_, index) =>
-    createFoodPreference(`${prefix}-${index}`),
-  );
+type FoodPreferenceListProps = {
+  /** 이전 취향을 불러왔을 때 채울 값 */
+  defaultFoods?: Pick<FoodPreference, "name" | "rating">[];
+};
+
+function createInitialRows(
+  prefix: string,
+  defaultFoods: Pick<FoodPreference, "name" | "rating">[] = [],
+): FoodPreference[] {
+  const rowCount = Math.max(INITIAL_FOOD_ROW_COUNT, defaultFoods.length);
+  return Array.from({ length: rowCount }, (_, index) => ({
+    ...createFoodPreference(`${prefix}-${index}`),
+    ...defaultFoods[index],
+  }));
 }
 
-export default function FoodPreferenceList() {
+export default function FoodPreferenceList({ defaultFoods }: FoodPreferenceListProps) {
   const id = useId();
-  const [rows, setRows] = useState<FoodPreference[]>(() => createInitialRows(id));
+  const [rows, setRows] = useState<FoodPreference[]>(() => createInitialRows(id, defaultFoods));
 
   function handleAddClick() {
     setRows((prev) => [...prev, createFoodPreference(`${id}-${prev.length}`)]);
@@ -46,6 +56,8 @@ export default function FoodPreferenceList() {
                 aria-label={`선호 음식 ${index + 1}`}
                 className="flex-1"
               />
+              {/* 별점은 버튼이라 폼 값에 안 잡히므로 숨은 입력으로 함께 제출함 */}
+              <input type="hidden" name="foodRating" value={row.rating} />
               <StarRating
                 value={row.rating}
                 label={`선호 음식 ${index + 1} 선호도`}
