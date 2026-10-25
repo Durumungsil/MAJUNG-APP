@@ -3,7 +3,7 @@ import { MOCK_RECOMMENDED_PLACES, createMockNearbyPlaces } from "../config/mock-
 import type { Place } from "../model/types";
 
 // TODO: 장소 API 연동 시 어댑터(외부 응답 → Place) + TanStack Query 훅으로 교체
-export function getRecommendedPlaces(groupId: string): Place[] {
+export function getRecommendedPlaces(groupId: number): Place[] {
   void groupId;
   return MOCK_RECOMMENDED_PLACES;
 }

@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { CalendarIcon, LocationIcon } from "@/shared/assets";
 import { formatCardDate } from "../lib/format-card-date";
-import type { Group } from "../model/types";
+import type { GroupSummary } from "../model/types";
 
 type GroupCardProps = {
-  group: Pick<Group, "id" | "name" | "destination" | "createdAt">;
+  group: Pick<GroupSummary, "id" | "name" | "region" | "startDate">;
 };
 
 export default function GroupCard({ group }: GroupCardProps) {
@@ -15,14 +15,18 @@ export default function GroupCard({ group }: GroupCardProps) {
     >
       <p className="text-m text-black">{group.name}</p>
       <div className="flex flex-col">
-        <p className="flex items-center gap-1 text-xxs text-primary-800">
-          <LocationIcon className="size-3" />
-          {group.destination}
-        </p>
-        <p className="flex items-center gap-1 text-xxs text-text-muted">
-          <CalendarIcon className="size-3" />
-          {formatCardDate(group.createdAt)}
-        </p>
+        {group.region && (
+          <p className="flex items-center gap-1 text-xxs text-primary-800">
+            <LocationIcon className="size-3" />
+            {group.region}
+          </p>
+        )}
+        {group.startDate && (
+          <p className="flex items-center gap-1 text-xxs text-text-muted">
+            <CalendarIcon className="size-3" />
+            {formatCardDate(group.startDate)}
+          </p>
+        )}
       </div>
     </Link>
   );

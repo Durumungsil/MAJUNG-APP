@@ -1,14 +1,40 @@
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/shared/api";
+import { sortLeaderFirst } from "../lib/sort-members";
 import type { Member } from "../model/types";
+import { userKeys } from "./query-keys";
 
-// TODO: 그룹 멤버 API 연동 전까지 사용하는 퍼블리싱용 목 데이터
-const MOCK_MEMBERS: Member[] = [
-  { id: "somonox", nickname: "somonox", avatarUrl: "/mock/avatars/avatar-2.jpg", isLeader: true },
-  { id: "yajaya", nickname: "yajaya", avatarUrl: "/mock/avatars/avatar-1.jpg", isLeader: false },
-  { id: "soriii1", nickname: "soriii1", avatarUrl: "/mock/avatars/avatar-3.jpg", isLeader: false },
-];
+/** GET /api/v1/groups/{groupId}/members 응답 (snake_case 그대로) */
+type GroupMembersResponse = {
+  group_id: number;
+  members: {
+    user_id: number;
+    user_name: string;
+    is_owner: boolean;
+    // preferences_completed도 내려오지만 누가 설문을 마쳤는지 드러나지 않도록 쓰지 않음
+    joined_at: string;
+  }[];
+  count: number;
+};
 
 /** 리더가 맨 앞에 오도록 정렬된 그룹 멤버 목록 */
-export function getMembers(groupId: string): Member[] {
-  void groupId;
-  return [...MOCK_MEMBERS].sort((a, b) => Number(b.isLeader) - Number(a.isLeader));
+export async function fetchGroupMembers(groupId: number): Promise<Member[]> {
+  const data = await apiRequest<GroupMembersResponse>(`/api/v1/groups/${groupId}/members`);
+  return sortLeaderFirst(
+    data.members.map((member) => ({
+      id: member.user_id,
+      nickname: member.user_name,
+      avatarUrl: null,
+      isLeader: member.is_owner,
+    })),
+  );
+}
+
+/** groupId가 아직 없으면(null) 요청하지 않음 */
+export function useGroupMembers(groupId: number | null) {
+  return useQuery({
+    queryKey: userKeys.groupMembers(groupId ?? 0),
+    queryFn: () => fetchGroupMembers(groupId ?? 0),
+    enabled: groupId !== null,
+  });
 }
