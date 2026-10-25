@@ -1,4 +1,5 @@
-import { Button, Screen } from "@/shared/ui";
+import { GoogleLoginButton } from "@/features/login-with-google";
+import { Screen } from "@/shared/ui";
 
 export default function LoginPage() {
   return (
@@ -8,10 +9,7 @@ export default function LoginPage() {
         <br />
         로그인하고 즐거운 여행을 시작해요
       </p>
-      {/* TODO: Supabase Google OAuth 연동 */}
-      <Button href="/" className="mt-auto mb-35">
-        구글로 로그인하기
-      </Button>
+      <GoogleLoginButton className="mt-auto mb-35" />
     </Screen>
   );
 }

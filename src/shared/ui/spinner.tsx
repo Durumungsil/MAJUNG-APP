@@ -5,7 +5,8 @@ import { SpinnerDotIcon, spinnerRingImage } from "@/shared/assets";
 export default function Spinner() {
   return (
     <div role="status" aria-label="로딩 중" className="relative size-20 animate-spin">
-      <Image src={spinnerRingImage} alt="" fill sizes="80px" />
+      {/* 렌더되면 항상 화면 중앙에 보이므로 지연 로딩하지 않음 */}
+      <Image src={spinnerRingImage} alt="" fill sizes="80px" loading="eager" />
       <SpinnerDotIcon className="absolute top-[85%] left-[43%] size-3 text-primary-500" />
     </div>
   );
