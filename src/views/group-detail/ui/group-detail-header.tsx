@@ -7,7 +7,7 @@ import { DotsVerticalIcon } from "@/shared/assets";
 import { BackHeader, DropdownMenu, type DropdownMenuItem } from "@/shared/ui";
 
 type GroupDetailHeaderProps = {
-  groupId: string;
+  groupId: number;
   role: GroupRole;
 };
 
@@ -26,10 +26,11 @@ export default function GroupDetailHeader({ groupId, role }: GroupDetailHeaderPr
     label: "그룹 멤버 보기",
     href: `/groups/${groupId}/members`,
   };
+  const leaveItem: DropdownMenuItem = { label: "그룹 탈퇴하기", onSelect: handleLeaveSelect };
   const menuItems: DropdownMenuItem[] =
     role === "leader"
-      ? [{ label: "그룹 수정하기", href: `/groups/${groupId}/edit` }, membersItem]
-      : [{ label: "그룹 탈퇴하기", onSelect: handleLeaveSelect }, membersItem];
+      ? [{ label: "그룹 수정하기", href: `/groups/${groupId}/edit` }, membersItem, leaveItem]
+      : [leaveItem, membersItem];
 
   return (
     <>
@@ -44,7 +45,12 @@ export default function GroupDetailHeader({ groupId, role }: GroupDetailHeaderPr
           />
         }
       />
-      <LeaveGroupModal groupId={groupId} open={leaveModalOpen} onClose={handleLeaveModalClose} />
+      <LeaveGroupModal
+        groupId={groupId}
+        isLeader={role === "leader"}
+        open={leaveModalOpen}
+        onClose={handleLeaveModalClose}
+      />
     </>
   );
 }

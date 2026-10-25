@@ -1,14 +1,33 @@
-import { notFound } from "next/navigation";
-import { getGroup } from "@/entities/group";
-import { Button, ModeTitle, Screen } from "@/shared/ui";
+"use client";
+
+import { useGroupByParam } from "@/entities/group";
+import { Button, ErrorState, ModeTitle, Screen, Skeleton } from "@/shared/ui";
 
 type StoryStartPageProps = {
   groupId: string;
 };
 
 export default function StoryStartPage({ groupId }: StoryStartPageProps) {
-  const group = getGroup(groupId);
-  if (!group) notFound();
+  const { data: group, isPending, isError, refetch } = useGroupByParam(groupId);
+
+  function handleRetry() {
+    void refetch();
+  }
+
+  if (isPending) {
+    return (
+      <Screen>
+        <Skeleton className="mt-5 h-40" />
+      </Screen>
+    );
+  }
+  if (isError) {
+    return (
+      <Screen>
+        <ErrorState onRetry={handleRetry} />
+      </Screen>
+    );
+  }
 
   return (
     <Screen className="items-center">

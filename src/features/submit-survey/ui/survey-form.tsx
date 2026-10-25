@@ -1,32 +1,87 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useId, type FormEvent } from "react";
-import { Button, TextField } from "@/shared/ui";
-import FoodPreferenceList from "./food-preference-list";
-import TransportOptions from "./transport-options";
-import TravelStyleOptions from "./travel-style-options";
+import { useState, type FormEvent } from "react";
+import { isApiError } from "@/shared/api";
+import { ERROR_MESSAGES } from "@/shared/config/error-messages";
+import { useToast } from "@/shared/lib";
+import { Button, Toast } from "@/shared/ui";
+import { useLoadPreviousPreference, useSavePreference } from "../api/save-preference";
+import {
+  toPreferencePayload,
+  toSurveyDefaults,
+  type SurveyInvalidField,
+} from "../lib/preference-payload";
+import type { SurveyDefaults, SurveyValues } from "../model/types";
+import SurveyFields from "./survey-fields";
 
 type SurveyFormProps = {
+  groupId: number;
   submittedHref: string;
 };
+
+const INVALID_FIELD_MESSAGES: Record<SurveyInvalidField, string> = {
+  budget: ERROR_MESSAGES.surveyBudgetInvalid,
+  transport: ERROR_MESSAGES.surveyTransportRequired,
+  travelStyle: ERROR_MESSAGES.surveyTravelStyleRequired,
+};
+
+function readSurveyValues(form: HTMLFormElement): SurveyValues {
+  const data = new FormData(form);
+  return {
+    budget: String(data.get("budget") ?? "").trim(),
+    allergy: String(data.get("allergy") ?? ""),
+    foodNames: data.getAll("foodName").map(String),
+    foodRatings: data.getAll("foodRating").map(Number),
+    transports: data.getAll("transport").map(String),
+    travelStyles: data.getAll("travelStyle").map(String),
+  };
+}
 
 /**
  * 취향 설문 폼.
  * 응답(특히 알레르기)은 민감 정보이므로 브라우저 저장소에 남기지 않고 폼 상태로만 다룸.
  */
-export default function SurveyForm({ submittedHref }: SurveyFormProps) {
+export default function SurveyForm({ groupId, submittedHref }: SurveyFormProps) {
   const router = useRouter();
-  const id = useId();
+  const { toastMessage, showToast } = useToast();
+  const [defaults, setDefaults] = useState<SurveyDefaults>();
+  // 이전 취향을 불러오면 입력칸을 새 기본값으로 다시 그림
+  const [fieldsKey, setFieldsKey] = useState(0);
+  const { mutate: savePreference, isPending: isSaving } = useSavePreference(groupId);
+  const { mutate: loadPrevious, isPending: isLoading } = useLoadPreviousPreference(groupId);
 
   function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    // TODO: 설문 제출 API 연동 (응답 원문을 로그·URL에 남기지 말 것)
-    router.push(submittedHref);
+    // 응답 원문을 로그·URL에 남기지 말 것
+    const result = toPreferencePayload(readSurveyValues(event.currentTarget));
+    if (!result.ok) {
+      showToast(INVALID_FIELD_MESSAGES[result.field]);
+      return;
+    }
+
+    savePreference(result.payload, {
+      onSuccess: () => router.push(submittedHref),
+      onError: (error) =>
+        showToast(
+          isApiError(error, 409) ? ERROR_MESSAGES.noActiveTrip : ERROR_MESSAGES.requestFailed,
+        ),
+    });
   }
 
   function handleLoadPreviousClick() {
-    // TODO: 이전 취향 설문지 불러오기 API 연동
+    loadPrevious(undefined, {
+      onSuccess: (preference) => {
+        setDefaults(toSurveyDefaults(preference));
+        setFieldsKey((prev) => prev + 1);
+      },
+      onError: (error) =>
+        showToast(
+          isApiError(error, 404)
+            ? ERROR_MESSAGES.previousSurveyNotFound
+            : ERROR_MESSAGES.loadFailed,
+        ),
+    });
   }
 
   return (
@@ -42,56 +97,21 @@ export default function SurveyForm({ submittedHref }: SurveyFormProps) {
           <button
             type="button"
             onClick={handleLoadPreviousClick}
-            className="w-full rounded-lg bg-secondary-400 px-5 py-1.5 text-s text-black"
+            disabled={isLoading}
+            aria-busy={isLoading}
+            className="w-full rounded-lg bg-secondary-400 px-5 py-1.5 text-s text-black disabled:opacity-50"
           >
             이전 취향 설문지 불러오기
           </button>
         </div>
 
-        <div className="flex flex-col gap-12.5">
-          <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-8">
-              <label htmlFor={`${id}-budget`} className="shrink-0 text-m text-black">
-                예산
-              </label>
-              <TextField
-                id={`${id}-budget`}
-                name="budget"
-                inputMode="numeric"
-                placeholder="최대 예산을 입력하세요"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-5">
-                <label htmlFor={`${id}-allergy`} className="shrink-0 text-m text-black">
-                  알러지
-                </label>
-                <TextField
-                  id={`${id}-allergy`}
-                  name="allergy"
-                  autoComplete="off"
-                  placeholder="알러지를 입력하세요"
-                  aria-describedby={`${id}-allergy-hint`}
-                />
-              </div>
-              <p id={`${id}-allergy-hint`} className="text-right text-xs text-text-muted">
-                여러개를 입력해야한다면 쉼표(,)로 띄어쓰기 없이 붙여주세요!
-              </p>
-            </div>
-          </div>
-
-          <FoodPreferenceList />
-
-          <div className="flex flex-col gap-13.5">
-            <TransportOptions />
-            <TravelStyleOptions />
-          </div>
-        </div>
+        <SurveyFields key={fieldsKey} defaults={defaults} />
       </div>
 
-      <Button type="submit" size="xl" className="h-11.25">
+      <Button type="submit" size="xl" className="h-11.25" disabled={isSaving} aria-busy={isSaving}>
         제출하기
       </Button>
+      <Toast open={toastMessage !== null} message={toastMessage ?? ""} />
     </form>
   );
 }

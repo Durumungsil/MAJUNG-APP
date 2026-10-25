@@ -1,4 +1,18 @@
 export const ERROR_MESSAGES = {
   mapLoadFailed: "지도를 불러오지 못했어요",
   loginFailed: "로그인하지 못했어요. 다시 시도해 주세요",
+  loadFailed: "정보를 불러오지 못했어요",
+  requestFailed: "요청을 처리하지 못했어요. 다시 시도해 주세요",
+  groupFormInvalid: "입력한 그룹 정보를 다시 확인해 주세요",
+  inviteCodeInvalid: "초대 코드를 다시 확인해 주세요",
+  groupFull: "그룹 인원이 가득 찼어요",
+  maxMembersBelowCurrent: "최대 인원은 현재 인원보다 적을 수 없어요",
+  leaderOnly: "그룹 대표자만 할 수 있어요",
+  noActiveTrip: "진행 중인 여행이 없어요",
+  tripInProgress: "아직 끝나지 않은 여행이 있어요",
+  leaderCannotLeave: "대표자를 다른 멤버에게 넘긴 뒤 탈퇴할 수 있어요",
+  surveyBudgetInvalid: "예산은 0원부터 1억 원까지 숫자로 입력해 주세요",
+  surveyTransportRequired: "선호하는 교통수단을 선택해 주세요",
+  surveyTravelStyleRequired: "좋아하는 여행 방식을 선택해 주세요",
+  previousSurveyNotFound: "불러올 이전 취향 설문지가 없어요",
 } as const;

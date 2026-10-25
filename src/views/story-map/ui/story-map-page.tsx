@@ -1,16 +1,35 @@
-import { notFound } from "next/navigation";
-import { getGroup } from "@/entities/group";
+"use client";
+
+import { useGroupByParam } from "@/entities/group";
 import { ScheduleHeader, getTimelineStops } from "@/entities/journey";
 import { MapExplorer } from "@/features/explore-map";
-import { TextLink } from "@/shared/ui";
+import { ErrorState, Screen, Skeleton, TextLink } from "@/shared/ui";
 
 type StoryMapPageProps = {
   groupId: string;
 };
 
 export default function StoryMapPage({ groupId }: StoryMapPageProps) {
-  const group = getGroup(groupId);
-  if (!group) notFound();
+  const { data: group, isPending, isError, refetch } = useGroupByParam(groupId);
+
+  function handleRetry() {
+    void refetch();
+  }
+
+  if (isPending) {
+    return (
+      <Screen>
+        <Skeleton className="mt-5 h-40" />
+      </Screen>
+    );
+  }
+  if (isError) {
+    return (
+      <Screen>
+        <ErrorState onRetry={handleRetry} />
+      </Screen>
+    );
+  }
 
   const stops = getTimelineStops(group.id);
 
@@ -19,8 +38,8 @@ export default function StoryMapPage({ groupId }: StoryMapPageProps) {
       <MapExplorer stops={stops} />
       <div className="mt-8 flex flex-col gap-5 px-page">
         <ScheduleHeader
-          startDate={group.startDate}
-          endDate={group.endDate}
+          startDate={group.startDate ?? ""}
+          endDate={group.endDate ?? ""}
           action={<TextLink href={`/groups/${group.id}/story/timeline`}>타임라인 보기</TextLink>}
         />
         <p className="text-s text-text-primary">

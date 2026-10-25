@@ -23,6 +23,8 @@ type GroupFormProps = {
   defaultValues?: Partial<GroupFormValues>;
   dateLabels: { start: string; end: string };
   submitLabel: string;
+  /** 저장 요청 중이면 제출 버튼을 잠금 */
+  submitting?: boolean;
   onSubmit: (values: GroupFormValues) => void;
 };
 
@@ -42,15 +44,22 @@ export default function GroupForm({
   defaultValues,
   dateLabels,
   submitLabel,
+  submitting = false,
   onSubmit,
 }: GroupFormProps) {
   const id = useId();
   const [maxMembers, setMaxMembers] = useState(defaultValues?.maxMembers ?? "");
+  // 종료일 선택기가 시작일 이전 날짜를 고를 수 없도록 min으로 씀
+  const [startDate, setStartDate] = useState(defaultValues?.startDate ?? "");
   const showHint = exceedsMaxMembers(maxMembers);
   const fieldClass = FIELD_CLASS[layout];
 
   function handleMaxMembersChange(event: ChangeEvent<HTMLInputElement>) {
     setMaxMembers(sanitizeMaxMembersInput(event.target.value));
+  }
+
+  function handleStartDateChange(event: ChangeEvent<HTMLInputElement>) {
+    setStartDate(event.target.value);
   }
 
   function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
@@ -112,13 +121,15 @@ export default function GroupForm({
         </div>
         <div className="flex flex-col gap-6">
           <FormRow label={dateLabels.start} htmlFor={`${id}-start-date`}>
+            {/* 백엔드가 날짜(YYYY-MM-DD)만 받으므로 날짜 선택기를 씀. 값은 항상 YYYY-MM-DD 형식 */}
             <TextField
               className={fieldClass}
               id={`${id}-start-date`}
               name="startDate"
+              type="date"
               required
-              defaultValue={defaultValues?.startDate}
-              placeholder={`${dateLabels.start}을 입력하세요`}
+              value={startDate}
+              onChange={handleStartDateChange}
             />
           </FormRow>
           <FormRow label={dateLabels.end} htmlFor={`${id}-end-date`}>
@@ -126,14 +137,15 @@ export default function GroupForm({
               className={fieldClass}
               id={`${id}-end-date`}
               name="endDate"
+              type="date"
               required
+              min={startDate || undefined}
               defaultValue={defaultValues?.endDate}
-              placeholder={`${dateLabels.end}을 입력하세요`}
             />
           </FormRow>
         </div>
       </div>
-      <Button type="submit" size="xl">
+      <Button type="submit" size="xl" disabled={submitting} aria-busy={submitting}>
         {submitLabel}
       </Button>
     </form>
