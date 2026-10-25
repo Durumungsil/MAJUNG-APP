@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import AuthGuard from "@/app/providers/auth-guard";
 import { fontVariables } from "@/app/styles/fonts";
 import { THEME_COLOR } from "@/shared/config/theme";
 import "@/app/styles/index.css";
@@ -21,7 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="ko" className={`${fontVariables} antialiased`}>
       <body className="min-h-dvh">
         <div className="relative mx-auto flex min-h-dvh w-full max-w-mobile flex-col bg-background">
-          {children}
+          <AuthGuard>{children}</AuthGuard>
         </div>
       </body>
     </html>
