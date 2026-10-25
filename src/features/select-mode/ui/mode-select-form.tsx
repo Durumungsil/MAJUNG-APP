@@ -1,8 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, type CSSProperties } from "react";
-import { cn } from "@/shared/lib";
-import { Button } from "@/shared/ui";
+import { isApiError } from "@/shared/api";
+import { ERROR_MESSAGES } from "@/shared/config/error-messages";
+import { cn, useToast } from "@/shared/lib";
+import { Button, Toast } from "@/shared/ui";
+import { useSelectMode } from "../api/select-mode";
 import { DEFAULT_MODE_INDEX, TRAVEL_MODES } from "../config/modes";
 import { getSwipeStep, getVisibleSlots, wrapIndex } from "../lib/carousel";
 import { useSwipe } from "../model/use-swipe";
@@ -13,11 +17,15 @@ const SWIPE_THRESHOLD_PX = 50;
 const SLOT_RADIUS = 2;
 
 type ModeSelectFormProps = {
+  groupId: number;
   confirmHref: string;
 };
 
-export default function ModeSelectForm({ confirmHref }: ModeSelectFormProps) {
+export default function ModeSelectForm({ groupId, confirmHref }: ModeSelectFormProps) {
+  const router = useRouter();
   const [position, setPosition] = useState(DEFAULT_MODE_INDEX);
+  const { mutate: selectMode, isPending } = useSelectMode(groupId);
+  const { toastMessage, showToast } = useToast();
   const current = TRAVEL_MODES[wrapIndex(TRAVEL_MODES.length, position)];
 
   function handleSwipeEnd(dragX: number) {
@@ -29,6 +37,17 @@ export default function ModeSelectForm({ confirmHref }: ModeSelectFormProps) {
 
   function handleSlotClick(offset: number) {
     setPosition((prev) => prev + offset);
+  }
+
+  function handleConfirmClick() {
+    selectMode(current.apiValue, {
+      onSuccess: () => router.push(confirmHref),
+      onError: (error) => {
+        if (isApiError(error, 403)) showToast(ERROR_MESSAGES.leaderOnly);
+        else if (isApiError(error, 409)) showToast(ERROR_MESSAGES.noActiveTrip);
+        else showToast(ERROR_MESSAGES.requestFailed);
+      },
+    });
   }
 
   return (
@@ -74,9 +93,10 @@ export default function ModeSelectForm({ confirmHref }: ModeSelectFormProps) {
           {current.description}
         </p>
       </div>
-      <Button href={confirmHref} size="xl">
+      <Button size="xl" onClick={handleConfirmClick} disabled={isPending} aria-busy={isPending}>
         모드 확정하기
       </Button>
+      <Toast open={toastMessage !== null} message={toastMessage ?? ""} />
     </div>
   );
 }
