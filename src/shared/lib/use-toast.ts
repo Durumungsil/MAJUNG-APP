@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const TOAST_DURATION_MS = 2000;
+export const TOAST_DURATION_MS = 2000;
 
 /** Toast 컴포넌트에 넘길 메시지와, 메시지를 잠깐 띄우는 함수 */
 export function useToast() {
