@@ -8,6 +8,8 @@ type HintIntroModalProps = {
   limitSeconds: number;
   cancelHref: string;
   onStartClick: () => void;
+  /** 힌트를 받아오는 중이면 버튼을 막음 */
+  isStarting?: boolean;
 };
 
 function handleModalClose() {}
@@ -17,6 +19,7 @@ export default function HintIntroModal({
   limitSeconds,
   cancelHref,
   onStartClick,
+  isStarting = false,
 }: HintIntroModalProps) {
   return (
     <Modal
@@ -36,7 +39,13 @@ export default function HintIntroModal({
         <Button href={cancelHref} size="md" variant="tertiary">
           취소하기
         </Button>
-        <Button size="md" variant="secondary" onClick={onStartClick}>
+        <Button
+          size="md"
+          variant="secondary"
+          disabled={isStarting}
+          aria-busy={isStarting}
+          onClick={onStartClick}
+        >
           힌트 사용하기
         </Button>
       </div>
