@@ -33,9 +33,10 @@ export default function ScheduleHeader({
 
   return (
     <div className="flex items-start justify-between">
-      <div className="flex flex-col gap-3">
+      {/* Day 탭이 많아도 오른쪽 링크가 밀려나지 않게 탭 줄만 가로 스크롤함 */}
+      <div className="flex min-w-0 flex-1 flex-col gap-3">
         <h2 className="text-l text-text-primary">{dates[selectedIndex]}의 일정</h2>
-        <div className="flex gap-2">
+        <div className="scrollbar-none flex gap-2 overflow-x-auto">
           {dates.map((date, index) => {
             const selected = index === selectedIndex;
             return (
@@ -45,7 +46,7 @@ export default function ScheduleHeader({
                 aria-pressed={selected}
                 onClick={() => handleDayClick(index)}
                 className={cn(
-                  "rounded-lg px-4 py-1 text-xs whitespace-nowrap text-text-primary",
+                  "shrink-0 rounded-lg px-4 py-1 text-xs whitespace-nowrap text-text-primary",
                   selected ? "bg-secondary-400" : "bg-secondary-300",
                 )}
               >
@@ -55,7 +56,7 @@ export default function ScheduleHeader({
           })}
         </div>
       </div>
-      {action}
+      {action && <div className="shrink-0">{action}</div>}
     </div>
   );
 }
