@@ -2,14 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useGroupByParam, type Group } from "@/entities/group";
+import { getGroupRole, useGroupByParam, type Group } from "@/entities/group";
 import {
+  TimelineStopCard,
+  getDayStops,
   getTripDates,
   parseItineraryId,
   useItinerary,
   withItineraryId,
   type ItineraryDay,
 } from "@/entities/journey";
+import { useSessionStore } from "@/entities/session";
 import { TimelineEditor } from "@/features/reorder-timeline";
 import { useSaveDestinationSelection } from "@/features/select-place";
 import { isApiError } from "@/shared/api";
@@ -62,6 +65,9 @@ function StoryTimelineContent({
   const dates = getTripDates(group.startDate ?? "", group.endDate ?? "");
   const isMissing = itineraryId === null || isApiError(error, 404);
   const router = useRouter();
+  const userId = useSessionStore((state) => state.session?.userId ?? null);
+  // 순서 변경·확정은 대표자만 함. 멤버에게는 읽기 전용 목록을 보여줌
+  const isLeader = getGroupRole(group, userId) === "leader";
   const { mutate: saveSelection, isPending: isSaving } = useSaveDestinationSelection(group.id);
   const { toastMessage, showToast } = useToast();
 
@@ -93,7 +99,7 @@ function StoryTimelineContent({
           지도로 보기
         </TextLink>
       }
-      guide="장소를 꾹 눌러서 순서를 변경할 수 있어요"
+      guide={isLeader ? "장소를 꾹 눌러서 순서를 변경할 수 있어요" : undefined}
       selectedDayIndex={selectedDayIndex}
       onSelectedDayIndexChange={setSelectedDayIndex}
     >
@@ -101,6 +107,14 @@ function StoryTimelineContent({
         <TimelineMissing groupId={group.id} />
       ) : isError || !itinerary ? (
         <ErrorState onRetry={handleRetry} />
+      ) : !isLeader ? (
+        <ol aria-label="타임라인" className="flex flex-col gap-5">
+          {getDayStops(itinerary, dates[selectedDayIndex]).map((stop) => (
+            <li key={stop.id}>
+              <TimelineStopCard stop={stop} />
+            </li>
+          ))}
+        </ol>
       ) : (
         <TimelineEditor
           initialDays={itinerary.days}

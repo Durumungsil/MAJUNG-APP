@@ -10,6 +10,8 @@ type PlaceSelectListProps = {
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   onLoadMore: () => void;
+  /** 대표자만 타임라인을 만들 수 있으므로 멤버에게는 생성 버튼을 숨김 */
+  canSubmit: boolean;
   /** 타임라인 생성 요청 중이면 버튼에 진행 상태를 표시함 */
   isSubmitting: boolean;
   /** 선택한 장소 id를 고른 순서대로 넘김 */
@@ -21,6 +23,7 @@ export default function PlaceSelectList({
   hasNextPage,
   isFetchingNextPage,
   onLoadMore,
+  canSubmit,
   isSubmitting,
   onSubmit,
 }: PlaceSelectListProps) {
@@ -66,15 +69,17 @@ export default function PlaceSelectList({
       <div ref={loadMoreRef} className="flex justify-center">
         {isFetchingNextPage && <Spinner />}
       </div>
-      <Button
-        size="xl"
-        onClick={handleSubmitClick}
-        disabled={selectedIds.size === 0 || isSubmitting}
-        aria-busy={isSubmitting}
-        className="mt-10"
-      >
-        타임라인 생성하기
-      </Button>
+      {canSubmit && (
+        <Button
+          size="xl"
+          onClick={handleSubmitClick}
+          disabled={selectedIds.size === 0 || isSubmitting}
+          aria-busy={isSubmitting}
+          className="mt-10"
+        >
+          타임라인 생성하기
+        </Button>
+      )}
       <PlaceDetailSheet
         place={previewPlace}
         snap={snap}

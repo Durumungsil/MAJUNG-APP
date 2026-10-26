@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useGroupByParam, type Group } from "@/entities/group";
+import { getGroupRole, useGroupByParam, type Group } from "@/entities/group";
 import { withItineraryId } from "@/entities/journey";
 import { useRecommendedPlaces } from "@/entities/place";
+import { useSessionStore } from "@/entities/session";
 import { useGenerateTimeline } from "@/features/generate-timeline";
 import { PlaceSelectList } from "@/features/select-place";
 import { isApiError } from "@/shared/api";
@@ -51,6 +52,8 @@ function StoryPlacesContent({ group }: { group: Group }) {
   } = useRecommendedPlaces(group.id);
   const { isConflict, toastMessage } = useStoryConflictRedirect(error, group.id);
   const router = useRouter();
+  const userId = useSessionStore((state) => state.session?.userId ?? null);
+  const isLeader = getGroupRole(group, userId) === "leader";
   const { mutate: generateTimeline, isPending: isGenerating } = useGenerateTimeline(group.id);
   const { toastMessage: generateToastMessage, showToast } = useToast();
 
@@ -96,6 +99,7 @@ function StoryPlacesContent({ group }: { group: Group }) {
           hasNextPage={hasNextPage}
           isFetchingNextPage={isFetchingNextPage}
           onLoadMore={handleLoadMore}
+          canSubmit={isLeader}
           isSubmitting={isGenerating}
           onSubmit={handleTimelineSubmit}
         />
