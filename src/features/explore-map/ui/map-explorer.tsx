@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { TimelineStop } from "@/entities/journey";
+import type { LatLng } from "@/shared/model";
 import { PlaceDetailSheet, getNearbyPlaces, type Place } from "@/entities/place";
 import { MapPinIcon, RecommendPinIcon } from "@/shared/assets";
 import { RouteMap, MapOverlay, MapPolyline, type BottomSheetSnap } from "@/shared/ui";
@@ -10,11 +11,19 @@ import MapMarkerButton from "./map-marker-button";
 /** 겹칠 때 위에 보일 순서 */
 const Z_INDEX = { nearby: 1, route: 2, activeRoute: 3 } as const;
 
+type LocatedStop = TimelineStop & { location: LatLng };
+
 type MapExplorerProps = {
   stops: TimelineStop[];
 };
 
-export default function MapExplorer({ stops }: MapExplorerProps) {
+function hasLocation(stop: TimelineStop): stop is LocatedStop {
+  return stop.location !== null;
+}
+
+export default function MapExplorer({ stops: allStops }: MapExplorerProps) {
+  // 좌표가 없는 장소는 지도에 그릴 수 없으므로 뺌
+  const stops = useMemo(() => allStops.filter(hasLocation), [allStops]);
   const [activeStopId, setActiveStopId] = useState<string | null>(null);
   const [previewPlace, setPreviewPlace] = useState<Place | null>(null);
   const [snap, setSnap] = useState<BottomSheetSnap>("peek");

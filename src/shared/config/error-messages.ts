@@ -15,6 +15,8 @@ export const ERROR_MESSAGES = {
   surveyTransportRequired: "선호하는 교통수단을 선택해 주세요",
   surveyTravelStyleRequired: "좋아하는 여행 방식을 선택해 주세요",
   previousSurveyNotFound: "불러올 이전 취향 설문지가 없어요",
+  storyUnavailable: "지금은 스토리모드를 진행할 수 없어요",
+  timelineConflict: "영업 시간이나 이동 시간 때문에 일정을 만들 수 없어요",
   adventureOutOfTripPeriod: "여행 기간에만 모험을 시작할 수 있어요",
   adventureUnavailable: "모험을 시작할 수 없어요. 여행 정보를 확인해 주세요",
   noCurrentMission: "지금 진행할 수 있는 미션이 없어요",

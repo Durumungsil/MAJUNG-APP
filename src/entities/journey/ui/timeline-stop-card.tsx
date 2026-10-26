@@ -22,7 +22,8 @@ export default function TimelineStopCard({
       )}
     >
       <span className="whitespace-nowrap">{formatTimeRange(stop)}</span>
-      <span className="min-w-0 flex-1">{stop.placeName}</span>
+      {/* 긴 장소 이름은 줄바꿈하지 않고 말줄임표로 자름 */}
+      <span className="min-w-0 flex-1 truncate">{stop.placeName}</span>
     </div>
   );
 }

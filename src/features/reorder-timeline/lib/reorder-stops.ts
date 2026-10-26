@@ -11,7 +11,12 @@ export function reorderStopPlaces(
   to: number,
 ): TimelineStop[] {
   const places = moveItem(
-    stops.map(({ id, placeName, location }) => ({ id, placeName, location })),
+    stops.map(({ id, destinationId, placeName, location }) => ({
+      id,
+      destinationId,
+      placeName,
+      location,
+    })),
     from,
     to,
   );

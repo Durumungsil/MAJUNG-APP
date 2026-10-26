@@ -12,7 +12,8 @@ export type PlaceReview = {
 
 /** 외부 장소 API 응답과 무관한 마중 내부 장소 타입 */
 export type Place = {
-  id: string;
+  /** 백엔드 destination_id */
+  id: number;
   name: string;
   category: string;
   address: string;
