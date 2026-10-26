@@ -9,6 +9,9 @@ type StoryLayoutProps = {
   action?: ReactNode;
   /** 일정 제목 아래 안내 문구 */
   guide?: string;
+  /** 선택한 Day 탭 위치. 일차별로 목록을 거르는 화면만 넘김 */
+  selectedDayIndex?: number;
+  onSelectedDayIndexChange?: (index: number) => void;
   children: ReactNode;
 };
 
@@ -18,6 +21,8 @@ export default function StoryLayout({
   endDate,
   action,
   guide,
+  selectedDayIndex,
+  onSelectedDayIndexChange,
   children,
 }: StoryLayoutProps) {
   return (
@@ -27,7 +32,13 @@ export default function StoryLayout({
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-4">
             <ModeTitle>STORY MODE</ModeTitle>
-            <ScheduleHeader startDate={startDate} endDate={endDate} action={action} />
+            <ScheduleHeader
+              startDate={startDate}
+              endDate={endDate}
+              action={action}
+              selectedIndex={selectedDayIndex}
+              onSelectedIndexChange={onSelectedDayIndexChange}
+            />
           </div>
           {guide && <p className="text-s text-text-primary">{guide}</p>}
         </div>

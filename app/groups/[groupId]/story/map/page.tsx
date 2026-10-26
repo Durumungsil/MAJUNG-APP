@@ -1,6 +1,10 @@
 import { StoryMapPage } from "@/views/story-map";
 
-export default async function Page({ params }: PageProps<"/groups/[groupId]/story/map">) {
+export default async function Page({
+  params,
+  searchParams,
+}: PageProps<"/groups/[groupId]/story/map">) {
   const { groupId } = await params;
-  return <StoryMapPage groupId={groupId} />;
+  const { itineraryId } = await searchParams;
+  return <StoryMapPage groupId={groupId} itineraryId={itineraryId} />;
 }

@@ -9,15 +9,26 @@ type ScheduleHeaderProps = {
   endDate: string;
   /** 오른쪽 끝 링크 (지도로 보기 / 타임라인 보기) */
   action?: ReactNode;
+  /** 선택한 Day 탭 위치. 넘기지 않으면 컴포넌트가 직접 관리함 */
+  selectedIndex?: number;
+  onSelectedIndexChange?: (index: number) => void;
 };
 
 /** "YYYY-MM-DD의 일정" 제목과 Day 탭 */
-export default function ScheduleHeader({ startDate, endDate, action }: ScheduleHeaderProps) {
+export default function ScheduleHeader({
+  startDate,
+  endDate,
+  action,
+  selectedIndex: controlledIndex,
+  onSelectedIndexChange,
+}: ScheduleHeaderProps) {
   const dates = getTripDates(startDate, endDate);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [uncontrolledIndex, setUncontrolledIndex] = useState(0);
+  const selectedIndex = controlledIndex ?? uncontrolledIndex;
 
   function handleDayClick(index: number) {
-    setSelectedIndex(index);
+    setUncontrolledIndex(index);
+    onSelectedIndexChange?.(index);
   }
 
   return (

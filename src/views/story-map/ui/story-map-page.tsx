@@ -1,15 +1,22 @@
 "use client";
 
 import { useGroupByParam } from "@/entities/group";
-import { ScheduleHeader, getTimelineStops } from "@/entities/journey";
+import {
+  ScheduleHeader,
+  getTimelineStops,
+  parseItineraryId,
+  withItineraryId,
+} from "@/entities/journey";
 import { MapExplorer } from "@/features/explore-map";
 import { ErrorState, Screen, Skeleton, TextLink } from "@/shared/ui";
 
 type StoryMapPageProps = {
   groupId: string;
+  itineraryId: string | string[] | undefined;
 };
 
-export default function StoryMapPage({ groupId }: StoryMapPageProps) {
+// TODO: 타임라인 응답에 좌표가 추가되면 목 데이터 대신 타임라인 조회로 교체
+export default function StoryMapPage({ groupId, itineraryId }: StoryMapPageProps) {
   const { data: group, isPending, isError, refetch } = useGroupByParam(groupId);
 
   function handleRetry() {
@@ -40,7 +47,16 @@ export default function StoryMapPage({ groupId }: StoryMapPageProps) {
         <ScheduleHeader
           startDate={group.startDate ?? ""}
           endDate={group.endDate ?? ""}
-          action={<TextLink href={`/groups/${group.id}/story/timeline`}>타임라인 보기</TextLink>}
+          action={
+            <TextLink
+              href={withItineraryId(
+                `/groups/${group.id}/story/timeline`,
+                parseItineraryId(itineraryId),
+              )}
+            >
+              타임라인 보기
+            </TextLink>
+          }
         />
         <p className="text-s text-text-primary">
           장소를 선택하면 그 주변의 또 다른 장소들을 추천해요
