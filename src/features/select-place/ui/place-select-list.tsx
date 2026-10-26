@@ -4,9 +4,18 @@ import { useState } from "react";
 import { PlaceCard, PlaceDetailSheet, type Place } from "@/entities/place";
 import { useIntersection } from "@/shared/lib";
 import { Button, Spinner, type BottomSheetSnap } from "@/shared/ui";
+import {
+  addPlaceToDate,
+  getSelectedCount,
+  toSelectionDays,
+  type DaySelection,
+} from "../lib/day-selection";
+import type { SelectionDay } from "../lib/selection-payload";
 
 type PlaceSelectListProps = {
   places: Place[];
+  /** 지금 고르는 방문일 (YYYY-MM-DD). Day 탭을 바꾸면 그날의 선택이 따로 쌓임 */
+  date: string;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   onLoadMore: () => void;
@@ -14,12 +23,13 @@ type PlaceSelectListProps = {
   canSubmit: boolean;
   /** 타임라인 생성 요청 중이면 버튼에 진행 상태를 표시함 */
   isSubmitting: boolean;
-  /** 선택한 장소 id를 고른 순서대로 넘김 */
-  onSubmit: (destinationIds: number[]) => void;
+  /** 방문일별로 고른 장소를 고른 순서대로 넘김 */
+  onSubmit: (days: SelectionDay[]) => void;
 };
 
 export default function PlaceSelectList({
   places,
+  date,
   hasNextPage,
   isFetchingNextPage,
   onLoadMore,
@@ -27,13 +37,15 @@ export default function PlaceSelectList({
   isSubmitting,
   onSubmit,
 }: PlaceSelectListProps) {
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [selection, setSelection] = useState<DaySelection>({});
   const [previewPlace, setPreviewPlace] = useState<Place | null>(null);
   const [snap, setSnap] = useState<BottomSheetSnap>("peek");
   const loadMoreRef = useIntersection<HTMLDivElement>(
     onLoadMore,
     hasNextPage && !isFetchingNextPage,
   );
+
+  const selectedIdsOfDate = selection[date] ?? [];
 
   function handlePlaceClick(place: Place) {
     setPreviewPlace(place);
@@ -45,37 +57,40 @@ export default function PlaceSelectList({
   }
 
   function handlePlaceSelect(place: Place) {
-    setSelectedIds((prev) => new Set(prev).add(place.id));
+    setSelection((prev) => addPlaceToDate(prev, date, place.id));
     setPreviewPlace(null);
   }
 
   function handleSubmitClick() {
-    onSubmit([...selectedIds]);
+    onSubmit(toSelectionDays(selection));
   }
 
   return (
     <>
-      <ul className="flex flex-col gap-5">
-        {places.map((place) => (
-          <li key={place.id}>
-            <PlaceCard
-              place={place}
-              selected={selectedIds.has(place.id) || previewPlace?.id === place.id}
-              onClick={() => handlePlaceClick(place)}
-            />
-          </li>
-        ))}
-      </ul>
-      <div ref={loadMoreRef} className="flex justify-center">
-        {isFetchingNextPage && <Spinner />}
+      {/* 목록만 이 영역 안에서 스크롤되고, 생성 버튼은 아래에 고정됨 */}
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        <ul className="flex flex-col gap-5">
+          {places.map((place) => (
+            <li key={place.id}>
+              <PlaceCard
+                place={place}
+                selected={selectedIdsOfDate.includes(place.id) || previewPlace?.id === place.id}
+                onClick={() => handlePlaceClick(place)}
+              />
+            </li>
+          ))}
+        </ul>
+        <div ref={loadMoreRef} className="flex justify-center">
+          {isFetchingNextPage && <Spinner />}
+        </div>
       </div>
       {canSubmit && (
         <Button
           size="xl"
           onClick={handleSubmitClick}
-          disabled={selectedIds.size === 0 || isSubmitting}
+          disabled={getSelectedCount(selection) === 0 || isSubmitting}
           aria-busy={isSubmitting}
-          className="mt-10"
+          className="mt-10 shrink-0"
         >
           타임라인 생성하기
         </Button>

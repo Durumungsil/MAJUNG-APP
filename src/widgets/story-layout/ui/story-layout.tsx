@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { ScheduleHeader } from "@/entities/journey";
+import { cn } from "@/shared/lib";
 import { ModeTitle, Screen, StripeBackground } from "@/shared/ui";
 
 type StoryLayoutProps = {
@@ -12,6 +13,8 @@ type StoryLayoutProps = {
   /** 선택한 Day 탭 위치. 일차별로 목록을 거르는 화면만 넘김 */
   selectedDayIndex?: number;
   onSelectedDayIndexChange?: (index: number) => void;
+  /** true면 화면 높이에 맞춰 고정하고, children이 남은 높이를 채움 (내부 스크롤 목록용) */
+  fillHeight?: boolean;
   children: ReactNode;
 };
 
@@ -23,12 +26,16 @@ export default function StoryLayout({
   guide,
   selectedDayIndex,
   onSelectedDayIndexChange,
+  fillHeight = false,
   children,
 }: StoryLayoutProps) {
+  // Screen의 flex-1은 부모 높이가 정해지지 않으면 콘텐츠 높이를 따라가므로 max-h로 화면 높이에 묶음
   return (
-    <Screen className="relative overflow-x-clip">
+    <Screen
+      className={cn("relative overflow-x-clip", fillHeight && "h-dvh max-h-dvh overflow-y-hidden")}
+    >
       <StripeBackground />
-      <div className="relative mt-5 flex flex-col gap-6">
+      <div className={cn("relative mt-5 flex flex-col gap-6", fillHeight && "min-h-0 flex-1")}>
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-4">
             <ModeTitle>STORY MODE</ModeTitle>
@@ -42,7 +49,7 @@ export default function StoryLayout({
           </div>
           {guide && <p className="text-s text-text-primary">{guide}</p>}
         </div>
-        <div className="flex flex-col">{children}</div>
+        <div className={cn("flex flex-col", fillHeight && "min-h-0 flex-1")}>{children}</div>
       </div>
     </Screen>
   );

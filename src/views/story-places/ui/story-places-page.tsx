@@ -1,12 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { getGroupRole, useGroupByParam, type Group } from "@/entities/group";
-import { withItineraryId } from "@/entities/journey";
+import { getTripDates, withItineraryId, type Itinerary } from "@/entities/journey";
 import { useRecommendedPlaces } from "@/entities/place";
 import { useSessionStore } from "@/entities/session";
 import { useGenerateTimeline } from "@/features/generate-timeline";
-import { PlaceSelectList } from "@/features/select-place";
+import {
+  PlaceSelectList,
+  useSaveDestinationSelection,
+  type SelectionDay,
+} from "@/features/select-place";
 import { isApiError } from "@/shared/api";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
 import { useToast } from "@/shared/lib";
@@ -40,6 +45,8 @@ export default function StoryPlacesPage({ groupId }: StoryPlacesPageProps) {
 }
 
 function StoryPlacesContent({ group }: { group: Group }) {
+  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+  const dates = getTripDates(group.startDate ?? "", group.endDate ?? "");
   const {
     data: places,
     error,
@@ -54,6 +61,7 @@ function StoryPlacesContent({ group }: { group: Group }) {
   const router = useRouter();
   const userId = useSessionStore((state) => state.session?.userId ?? null);
   const isLeader = getGroupRole(group, userId) === "leader";
+  const { mutate: saveSelection, isPending: isSaving } = useSaveDestinationSelection(group.id);
   const { mutate: generateTimeline, isPending: isGenerating } = useGenerateTimeline(group.id);
   const { toastMessage: generateToastMessage, showToast } = useToast();
 
@@ -65,17 +73,31 @@ function StoryPlacesContent({ group }: { group: Group }) {
     void fetchNextPage();
   }
 
-  function handleTimelineSubmit(destinationIds: number[]) {
-    generateTimeline(destinationIds, {
-      onSuccess: (itinerary) =>
-        router.push(withItineraryId(`/groups/${group.id}/story/timeline`, itinerary.id)),
-      onError: (generateError) => {
-        // 추천 목록을 받은 뒤라 스토리모드·여행 상태는 확인된 상태. 409는 영업·이동 시간 충돌로 봄
-        if (isApiError(generateError, 409)) showToast(ERROR_MESSAGES.timelineConflict);
-        else if (isApiError(generateError, 403)) showToast(ERROR_MESSAGES.leaderOnly);
+  // 일차별 선택을 방문일과 함께 저장한 뒤, 저장한 선택으로 타임라인을 만듦 (서버가 방문일을 지켜 배치함)
+  function handleTimelineSubmit(days: SelectionDay[]) {
+    saveSelection(days, {
+      onSuccess: () =>
+        generateTimeline(undefined, {
+          onSuccess: handleGenerateSuccess,
+          onError: handleGenerateError,
+        }),
+      onError: (saveError) => {
+        if (isApiError(saveError, 403)) showToast(ERROR_MESSAGES.leaderOnly);
+        else if (isApiError(saveError, 409)) showToast(ERROR_MESSAGES.storyUnavailable);
         else showToast(ERROR_MESSAGES.requestFailed);
       },
     });
+  }
+
+  function handleGenerateSuccess(itinerary: Itinerary) {
+    router.push(withItineraryId(`/groups/${group.id}/story/timeline`, itinerary.id));
+  }
+
+  function handleGenerateError(generateError: Error) {
+    // 추천 목록을 받은 뒤라 스토리모드·여행 상태는 확인된 상태. 409는 영업·이동 시간 충돌로 봄
+    if (isApiError(generateError, 409)) showToast(ERROR_MESSAGES.timelineConflict);
+    else if (isApiError(generateError, 403)) showToast(ERROR_MESSAGES.leaderOnly);
+    else showToast(ERROR_MESSAGES.requestFailed);
   }
 
   if (isPending || isConflict) {
@@ -88,7 +110,14 @@ function StoryPlacesContent({ group }: { group: Group }) {
   }
 
   return (
-    <StoryLayout startDate={group.startDate ?? ""} endDate={group.endDate ?? ""} guide={GUIDE}>
+    <StoryLayout
+      startDate={group.startDate ?? ""}
+      endDate={group.endDate ?? ""}
+      guide={GUIDE}
+      selectedDayIndex={selectedDayIndex}
+      onSelectedDayIndexChange={setSelectedDayIndex}
+      fillHeight
+    >
       {isError ? (
         <ErrorState onRetry={handleRetry} />
       ) : places.length === 0 ? (
@@ -96,11 +125,12 @@ function StoryPlacesContent({ group }: { group: Group }) {
       ) : (
         <PlaceSelectList
           places={places}
+          date={dates[selectedDayIndex]}
           hasNextPage={hasNextPage}
           isFetchingNextPage={isFetchingNextPage}
           onLoadMore={handleLoadMore}
           canSubmit={isLeader}
-          isSubmitting={isGenerating}
+          isSubmitting={isSaving || isGenerating}
           onSubmit={handleTimelineSubmit}
         />
       )}
