@@ -6,7 +6,7 @@ export function getModeStartHref(group: Pick<Group, "id" | "mode">): string {
     case "STORY":
       return `/groups/${group.id}/story`;
     case "ADVENTURE":
-      return "/adventure";
+      return `/groups/${group.id}/adventure`;
     default:
       return `/groups/${group.id}`;
   }

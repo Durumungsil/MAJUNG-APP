@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { cn } from "@/shared/lib";
 
 type ModeTitleSize = "lg" | "md";
@@ -10,7 +11,8 @@ const SIZE_CLASS: Record<ModeTitleSize, string> = {
 };
 
 type ModeTitleProps = {
-  children: string;
+  /** 두 줄 제목은 <br />로 나눔 (예: ADVENTURE / MODE) */
+  children: ReactNode;
   size?: ModeTitleSize;
   className?: string;
 };
