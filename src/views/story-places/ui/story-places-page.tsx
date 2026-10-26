@@ -1,8 +1,14 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useGroupByParam, type Group } from "@/entities/group";
+import { withItineraryId } from "@/entities/journey";
 import { useRecommendedPlaces } from "@/entities/place";
+import { useGenerateTimeline } from "@/features/generate-timeline";
 import { PlaceSelectList } from "@/features/select-place";
+import { isApiError } from "@/shared/api";
+import { ERROR_MESSAGES } from "@/shared/config/error-messages";
+import { useToast } from "@/shared/lib";
 import { StoryLayout, useStoryConflictRedirect } from "@/widgets/story-layout";
 import { ErrorState, Screen, Skeleton, Toast } from "@/shared/ui";
 
@@ -44,6 +50,9 @@ function StoryPlacesContent({ group }: { group: Group }) {
     fetchNextPage,
   } = useRecommendedPlaces(group.id);
   const { isConflict, toastMessage } = useStoryConflictRedirect(error, group.id);
+  const router = useRouter();
+  const { mutate: generateTimeline, isPending: isGenerating } = useGenerateTimeline(group.id);
+  const { toastMessage: generateToastMessage, showToast } = useToast();
 
   function handleRetry() {
     void refetch();
@@ -51,6 +60,19 @@ function StoryPlacesContent({ group }: { group: Group }) {
 
   function handleLoadMore() {
     void fetchNextPage();
+  }
+
+  function handleTimelineSubmit(destinationIds: number[]) {
+    generateTimeline(destinationIds, {
+      onSuccess: (itinerary) =>
+        router.push(withItineraryId(`/groups/${group.id}/story/timeline`, itinerary.id)),
+      onError: (generateError) => {
+        // 추천 목록을 받은 뒤라 스토리모드·여행 상태는 확인된 상태. 409는 영업·이동 시간 충돌로 봄
+        if (isApiError(generateError, 409)) showToast(ERROR_MESSAGES.timelineConflict);
+        else if (isApiError(generateError, 403)) showToast(ERROR_MESSAGES.leaderOnly);
+        else showToast(ERROR_MESSAGES.requestFailed);
+      },
+    });
   }
 
   if (isPending || isConflict) {
@@ -71,12 +93,14 @@ function StoryPlacesContent({ group }: { group: Group }) {
       ) : (
         <PlaceSelectList
           places={places}
-          nextHref={`/groups/${group.id}/story/timeline`}
           hasNextPage={hasNextPage}
           isFetchingNextPage={isFetchingNextPage}
           onLoadMore={handleLoadMore}
+          isSubmitting={isGenerating}
+          onSubmit={handleTimelineSubmit}
         />
       )}
+      <Toast open={generateToastMessage !== null} message={generateToastMessage ?? ""} />
     </StoryLayout>
   );
 }

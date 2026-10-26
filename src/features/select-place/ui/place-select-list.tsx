@@ -7,18 +7,22 @@ import { Button, Spinner, type BottomSheetSnap } from "@/shared/ui";
 
 type PlaceSelectListProps = {
   places: Place[];
-  nextHref: string;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   onLoadMore: () => void;
+  /** 타임라인 생성 요청 중이면 버튼에 진행 상태를 표시함 */
+  isSubmitting: boolean;
+  /** 선택한 장소 id를 고른 순서대로 넘김 */
+  onSubmit: (destinationIds: number[]) => void;
 };
 
 export default function PlaceSelectList({
   places,
-  nextHref,
   hasNextPage,
   isFetchingNextPage,
   onLoadMore,
+  isSubmitting,
+  onSubmit,
 }: PlaceSelectListProps) {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [previewPlace, setPreviewPlace] = useState<Place | null>(null);
@@ -42,6 +46,10 @@ export default function PlaceSelectList({
     setPreviewPlace(null);
   }
 
+  function handleSubmitClick() {
+    onSubmit([...selectedIds]);
+  }
+
   return (
     <>
       <ul className="flex flex-col gap-5">
@@ -58,7 +66,13 @@ export default function PlaceSelectList({
       <div ref={loadMoreRef} className="flex justify-center">
         {isFetchingNextPage && <Spinner />}
       </div>
-      <Button size="xl" href={nextHref} className="mt-10">
+      <Button
+        size="xl"
+        onClick={handleSubmitClick}
+        disabled={selectedIds.size === 0 || isSubmitting}
+        aria-busy={isSubmitting}
+        className="mt-10"
+      >
         타임라인 생성하기
       </Button>
       <PlaceDetailSheet
