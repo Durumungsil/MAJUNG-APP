@@ -1,11 +1,21 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useGroupByParam, type Group } from "@/entities/group";
-import { getTripDates, parseItineraryId, useItinerary, withItineraryId } from "@/entities/journey";
+import {
+  getTripDates,
+  parseItineraryId,
+  useItinerary,
+  withItineraryId,
+  type ItineraryDay,
+} from "@/entities/journey";
 import { TimelineEditor } from "@/features/reorder-timeline";
+import { useSaveDestinationSelection } from "@/features/select-place";
 import { isApiError } from "@/shared/api";
-import { ErrorState, Screen, Skeleton, TextLink } from "@/shared/ui";
+import { ERROR_MESSAGES } from "@/shared/config/error-messages";
+import { useToast } from "@/shared/lib";
+import { ErrorState, Screen, Skeleton, TextLink, Toast } from "@/shared/ui";
 import { StoryLayout, TimelineMissing } from "@/widgets/story-layout";
 
 const SKELETON_CARD_COUNT = 4;
@@ -51,9 +61,25 @@ function StoryTimelineContent({
   } = useItinerary(group.id, itineraryId);
   const dates = getTripDates(group.startDate ?? "", group.endDate ?? "");
   const isMissing = itineraryId === null || isApiError(error, 404);
+  const router = useRouter();
+  const { mutate: saveSelection, isPending: isSaving } = useSaveDestinationSelection(group.id);
+  const { toastMessage, showToast } = useToast();
 
   function handleRetry() {
     void refetch();
+  }
+
+  // TODO: 바꾼 순서를 타임라인에도 반영하는 방법(PATCH 동작)이 백엔드에서 확정되면 함께 저장
+  function handleTimelineConfirm(days: ItineraryDay[]) {
+    saveSelection(days, {
+      onSuccess: () =>
+        router.push(withItineraryId(`/groups/${group.id}/story/timeline/confirmed`, itineraryId)),
+      onError: (saveError) => {
+        if (isApiError(saveError, 403)) showToast(ERROR_MESSAGES.leaderOnly);
+        else if (isApiError(saveError, 409)) showToast(ERROR_MESSAGES.storyUnavailable);
+        else showToast(ERROR_MESSAGES.requestFailed);
+      },
+    });
   }
 
   if (!isMissing && isPending) return <StoryTimelineSkeleton />;
@@ -79,9 +105,11 @@ function StoryTimelineContent({
         <TimelineEditor
           initialDays={itinerary.days}
           date={dates[selectedDayIndex]}
-          confirmHref={withItineraryId(`/groups/${group.id}/story/timeline/confirmed`, itineraryId)}
+          isConfirming={isSaving}
+          onConfirm={handleTimelineConfirm}
         />
       )}
+      <Toast open={toastMessage !== null} message={toastMessage ?? ""} />
     </StoryLayout>
   );
 }
