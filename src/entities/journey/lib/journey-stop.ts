@@ -22,11 +22,3 @@ export function formatEndedAt(endedAt: JourneyStop["endedAt"]): string {
   if (endedAt === null) return "종료: --시 --분";
   return `종료: ${endedAt.getHours()}시 ${endedAt.getMinutes()}분`;
 }
-
-export function completeStopAt(stops: JourneyStop[], index: number, endedAt: Date): JourneyStop[] {
-  return stops.map((stop, i) => (i === index ? { ...stop, endedAt } : stop));
-}
-
-export function startStopAt(stops: JourneyStop[], index: number, startedAt: Date): JourneyStop[] {
-  return stops.map((stop, i) => (i === index ? { ...stop, startedAt } : stop));
-}

@@ -1,32 +1,59 @@
 "use client";
 
+import { notFound } from "next/navigation";
 import { useState } from "react";
-import { getMockMissionLocation, useJourneyStore } from "@/entities/journey";
+import { useAdventureStore, useCurrentMission, type MissionHint } from "@/entities/adventure";
+import { parseGroupId } from "@/entities/group";
 import {
   formatRemainingHintTime,
   HintExpiredModal,
+  HINT_VIEW_SECONDS,
   HintIntroModal,
-  MOCK_HINT_VIEW_LIMIT_SECONDS,
   useHintCountdown,
+  useMissionHint,
 } from "@/features/view-place-hint";
-import { useCurrentPosition } from "@/shared/lib/use-current-position";
-import type { LatLngLiteral } from "@/shared/model/lat-lng";
-import { Spinner } from "@/shared/ui";
+import { isApiError } from "@/shared/api";
+import { ERROR_MESSAGES } from "@/shared/config/error-messages";
+import { useToast } from "@/shared/lib";
+import { Button, Spinner, Toast } from "@/shared/ui";
 import KakaoRoadview, { type KakaoRoadviewStatus } from "@/shared/ui/kakao-roadview";
 
-export default function AdventureHintView() {
-  const { position } = useCurrentPosition();
-  const currentIndex = useJourneyStore((state) => state.currentIndex);
+interface AdventureHintViewProps {
+  groupId: string;
+}
 
-  // TODO: API 연동 시 힌트 API 응답(위도·경도, 최대 시청 시간)으로 교체.
-  const [hintLocation, setHintLocation] = useState<LatLngLiteral | null>(null);
+function getHintErrorMessage(error: unknown): string {
+  if (isApiError(error, 404, 409)) return ERROR_MESSAGES.hintUnavailable;
+  return ERROR_MESSAGES.requestFailed;
+}
+
+export default function AdventureHintView({ groupId: groupIdParam }: AdventureHintViewProps) {
+  const groupId = parseGroupId(groupIdParam);
+  if (groupId === null) notFound();
+
+  const mapHref = `/groups/${groupId}/adventure/map`;
+  const { data: mission, isPending: isMissionPending } = useCurrentMission(groupId);
+  const { mutate: requestHint, isPending: isHintPending } = useMissionHint(groupId);
+  const setHintTarget = useAdventureStore((state) => state.setHintTarget);
+  const { toastMessage, showToast } = useToast();
+
+  const [hint, setHint] = useState<MissionHint | null>(null);
   const [roadviewStatus, setRoadviewStatus] = useState<KakaoRoadviewStatus>("loading");
-  const hintLimitSeconds = MOCK_HINT_VIEW_LIMIT_SECONDS;
-  const { remainingSeconds, isStarted, isExpired, start } = useHintCountdown(hintLimitSeconds);
+  const { remainingSeconds, isStarted, isExpired, start } = useHintCountdown(HINT_VIEW_SECONDS);
 
   function handleHintStartClick() {
-    setHintLocation(getMockMissionLocation(currentIndex, position));
-    start();
+    if (mission == null) {
+      showToast(ERROR_MESSAGES.noCurrentMission);
+      return;
+    }
+    requestHint(mission.id, {
+      onSuccess: (result) => {
+        setHint(result);
+        setHintTarget({ missionId: result.missionId, location: result.location });
+        start();
+      },
+      onError: (error) => showToast(getHintErrorMessage(error)),
+    });
   }
 
   return (
@@ -36,11 +63,11 @@ export default function AdventureHintView() {
         <p className="text-s text-text-primary">{formatRemainingHintTime(remainingSeconds)}</p>
       </header>
 
-      <section className="mb-[max(--spacing(19),calc(--spacing(10.5)+var(--safe-bottom)))] relative min-h-0 flex-1 bg-natural-500">
+      <section className="relative min-h-0 flex-1 bg-natural-500">
         {isStarted && !isExpired && (
           <>
             <KakaoRoadview
-              position={hintLocation}
+              position={hint?.location ?? null}
               onStatusChange={setRoadviewStatus}
               className="absolute inset-0"
             />
@@ -59,13 +86,22 @@ export default function AdventureHintView() {
         )}
       </section>
 
+      <nav className="flex shrink-0 flex-col px-page pt-4 pb-[max(--spacing(7.5),var(--safe-bottom))]">
+        {/* 뒤로 가기로 힌트 화면에 돌아오지 않도록 replace로 이동 (다시 들어오면 힌트 횟수가 또 오름) */}
+        <Button href={mapHref} replace size="xl">
+          힌트 종료하기
+        </Button>
+      </nav>
+
       <HintIntroModal
         open={!isStarted}
-        limitSeconds={hintLimitSeconds}
-        cancelHref="/adventure"
+        limitSeconds={HINT_VIEW_SECONDS}
+        cancelHref={mapHref}
         onStartClick={handleHintStartClick}
+        isStarting={isMissionPending || isHintPending}
       />
-      <HintExpiredModal open={isExpired} backHref="/adventure" />
+      <HintExpiredModal open={isExpired} backHref={mapHref} />
+      <Toast open={toastMessage !== null} message={toastMessage ?? ""} />
     </main>
   );
 }

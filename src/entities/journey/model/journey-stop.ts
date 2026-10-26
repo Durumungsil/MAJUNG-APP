@@ -1,12 +1,8 @@
-import type { LatLngLiteral } from "@/shared/model/lat-lng";
-
+/** 모험모드 "나의 여정"의 한 칸 */
 export interface JourneyStop {
   id: string;
   placeName: string;
-  location: LatLngLiteral;
   rank: string | null;
   startedAt: Date | null;
   endedAt: Date | null;
 }
-
-export type MissionPhase = "searching" | "succeeded" | "exploring";
