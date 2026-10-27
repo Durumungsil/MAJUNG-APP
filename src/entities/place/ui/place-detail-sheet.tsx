@@ -12,6 +12,8 @@ type PlaceDetailSheetProps = {
   onSnapChange: (snap: BottomSheetSnap) => void;
   onClose: () => void;
   onSelect: (place: Place) => void;
+  /** 하단 버튼 문구 */
+  selectLabel?: string;
 };
 
 /** 장소 상세 바텀시트. "리뷰 더보기"를 누르면 full로 펼쳐 전체 리뷰를 보여줌 */
@@ -21,6 +23,7 @@ export default function PlaceDetailSheet({
   onSnapChange,
   onClose,
   onSelect,
+  selectLabel = "장소 선택하기",
 }: PlaceDetailSheetProps) {
   const titleId = useId();
 
@@ -45,7 +48,7 @@ export default function PlaceDetailSheet({
       labelledBy={titleId}
       footer={
         <Button size="xl" onClick={handleSelectClick}>
-          장소 선택하기
+          {selectLabel}
         </Button>
       }
     >
