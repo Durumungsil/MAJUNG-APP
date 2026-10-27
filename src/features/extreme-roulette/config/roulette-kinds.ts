@@ -1,3 +1,4 @@
+import type { RouletteType } from "../api/dto";
 import type { RouletteKind } from "../model/types";
 
 type RouletteKindCopy = {
@@ -31,3 +32,15 @@ export const ROULETTE_KIND_COPY: Record<RouletteKind, RouletteKindCopy> = {
 };
 
 export const ROULETTE_KINDS: RouletteKind[] = ["place", "food"];
+
+/** 룰렛 종류별 추첨 API 경로 (/api/v2/groups/{groupId}/roulette/ 뒤) */
+export const ROULETTE_DRAW_PATH: Record<RouletteKind, string> = {
+  place: "destinations",
+  food: "restaurants",
+};
+
+/** 백엔드 룰렛 종류 → 화면 룰렛 종류 */
+export const ROULETTE_KIND_BY_TYPE: Record<RouletteType, RouletteKind> = {
+  DESTINATION: "place",
+  RESTAURANT: "food",
+};

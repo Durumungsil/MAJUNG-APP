@@ -2,10 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import { SPIN_DURATION_MS, SPIN_MIN_TURNS } from "../config/spin";
-import { getNextRotation, pickRandom } from "../lib/spin";
+import { getNextRotation, getRemainingSpinMs } from "../lib/spin";
 
-/** 휠 회전 각도와 결과. 회전이 끝나면 result가 채워짐 */
-export function useRouletteSpin<T>(candidates: readonly T[]) {
+type UseRouletteSpinOptions<T> = {
+  /** 결과를 정하는 요청. 휠은 요청과 동시에 돌기 시작함 */
+  draw: () => Promise<T>;
+  onError: (error: unknown) => void;
+};
+
+/** 휠 회전 각도와 결과. 요청 응답과 회전이 모두 끝나면 result가 채워짐 */
+export function useRouletteSpin<T>({ draw, onError }: UseRouletteSpinOptions<T>) {
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<T | null>(null);
@@ -17,18 +23,26 @@ export function useRouletteSpin<T>(candidates: readonly T[]) {
     };
   }, []);
 
+  // 응답이 빨리 와도 휠이 멈춘 뒤에 결과·오류를 보여줌
+  function afterSpinStops(startedAt: number, callback: () => void) {
+    const remaining = getRemainingSpinMs(Date.now() - startedAt, SPIN_DURATION_MS);
+    timerRef.current = window.setTimeout(() => {
+      setSpinning(false);
+      callback();
+    }, remaining);
+  }
+
   function spin() {
     if (spinning) return;
-    const picked = pickRandom(candidates, Math.random());
-    if (picked === null) return;
+    const startedAt = Date.now();
 
     setResult(null);
     setSpinning(true);
     setRotation((prev) => getNextRotation(prev, SPIN_MIN_TURNS, Math.random()));
-    timerRef.current = window.setTimeout(() => {
-      setSpinning(false);
-      setResult(picked);
-    }, SPIN_DURATION_MS);
+    draw().then(
+      (drawn) => afterSpinStops(startedAt, () => setResult(drawn)),
+      (error: unknown) => afterSpinStops(startedAt, () => onError(error)),
+    );
   }
 
   function clearResult() {

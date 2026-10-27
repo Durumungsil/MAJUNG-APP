@@ -1,42 +1,82 @@
 "use client";
 
 import { notFound, useRouter } from "next/navigation";
+import { parseGroupId } from "@/entities/group";
 import {
   ExtremePlaceConfirm,
-  findRouletteCandidate,
   isRouletteKind,
+  parseRouletteId,
+  useExtremeConflictRedirect,
+  useRouletteResult,
 } from "@/features/extreme-roulette";
+import { isApiError } from "@/shared/api";
+import { ErrorState, Screen, Skeleton, Toast } from "@/shared/ui";
 
 type ExtremePlaceDetailPageProps = {
   groupId: string;
   kind: string;
-  placeId: string;
+  rouletteId: string;
 };
 
 export default function ExtremePlaceDetailPage({
-  groupId,
+  groupId: groupIdParam,
   kind,
-  placeId,
+  rouletteId: rouletteIdParam,
 }: ExtremePlaceDetailPageProps) {
-  const router = useRouter();
+  const groupId = parseGroupId(groupIdParam);
+  const rouletteId = parseRouletteId(rouletteIdParam);
+  if (groupId === null || rouletteId === null || !isRouletteKind(kind)) notFound();
 
-  if (!isRouletteKind(kind)) notFound();
-  const place = findRouletteCandidate(kind, Number(placeId));
-  if (!place) notFound();
+  const router = useRouter();
+  const {
+    data: result,
+    isPending,
+    isError,
+    error,
+    refetch,
+  } = useRouletteResult(groupId, rouletteId);
+  const { isConflict, toastMessage } = useExtremeConflictRedirect(error, groupId);
 
   function handleConfirmed() {
-    router.push(`/groups/${groupId}/extreme/play`);
+    router.push(`/groups/${groupId}/extreme/navigate/${rouletteId}`);
   }
 
   function handleClose() {
     router.push(`/groups/${groupId}/extreme/roulette/${kind}`);
   }
 
+  function handleRetry() {
+    void refetch();
+  }
+
+  if (isApiError(error, 404)) notFound();
+  if (isConflict) return <Toast open={toastMessage !== null} message={toastMessage ?? ""} />;
+  if (isPending) {
+    return (
+      <main className="flex flex-1 flex-col">
+        <Skeleton className="aspect-[402/674] w-full rounded-none" />
+        <div className="flex flex-col gap-3 px-8 pt-6">
+          <Skeleton className="h-9 w-2/3" />
+          <Skeleton className="h-5 w-full" />
+        </div>
+      </main>
+    );
+  }
+  if (isError) {
+    return (
+      <Screen>
+        <ErrorState onRetry={handleRetry} />
+      </Screen>
+    );
+  }
+  // 다른 종류 룰렛의 결과를 주소로 직접 연 경우
+  if (result.kind !== kind) notFound();
+
   return (
     <main className="flex flex-1 flex-col">
       <ExtremePlaceConfirm
-        kind={kind}
-        place={place}
+        groupId={groupId}
+        result={result}
         onConfirmed={handleConfirmed}
         onClose={handleClose}
       />

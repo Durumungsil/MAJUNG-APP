@@ -1,8 +1,8 @@
 "use client";
 
 import { notFound } from "next/navigation";
-import type { Place } from "@/entities/place";
-import { ExtremeRoulette, isRouletteKind } from "@/features/extreme-roulette";
+import { parseGroupId } from "@/entities/group";
+import { ExtremeRoulette, isRouletteKind, type RouletteResult } from "@/features/extreme-roulette";
 import { Screen } from "@/shared/ui";
 
 type ExtremeRoulettePageProps = {
@@ -10,16 +10,20 @@ type ExtremeRoulettePageProps = {
   kind: string;
 };
 
-export default function ExtremeRoulettePage({ groupId, kind }: ExtremeRoulettePageProps) {
-  if (!isRouletteKind(kind)) notFound();
+export default function ExtremeRoulettePage({
+  groupId: groupIdParam,
+  kind,
+}: ExtremeRoulettePageProps) {
+  const groupId = parseGroupId(groupIdParam);
+  if (groupId === null || !isRouletteKind(kind)) notFound();
 
-  function getDetailHref(place: Place) {
-    return `/groups/${groupId}/extreme/roulette/${kind}/${place.id}`;
+  function getDetailHref(result: RouletteResult) {
+    return `/groups/${groupId}/extreme/roulette/${kind}/${result.id}`;
   }
 
   return (
     <Screen className="justify-center">
-      <ExtremeRoulette kind={kind} getDetailHref={getDetailHref} />
+      <ExtremeRoulette groupId={groupId} kind={kind} getDetailHref={getDetailHref} />
     </Screen>
   );
 }
