@@ -6,9 +6,7 @@ export function getNextRotation(current: number, minTurns: number, random: numbe
   return current + minTurns * 360 + Math.floor(random * 360);
 }
 
-/** random(0~1)으로 후보 하나를 고름. 후보가 없으면 null */
-export function pickRandom<T>(items: readonly T[], random: number): T | null {
-  if (items.length === 0) return null;
-  const index = Math.min(Math.floor(random * items.length), items.length - 1);
-  return items[index];
+/** 회전을 시작한 지 elapsedMs가 지났을 때, 휠이 멈출 때까지 남은 시간. 이미 멈췄으면 0 */
+export function getRemainingSpinMs(elapsedMs: number, durationMs: number): number {
+  return Math.max(0, durationMs - elapsedMs);
 }

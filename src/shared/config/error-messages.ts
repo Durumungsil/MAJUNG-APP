@@ -22,4 +22,7 @@ export const ERROR_MESSAGES = {
   noCurrentMission: "지금 진행할 수 있는 미션이 없어요",
   hintUnavailable: "지금은 힌트를 볼 수 없어요",
   locationRequired: "현재 위치를 확인한 뒤 다시 시도해 주세요",
+  extremeUnavailable: "지금은 익스트림 모드를 진행할 수 없어요",
+  rouletteNoCandidate: "조건에 맞는 곳이 없어 룰렛을 돌릴 수 없어요",
+  currentLocationUnavailable: "현재 위치를 가져오지 못해 목적지만 보여드려요",
 } as const;
