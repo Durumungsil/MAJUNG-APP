@@ -1,3 +1,2 @@
-// 힌트(로드뷰)를 보여주는 시간. 서버 응답의 view_seconds(백엔드 기본 30초) 대신 팀에서 정한 60초를 씀
-// TODO: 백엔드 HINT_VIEW_SECONDS를 60으로 맞추면 응답값을 쓰도록 되돌릴 것
-export const HINT_VIEW_SECONDS = 60;
+// 힌트 시간은 힌트 API 응답(view_seconds)으로 정해짐. 힌트를 받기 전 안내 모달에서만 서버 기본값(HINT_VIEW_SECONDS)을 보여줌
+export const DEFAULT_HINT_VIEW_SECONDS = 60;

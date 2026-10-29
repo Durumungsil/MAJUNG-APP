@@ -7,7 +7,7 @@ import { parseGroupId } from "@/entities/group";
 import {
   formatRemainingHintTime,
   HintExpiredModal,
-  HINT_VIEW_SECONDS,
+  DEFAULT_HINT_VIEW_SECONDS,
   HintIntroModal,
   useHintCountdown,
   useMissionHint,
@@ -39,7 +39,9 @@ export default function AdventureHintView({ groupId: groupIdParam }: AdventureHi
 
   const [hint, setHint] = useState<MissionHint | null>(null);
   const [roadviewStatus, setRoadviewStatus] = useState<KakaoRoadviewStatus>("loading");
-  const { remainingSeconds, isStarted, isExpired, start } = useHintCountdown(HINT_VIEW_SECONDS);
+  // 서버가 내려준 표시 시간(view_seconds)으로 카운트다운함. 힌트를 받기 전에는 서버 기본값으로 안내
+  const hintLimitSeconds = hint?.viewSeconds ?? DEFAULT_HINT_VIEW_SECONDS;
+  const { remainingSeconds, isStarted, isExpired, start } = useHintCountdown(hintLimitSeconds);
 
   function handleHintStartClick() {
     if (mission == null) {
@@ -95,7 +97,7 @@ export default function AdventureHintView({ groupId: groupIdParam }: AdventureHi
 
       <HintIntroModal
         open={!isStarted}
-        limitSeconds={HINT_VIEW_SECONDS}
+        limitSeconds={hintLimitSeconds}
         cancelHref={mapHref}
         onStartClick={handleHintStartClick}
         isStarting={isMissionPending || isHintPending}
