@@ -53,9 +53,9 @@ export default function ExtremePlaceDetailPage({
   if (isConflict) return <Toast open={toastMessage !== null} message={toastMessage ?? ""} />;
   if (isPending) {
     return (
-      <main className="flex flex-1 flex-col">
-        <Skeleton className="aspect-[402/674] w-full rounded-none" />
-        <div className="flex flex-col gap-3 px-8 pt-6">
+      <main className="flex h-dvh flex-col overflow-hidden">
+        <Skeleton className="min-h-0 w-full flex-1 rounded-none" />
+        <div className="flex flex-col gap-3 px-8 pt-6 pb-[calc(var(--safe-bottom)+--spacing(11))]">
           <Skeleton className="h-9 w-2/3" />
           <Skeleton className="h-5 w-full" />
         </div>
@@ -73,7 +73,7 @@ export default function ExtremePlaceDetailPage({
   if (result.kind !== kind) notFound();
 
   return (
-    <main className="flex flex-1 flex-col">
+    <main className="flex h-dvh flex-col overflow-hidden">
       <ExtremePlaceConfirm
         groupId={groupId}
         result={result}
