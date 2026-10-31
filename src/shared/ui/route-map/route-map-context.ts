@@ -1,16 +1,11 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { KakaoMap, KakaoMapsNamespace as KakaoMaps } from "@/shared/lib/kakao-maps";
+import type { LoadedGoogleMap } from "@/shared/lib/use-google-map";
 
-type RouteMapContextValue = {
-  maps: KakaoMaps;
-  map: KakaoMap;
-};
+export const RouteMapContext = createContext<LoadedGoogleMap | null>(null);
 
-export const RouteMapContext = createContext<RouteMapContextValue | null>(null);
-
-export function useRouteMapContext(): RouteMapContextValue {
+export function useRouteMapContext(): LoadedGoogleMap {
   const value = useContext(RouteMapContext);
   if (!value) throw new Error("RouteMap 안에서만 사용할 수 있어요");
   return value;
