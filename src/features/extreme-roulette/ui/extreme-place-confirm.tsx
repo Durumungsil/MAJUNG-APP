@@ -60,10 +60,11 @@ export default function ExtremePlaceConfirm({
 
   return (
     <>
+      {/* 고정 비율이면 세로로 긴 화면에서 지도가 중간에 끊기므로, 남은 높이를 모두 채움 */}
       <RouteMap
         fitPoints={getFocusPoints(place.location)}
         label={`${place.name} 위치 지도`}
-        className="aspect-[402/674] w-full"
+        className="min-h-0 w-full flex-1"
       >
         <MapOverlay position={place.location}>
           <MapPinIcon variant="active" className="h-[47.78px] w-[33.72px]" />

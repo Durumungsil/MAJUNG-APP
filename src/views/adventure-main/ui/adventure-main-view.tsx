@@ -9,7 +9,7 @@ import SearchIcon from "@/shared/assets/icons/search-icon";
 import CurrentLocationMarker from "@/shared/assets/markers/current-location-marker";
 import { MissionSuccessModal } from "@/features/complete-mission";
 import { Button, ErrorState, Screen, Skeleton, Toast } from "@/shared/ui";
-import KakaoMap from "@/shared/ui/kakao-map";
+import GoogleMap from "@/shared/ui/google-map";
 import { DEFAULT_MAP_CENTER } from "../config/default-center";
 import { useMissionFlow } from "../model/use-mission-flow";
 
@@ -56,7 +56,7 @@ export default function AdventureMainView({ groupId: groupIdParam }: AdventureMa
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-background">
       <section className="relative min-h-0 flex-1">
-        <KakaoMap
+        <GoogleMap
           center={position ?? DEFAULT_MAP_CENTER}
           marker={position ? <CurrentLocationMarker /> : undefined}
           className="absolute inset-0"

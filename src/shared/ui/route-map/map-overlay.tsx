@@ -12,24 +12,23 @@ type MapOverlayProps = {
   children: ReactNode;
 };
 
-/** 카카오맵 CustomOverlay 위에 React 요소를 그림 */
+/** 구글 AdvancedMarkerElement 위에 React 요소를 그림 (기본 기준점이 아래 가운데) */
 export default function MapOverlay({ position, zIndex = 0, children }: MapOverlayProps) {
-  const { maps, map } = useRouteMapContext();
+  const { libraries, map } = useRouteMapContext();
   const [container] = useState(() => document.createElement("div"));
   const { lat, lng } = position;
 
   useEffect(() => {
-    const overlay = new maps.CustomOverlay({
+    const marker = new libraries.marker.AdvancedMarkerElement({
       content: container,
-      position: new maps.LatLng(lat, lng),
-      xAnchor: 0.5,
-      yAnchor: 1,
+      position: { lat, lng },
       zIndex,
-      clickable: true,
+      map,
     });
-    overlay.setMap(map);
-    return () => overlay.setMap(null);
-  }, [maps, map, container, lat, lng, zIndex]);
+    return () => {
+      marker.map = null;
+    };
+  }, [libraries, map, container, lat, lng, zIndex]);
 
   return createPortal(children, container);
 }
