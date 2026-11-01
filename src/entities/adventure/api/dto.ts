@@ -60,7 +60,17 @@ export type MissionHintResponse = {
   hint_count: number;
 };
 
+export type MissionDistanceResponse = {
+  distance_meters: number;
+};
+
+export type ReplaceMissionRequest = {
+  reason: "ROADVIEW_UNAVAILABLE";
+};
+
 export type CompleteMissionRequest = MissionLocationRequest & {
+  /** 실제 GPS 오차 반경(m). 서버가 0 초과 50m 이하만 받음 */
+  accuracy_meters: number;
   /** ISO 날짜시간. 선택값이며 서버는 저장·랭크 계산에 서버 시각을 씀 */
   completed_at?: string;
 };

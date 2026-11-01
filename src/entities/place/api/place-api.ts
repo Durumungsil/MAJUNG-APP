@@ -1,8 +1,11 @@
 import { apiRequest } from "@/shared/api";
-import { DESTINATION_CATEGORY_LABEL } from "../config/category";
-import { MOCK_PLACE_DETAIL } from "../config/mock-places";
-import type { Place } from "../model/types";
-import type { DestinationRecommendationsResponse } from "./dto";
+import { toLatLng } from "@/shared/lib";
+import type { Place, PlaceCategory } from "../model/types";
+import type {
+  DestinationRecommendationsResponse,
+  NearbyDestinationsResponse,
+  RecommendedPlaceItem,
+} from "./dto";
 
 export type RecommendedPlacePage = {
   places: Place[];
@@ -10,28 +13,41 @@ export type RecommendedPlacePage = {
   nextCursor: string | null;
 };
 
-/** 백엔드 추천 장소 → 마중 Place. 응답에 없는 상세 정보는 장소 상세 API가 나오기 전까지 목 데이터로 채움 */
-function toPlace(item: DestinationRecommendationsResponse["items"][number]): Place {
+function toPlace(item: RecommendedPlaceItem): Place {
   return {
-    ...MOCK_PLACE_DETAIL,
-    id: item.destination_id,
+    id: item.place_id,
     name: item.name,
-    category: DESTINATION_CATEGORY_LABEL[item.category],
-    address: item.address,
-    location: { lat: item.latitude, lng: item.longitude },
+    category: item.category,
+    location: toLatLng(item.latitude, item.longitude),
   };
 }
 
-/** 여행지 리스트 추천 - 그룹 취향 기준 추천 장소 한 페이지 */
+/**
+ * 여행지 리스트 추천 - 그룹 취향 기준 추천 장소 한 페이지.
+ * category가 null이면 그룹 취향 상위 카테고리를 섞어서 추천함.
+ * cursor는 같은 category로만 이어 받을 수 있음 (조건이 바뀌거나 15분이 지나면 400)
+ */
 export async function fetchRecommendedPlaces(
   groupId: number,
-  limit: number,
-  cursor: string | null,
+  {
+    category,
+    limit,
+    cursor,
+  }: { category: PlaceCategory | null; limit: number; cursor: string | null },
 ): Promise<RecommendedPlacePage> {
   const params = new URLSearchParams({ limit: String(limit) });
+  if (category) params.set("category", category);
   if (cursor) params.set("cursor", cursor);
   const data = await apiRequest<DestinationRecommendationsResponse>(
     `/api/v1/groups/${groupId}/destinations/recommendations?${params}`,
   );
   return { places: data.items.map(toPlace), nextCursor: data.next_cursor };
+}
+
+/** 2차 추천 - 기준 장소 주변 추천 장소 첫 페이지 (기준 장소는 결과에서 빠짐) */
+export async function fetchNearbyPlaces(groupId: number, placeId: string): Promise<Place[]> {
+  const data = await apiRequest<NearbyDestinationsResponse>(
+    `/api/v1/groups/${groupId}/destinations/${encodeURIComponent(placeId)}/recommendations`,
+  );
+  return data.items.map(toPlace);
 }

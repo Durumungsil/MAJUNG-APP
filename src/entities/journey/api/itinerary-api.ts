@@ -1,4 +1,5 @@
 import { apiRequest } from "@/shared/api";
+import { toLatLng } from "@/shared/lib";
 import type { Itinerary, TimelineStop } from "../model/types";
 import type { ItineraryItemResponse, ItineraryResponse } from "./dto";
 
@@ -18,12 +19,10 @@ export function toItinerary(data: ItineraryResponse): Itinerary {
       date: day.date,
       stops: day.items.filter(isVisit).map((item): TimelineStop => ({
         id: String(item.item_id),
-        destinationId: item.destination_id,
+        placeId: item.place_id,
         startTime: item.start_at,
         endTime: item.end_at,
-        placeName: item.destination_name,
-        // TODO: 백엔드가 VISIT 항목에 좌표를 추가하면 채움
-        location: null,
+        location: toLatLng(item.latitude, item.longitude),
       })),
     })),
   };

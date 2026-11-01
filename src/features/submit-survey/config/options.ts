@@ -18,15 +18,19 @@ export const TRANSPORT_OPTIONS = [
   { value: "AIRPLANE", label: "비행기" },
 ] as const satisfies readonly { value: TransportType; label: string }[];
 
-/** 선택지 value가 곧 백엔드 TravelCategory 값 (1:1) */
+/**
+ * 선택지 value가 곧 백엔드 TravelCategory 값 (1:1).
+ * FESTIVAL은 서버가 장소 검색에 쓰지 않으므로 선택지에서 숨김 (이전 응답에 있어도 다시 제출할 때 빠짐)
+ */
 export const TRAVEL_STYLE_OPTIONS = [
   { value: "HEALING", label: "힐링" },
-  { value: "FESTIVAL", label: "축제" },
   { value: "SHOPPING", label: "쇼핑" },
   { value: "CULTURE", label: "문화관광" },
   { value: "ACTIVITY", label: "액티비티" },
   { value: "FOOD", label: "맛집 탐방" },
   { value: "NATURE", label: "자연친화적" },
+  { value: "CAFE", label: "카페·디저트" },
+  { value: "SIGHTSEEING", label: "관광명소" },
 ] as const satisfies readonly { value: TravelCategory; label: string }[];
 
 export const INITIAL_FOOD_ROW_COUNT = 2;

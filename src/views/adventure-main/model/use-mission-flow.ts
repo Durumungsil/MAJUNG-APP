@@ -3,9 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import {
-  getRemainingDistanceLabel,
+  formatDistance,
   useAdventureStore,
   useCurrentMission,
+  useMissionDistance,
   type CompletedMission,
 } from "@/entities/adventure";
 import { useAutoCompleteMission } from "@/features/complete-mission";
@@ -20,13 +21,12 @@ import { useCurrentPosition } from "@/shared/lib/use-current-position";
  */
 export function useMissionFlow(groupId: number) {
   const router = useRouter();
-  const { position } = useCurrentPosition();
+  const { position, accuracyMeters } = useCurrentPosition();
   const currentMissionQuery = useCurrentMission(groupId);
   const mission = currentMissionQuery.data ?? null;
 
   const phase = useAdventureStore((state) => state.phase);
   const succeededMission = useAdventureStore((state) => state.succeededMission);
-  const hintTarget = useAdventureStore((state) => state.hintTarget);
   const succeed = useAdventureStore((state) => state.succeed);
   const exploreAround = useAdventureStore((state) => state.exploreAround);
   const searchNext = useAdventureStore((state) => state.searchNext);
@@ -55,10 +55,18 @@ export function useMissionFlow(groupId: number) {
     onError: handleMissionError,
   });
 
+  // 남은 거리는 힌트를 쓴 미션만 서버가 알려줌 (안 쓰면 409)
+  const { data: remainingMeters } = useMissionDistance(
+    groupId,
+    mission !== null && mission.hintCount > 0 && isSearching ? mission.id : null,
+    position,
+  );
+
   useAutoCompleteMission({
     groupId,
     missionId: mission !== null && mission.startedAt !== null ? mission.id : null,
     position,
+    accuracyMeters,
     enabled: isSearching,
     onComplete: handleMissionComplete,
     onError: handleMissionError,
@@ -76,7 +84,7 @@ export function useMissionFlow(groupId: number) {
     mission,
     phase,
     succeededMission,
-    remainingDistanceLabel: getRemainingDistanceLabel(position, hintTarget, mission?.id ?? null),
+    remainingDistanceLabel: remainingMeters === undefined ? null : formatDistance(remainingMeters),
     toastMessage,
     exploreAround,
     goToNextPlace,

@@ -1,13 +1,15 @@
 import { cn } from "@/shared/lib";
+import { PLACE_CATEGORY_LABEL } from "../config/category";
 import type { Place } from "../model/types";
-import BusinessStatusText from "./business-status-text";
+import PlaceName from "./place-name";
 
 type PlaceCardProps = {
-  place: Pick<Place, "name" | "category" | "address" | "businessStatus">;
+  place: Pick<Place, "id" | "name" | "category">;
   selected?: boolean;
   onClick?: () => void;
 };
 
+/** 목록용 장소 카드. 사진·주소는 추천 응답에 없고 목록에서는 Google 상세를 조회하지 않음 */
 export default function PlaceCard({ place, selected = false, onClick }: PlaceCardProps) {
   return (
     <button
@@ -21,11 +23,15 @@ export default function PlaceCard({ place, selected = false, onClick }: PlaceCar
     >
       {/* 카드 폭을 넘는 글자는 줄바꿈하지 않고 말줄임표로 자름 */}
       <span className="flex w-full min-w-0 items-center gap-3 whitespace-nowrap">
-        <span className="min-w-0 truncate text-m">{place.name}</span>
-        <span className="shrink-0 text-xs text-primary-800">{place.category}</span>
+        <span className="min-w-0 truncate text-m">
+          <PlaceName placeId={place.id} name={place.name} />
+        </span>
+        {place.category && (
+          <span className="shrink-0 text-xs text-primary-800">
+            {PLACE_CATEGORY_LABEL[place.category]}
+          </span>
+        )}
       </span>
-      <span className="w-full truncate text-s">{place.address}</span>
-      <BusinessStatusText status={place.businessStatus} className="w-full truncate text-xs" />
     </button>
   );
 }

@@ -1,5 +1,6 @@
 export { default as Logo } from "./icons/logo";
 export { default as PlusIcon } from "./icons/plus-icon";
+export { default as SettingsIcon } from "./icons/settings-icon";
 export { default as LocationIcon } from "./icons/location-icon";
 export { default as CalendarIcon } from "./icons/calendar-icon";
 export { default as ChevronLeftIcon } from "./icons/chevron-left-icon";

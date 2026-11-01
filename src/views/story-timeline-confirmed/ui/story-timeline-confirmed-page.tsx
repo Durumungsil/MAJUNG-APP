@@ -10,6 +10,7 @@ import {
   useItinerary,
   withItineraryId,
 } from "@/entities/journey";
+import { PlaceName } from "@/entities/place";
 import { isApiError } from "@/shared/api";
 import { ErrorState, Screen, Skeleton, TextLink } from "@/shared/ui";
 import { StoryLayout, TimelineMissing } from "@/widgets/story-layout";
@@ -82,7 +83,7 @@ function ConfirmedContent({ group, itineraryId }: { group: Group; itineraryId: n
           <ol aria-label="확정된 타임라인" className="flex flex-col gap-5">
             {getDayStops(itinerary, dates[selectedDayIndex]).map((stop) => (
               <li key={stop.id}>
-                <TimelineStopCard stop={stop} />
+                <TimelineStopCard stop={stop} placeName={<PlaceName placeId={stop.placeId} />} />
               </li>
             ))}
           </ol>

@@ -7,6 +7,8 @@ export type CurrentPositionStatus = "pending" | "granted" | "denied" | "unavaila
 
 interface CurrentPositionState {
   position: LatLngLiteral | null;
+  /** GPS 오차 반경(m). 위치를 아직 못 받았으면 null */
+  accuracyMeters: number | null;
   status: CurrentPositionStatus;
 }
 
@@ -18,7 +20,7 @@ const WATCH_OPTIONS: PositionOptions = {
 
 function getInitialState(): CurrentPositionState {
   const isSupported = typeof navigator === "undefined" || "geolocation" in navigator;
-  return { position: null, status: isSupported ? "pending" : "unavailable" };
+  return { position: null, accuracyMeters: null, status: isSupported ? "pending" : "unavailable" };
 }
 
 export function useCurrentPosition(): CurrentPositionState {
@@ -29,11 +31,15 @@ export function useCurrentPosition(): CurrentPositionState {
 
     const watchId = navigator.geolocation.watchPosition(
       ({ coords }) => {
-        setState({ position: { lat: coords.latitude, lng: coords.longitude }, status: "granted" });
+        setState({
+          position: { lat: coords.latitude, lng: coords.longitude },
+          accuracyMeters: coords.accuracy,
+          status: "granted",
+        });
       },
       (error) => {
         setState((prev) => ({
-          position: prev.position,
+          ...prev,
           status: error.code === error.PERMISSION_DENIED ? "denied" : "unavailable",
         }));
       },

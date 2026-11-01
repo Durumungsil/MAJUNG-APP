@@ -15,8 +15,7 @@ export function useSaveDestinationSelection(groupId: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (days: readonly SelectionDay[]) => saveDestinationSelection(groupId, days),
-    // 선택을 저장하면 추천 중심이 선택한 장소 쪽으로 바뀌므로 추천 목록을 다시 받음
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: placeKeys.recommendations(groupId) }),
+    // 선택을 저장하면 추천 중심이 선택한 장소 쪽으로 바뀌므로, 이전 cursor를 버리고 첫 페이지부터 다시 받음
+    onSuccess: () => queryClient.resetQueries({ queryKey: placeKeys.recommendations(groupId) }),
   });
 }

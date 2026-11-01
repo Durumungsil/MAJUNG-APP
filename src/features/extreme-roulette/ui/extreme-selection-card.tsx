@@ -1,5 +1,4 @@
-import Image from "next/image";
-import type { Place } from "@/entities/place";
+import { PlaceName, type Place } from "@/entities/place";
 import { cn } from "@/shared/lib";
 import { Button } from "@/shared/ui";
 import { ROULETTE_KIND_COPY } from "../config/roulette-kinds";
@@ -18,7 +17,6 @@ export default function ExtremeSelectionCard({
   rouletteHref,
 }: ExtremeSelectionCardProps) {
   const copy = ROULETTE_KIND_COPY[kind];
-  const imageUrl = place?.imageUrls[0];
 
   return (
     <section
@@ -30,20 +28,12 @@ export default function ExtremeSelectionCard({
     >
       {place ? (
         <div className="flex h-16.5 gap-6">
-          <div className="relative flex-1 overflow-hidden rounded-lg bg-natural-400">
-            {imageUrl && (
-              <Image
-                src={imageUrl}
-                alt={`${place.name} 사진`}
-                fill
-                sizes="140px"
-                className="object-cover"
-              />
-            )}
-          </div>
+          {/* 사진은 상세 화면에서만 조회함 (Google 사진 요청은 따로 과금됨) */}
+          <div className="relative flex-1 overflow-hidden rounded-lg bg-natural-400" />
           <div className="flex min-w-0 flex-1 flex-col">
-            <p className="truncate text-l text-text-primary">{place.name}</p>
-            <p className="truncate text-s text-text-muted">{place.address}</p>
+            <p className="truncate text-l text-text-primary">
+              <PlaceName placeId={place.id} name={place.name} />
+            </p>
           </div>
         </div>
       ) : (

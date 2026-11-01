@@ -1,6 +1,5 @@
 export type { Itinerary, ItineraryDay, TimelineStop } from "./model/types";
 export type { ItineraryResponse } from "./api/dto";
-export { getTimelineStops } from "./api/get-journey";
 export { toItinerary } from "./api/itinerary-api";
 export { journeyKeys } from "./api/query-keys";
 export { useItinerary } from "./api/queries";

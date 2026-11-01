@@ -15,11 +15,13 @@ export default function QueryProvider({ children }: { children: ReactNode }) {
   // 요청 간 캐시가 섞이지 않도록 컴포넌트마다 한 번만 생성함 (모듈 전역 인스턴스 금지)
   const [queryClient] = useState(makeQueryClient);
 
-  // 로그아웃·토큰 만료 시 이전 사용자의 데이터가 남지 않게 캐시를 비움
+  // 로그아웃·토큰 만료·다른 계정으로 전환 시 이전 사용자의 데이터가 남지 않게 캐시를 비움
   useEffect(
     () =>
       useSessionStore.subscribe((state, prevState) => {
-        if (prevState.session && !state.session) queryClient.clear();
+        if (prevState.session && prevState.session.userId !== state.session?.userId) {
+          queryClient.clear();
+        }
       }),
     [queryClient],
   );

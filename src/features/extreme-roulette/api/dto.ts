@@ -1,16 +1,16 @@
+import type { PlaceCategory } from "@/entities/place";
+
 // 백엔드 JSON이 snake_case라서 응답 타입은 필드 이름을 그대로 따름. 화면에서는 model 타입으로 변환해서 씀
 
 /** 룰렛 종류 (백엔드 enum) */
 export type RouletteType = "DESTINATION" | "RESTAURANT";
 
-/** 룰렛으로 뽑힌 장소 */
+/** 룰렛으로 뽑힌 장소. 이름·주소는 없고, 좌표는 다른 검색으로 캐시된 경우에만 있음 */
 export type RoulettePlaceDto = {
-  place_id: number;
-  name: string;
-  category: string | null;
-  address: string;
-  latitude: number;
-  longitude: number;
+  place_id: string;
+  category: PlaceCategory | null;
+  latitude: number | null;
+  longitude: number | null;
 };
 
 /** POST /roulette/destinations, /roulette/restaurants 응답 (201) */

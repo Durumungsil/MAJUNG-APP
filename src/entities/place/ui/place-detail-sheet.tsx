@@ -2,7 +2,6 @@
 
 import { useId } from "react";
 import { BottomSheet, Button, type BottomSheetSnap } from "@/shared/ui";
-import { PREVIEW_REVIEW_COUNT } from "../config/constants";
 import type { Place } from "../model/types";
 import PlaceDetail from "./place-detail";
 
@@ -16,7 +15,7 @@ type PlaceDetailSheetProps = {
   selectLabel?: string;
 };
 
-/** 장소 상세 바텀시트. "리뷰 더보기"를 누르면 full로 펼쳐 전체 리뷰를 보여줌 */
+/** 장소 상세 바텀시트 */
 export default function PlaceDetailSheet({
   place,
   snap,
@@ -28,12 +27,6 @@ export default function PlaceDetailSheet({
   const titleId = useId();
 
   if (!place) return null;
-
-  const visibleReviewCount = snap === "full" ? place.reviews.length : PREVIEW_REVIEW_COUNT;
-
-  function handleShowMoreReviews() {
-    onSnapChange("full");
-  }
 
   function handleSelectClick() {
     if (place) onSelect(place);
@@ -52,12 +45,8 @@ export default function PlaceDetailSheet({
         </Button>
       }
     >
-      <PlaceDetail
-        place={place}
-        titleId={titleId}
-        visibleReviewCount={visibleReviewCount}
-        onShowMoreReviews={handleShowMoreReviews}
-      />
+      {/* 장소를 바꾸면 사진 상태를 새로 시작하도록 key를 줌 */}
+      <PlaceDetail key={place.id} place={place} titleId={titleId} />
     </BottomSheet>
   );
 }

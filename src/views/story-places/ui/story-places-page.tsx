@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { getGroupRole, useGroupByParam, type Group } from "@/entities/group";
 import { getTripDates, withItineraryId, type Itinerary } from "@/entities/journey";
-import { useRecommendedPlaces } from "@/entities/place";
+import { PlaceCategoryTabs, useRecommendedPlaces, type PlaceCategory } from "@/entities/place";
 import { useSessionStore } from "@/entities/session";
 import { useGenerateTimeline } from "@/features/generate-timeline";
 import {
@@ -46,6 +46,7 @@ export default function StoryPlacesPage({ groupId }: StoryPlacesPageProps) {
 
 function StoryPlacesContent({ group }: { group: Group }) {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+  const [category, setCategory] = useState<PlaceCategory | null>(null);
   const dates = getTripDates(group.startDate ?? "", group.endDate ?? "");
   const {
     data: places,
@@ -55,8 +56,9 @@ function StoryPlacesContent({ group }: { group: Group }) {
     refetch,
     hasNextPage,
     isFetchingNextPage,
-    fetchNextPage,
-  } = useRecommendedPlaces(group.id);
+    isFetchNextPageError,
+    loadMore,
+  } = useRecommendedPlaces(group.id, category);
   const { isConflict, toastMessage } = useStoryConflictRedirect(error, group.id);
   const router = useRouter();
   const userId = useSessionStore((state) => state.session?.userId ?? null);
@@ -70,7 +72,7 @@ function StoryPlacesContent({ group }: { group: Group }) {
   }
 
   function handleLoadMore() {
-    void fetchNextPage();
+    void loadMore();
   }
 
   // 일차별 선택을 방문일과 함께 저장한 뒤, 저장한 선택으로 타임라인을 만듦 (서버가 방문일을 지켜 배치함)
@@ -100,7 +102,8 @@ function StoryPlacesContent({ group }: { group: Group }) {
     else showToast(ERROR_MESSAGES.requestFailed);
   }
 
-  if (isPending || isConflict) {
+  // 탭을 바꿀 때마다 화면 전체를 다시 그리지 않도록, 전체 스켈레톤은 처음 들어왔을 때(전체 탭)만 보여줌
+  if ((isPending && category === null) || isConflict) {
     return (
       <>
         <StoryPlacesSkeleton />
@@ -118,22 +121,29 @@ function StoryPlacesContent({ group }: { group: Group }) {
       onSelectedDayIndexChange={setSelectedDayIndex}
       fillHeight
     >
-      {isError ? (
-        <ErrorState onRetry={handleRetry} />
-      ) : places.length === 0 ? (
-        <p className="mt-24 text-center text-l text-text-primary">추천할 장소가 없어요</p>
-      ) : (
-        <PlaceSelectList
-          places={places}
-          date={dates[selectedDayIndex]}
-          hasNextPage={hasNextPage}
-          isFetchingNextPage={isFetchingNextPage}
-          onLoadMore={handleLoadMore}
-          canSubmit={isLeader}
-          isSubmitting={isSaving || isGenerating}
-          onSubmit={handleTimelineSubmit}
-        />
-      )}
+      <div className="mb-5 shrink-0">
+        <PlaceCategoryTabs selected={category} onSelect={setCategory} />
+      </div>
+      <PlaceSelectList
+        places={places ?? []}
+        fallback={
+          isPending ? (
+            <PlaceListSkeleton />
+          ) : isError && places === undefined ? (
+            <ErrorState onRetry={handleRetry} />
+          ) : places.length === 0 ? (
+            <p className="mt-24 text-center text-l text-text-primary">추천할 장소가 없어요</p>
+          ) : undefined
+        }
+        date={dates[selectedDayIndex]}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        isLoadMoreError={isFetchNextPageError}
+        onLoadMore={handleLoadMore}
+        canSubmit={isLeader}
+        isSubmitting={isSaving || isGenerating}
+        onSubmit={handleTimelineSubmit}
+      />
       <Toast open={generateToastMessage !== null} message={generateToastMessage ?? ""} />
     </StoryLayout>
   );
@@ -145,10 +155,18 @@ function StoryPlacesSkeleton() {
       <div className="mt-5 flex flex-col gap-5">
         <Skeleton className="h-8 w-1/2" />
         <Skeleton className="h-6 w-2/3" />
-        {Array.from({ length: SKELETON_CARD_COUNT }, (_, index) => (
-          <Skeleton key={index} className="h-24" />
-        ))}
+        <PlaceListSkeleton />
       </div>
     </Screen>
+  );
+}
+
+function PlaceListSkeleton() {
+  return (
+    <div className="flex flex-col gap-5">
+      {Array.from({ length: SKELETON_CARD_COUNT }, (_, index) => (
+        <Skeleton key={index} className="h-12" />
+      ))}
+    </div>
   );
 }

@@ -12,6 +12,7 @@ import {
   withItineraryId,
   type ItineraryDay,
 } from "@/entities/journey";
+import { PlaceName } from "@/entities/place";
 import { useSessionStore } from "@/entities/session";
 import { TimelineEditor } from "@/features/reorder-timeline";
 import { useSaveDestinationSelection } from "@/features/select-place";
@@ -111,7 +112,7 @@ function StoryTimelineContent({
         <ol aria-label="타임라인" className="flex flex-col gap-5">
           {getDayStops(itinerary, dates[selectedDayIndex]).map((stop) => (
             <li key={stop.id}>
-              <TimelineStopCard stop={stop} />
+              <TimelineStopCard stop={stop} placeName={<PlaceName placeId={stop.placeId} />} />
             </li>
           ))}
         </ol>

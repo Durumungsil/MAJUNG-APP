@@ -12,6 +12,8 @@ type AutoCompleteMissionOptions = {
   /** 시작한 미션 ID. 시작 전이면 null */
   missionId: number | null;
   position: LatLngLiteral | null;
+  /** 실제 GPS 오차 반경(m). 서버가 필수로 받으므로 없으면 요청하지 않음 */
+  accuracyMeters: number | null;
   /** 장소를 찾는 단계일 때만 요청함 */
   enabled: boolean;
   onComplete: (result: CompletedMission) => void;
@@ -20,12 +22,13 @@ type AutoCompleteMissionOptions = {
 
 /**
  * 현재 위치로 미션 완료를 요청함. 도착 여부는 서버가 판정하고,
- * 아직 멀면(400) 조용히 넘어가서 다음 위치에서 다시 요청함
+ * 아직 멀거나 GPS가 부정확하면(400) 조용히 넘어가서 다음 위치에서 다시 요청함
  */
 export function useAutoCompleteMission({
   groupId,
   missionId,
   position,
+  accuracyMeters,
   enabled,
   onComplete,
   onError,
@@ -34,7 +37,8 @@ export function useAutoCompleteMission({
   const lastAttemptRef = useRef<(CompletionAttempt & { missionId: number }) | null>(null);
 
   useEffect(() => {
-    if (!enabled || missionId === null || position === null || isPending) return;
+    if (!enabled || missionId === null || position === null || accuracyMeters === null) return;
+    if (isPending) return;
     const now = Date.now();
     const lastAttempt =
       lastAttemptRef.current?.missionId === missionId ? lastAttemptRef.current : null;
@@ -42,7 +46,7 @@ export function useAutoCompleteMission({
 
     lastAttemptRef.current = { missionId, position, attemptedAt: now };
     mutate(
-      { missionId, position },
+      { missionId, position, accuracyMeters },
       {
         onSuccess: onComplete,
         onError: (error) => {
@@ -50,5 +54,5 @@ export function useAutoCompleteMission({
         },
       },
     );
-  }, [enabled, missionId, position, isPending, mutate, onComplete, onError]);
+  }, [enabled, missionId, position, accuracyMeters, isPending, mutate, onComplete, onError]);
 }

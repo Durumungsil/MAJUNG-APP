@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { PlaceCard, PlaceDetailSheet, type Place } from "@/entities/place";
 import { useIntersection } from "@/shared/lib";
 import { Button, Spinner, type BottomSheetSnap } from "@/shared/ui";
 import {
   addPlaceToDate,
   getSelectedCount,
+  isPlaceSelected,
   toSelectionDays,
   type DaySelection,
 } from "../lib/day-selection";
@@ -14,10 +15,17 @@ import type { SelectionDay } from "../lib/selection-payload";
 
 type PlaceSelectListProps = {
   places: Place[];
+  /**
+   * 목록 대신 보여줄 내용 (불러오는 중·실패·빈 목록).
+   * 카테고리 탭을 바꿔도 고른 장소가 남도록 목록 자리만 바꾸고 이 컴포넌트는 그대로 둠
+   */
+  fallback?: ReactNode;
   /** 지금 고르는 방문일 (YYYY-MM-DD). Day 탭을 바꾸면 그날의 선택이 따로 쌓임 */
   date: string;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
+  /** 다음 페이지 요청이 실패하면 자동으로 다시 부르지 않고 더 보기 버튼을 보여줌 */
+  isLoadMoreError: boolean;
   onLoadMore: () => void;
   /** 대표자만 타임라인을 만들 수 있으므로 멤버에게는 생성 버튼을 숨김 */
   canSubmit: boolean;
@@ -29,9 +37,11 @@ type PlaceSelectListProps = {
 
 export default function PlaceSelectList({
   places,
+  fallback,
   date,
   hasNextPage,
   isFetchingNextPage,
+  isLoadMoreError,
   onLoadMore,
   canSubmit,
   isSubmitting,
@@ -42,10 +52,10 @@ export default function PlaceSelectList({
   const [snap, setSnap] = useState<BottomSheetSnap>("peek");
   const loadMoreRef = useIntersection<HTMLDivElement>(
     onLoadMore,
-    hasNextPage && !isFetchingNextPage,
+    fallback === undefined && hasNextPage && !isFetchingNextPage && !isLoadMoreError,
   );
 
-  const selectedIdsOfDate = selection[date] ?? [];
+  const selectedStopsOfDate = selection[date] ?? [];
 
   function handlePlaceClick(place: Place) {
     setPreviewPlace(place);
@@ -57,7 +67,9 @@ export default function PlaceSelectList({
   }
 
   function handlePlaceSelect(place: Place) {
-    setSelection((prev) => addPlaceToDate(prev, date, place.id));
+    setSelection((prev) =>
+      addPlaceToDate(prev, date, { placeId: place.id, category: place.category }),
+    );
     setPreviewPlace(null);
   }
 
@@ -69,20 +81,36 @@ export default function PlaceSelectList({
     <>
       {/* 목록만 이 영역 안에서 스크롤되고, 생성 버튼은 아래에 고정됨 */}
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-        <ul className="flex flex-col gap-5">
-          {places.map((place) => (
-            <li key={place.id}>
-              <PlaceCard
-                place={place}
-                selected={selectedIdsOfDate.includes(place.id) || previewPlace?.id === place.id}
-                onClick={() => handlePlaceClick(place)}
-              />
-            </li>
-          ))}
-        </ul>
-        <div ref={loadMoreRef} className="flex justify-center">
-          {isFetchingNextPage && <Spinner />}
-        </div>
+        {fallback ?? (
+          <>
+            <ul className="flex flex-col gap-5">
+              {places.map((place) => (
+                <li key={place.id}>
+                  <PlaceCard
+                    place={place}
+                    selected={
+                      isPlaceSelected(selectedStopsOfDate, place.id) ||
+                      previewPlace?.id === place.id
+                    }
+                    onClick={() => handlePlaceClick(place)}
+                  />
+                </li>
+              ))}
+            </ul>
+            <div ref={loadMoreRef} className="flex justify-center">
+              {isFetchingNextPage && <Spinner />}
+              {isLoadMoreError && !isFetchingNextPage && (
+                <button
+                  type="button"
+                  onClick={onLoadMore}
+                  className="mt-5 w-full text-center text-xs text-text-muted"
+                >
+                  더 보기
+                </button>
+              )}
+            </div>
+          </>
+        )}
       </div>
       {canSubmit && (
         <Button

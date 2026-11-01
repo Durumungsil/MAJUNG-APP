@@ -1,8 +1,8 @@
 "use client";
 
-import { notFound } from "next/navigation";
-import { useState } from "react";
-import { useAdventureStore, useCurrentMission, type MissionHint } from "@/entities/adventure";
+import { notFound, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { useCurrentMission, type MissionHint } from "@/entities/adventure";
 import { parseGroupId } from "@/entities/group";
 import {
   formatRemainingHintTime,
@@ -11,10 +11,11 @@ import {
   HintIntroModal,
   useHintCountdown,
   useMissionHint,
+  useReplaceMission,
 } from "@/features/view-place-hint";
 import { isApiError } from "@/shared/api";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
-import { useToast } from "@/shared/lib";
+import { TOAST_DURATION_MS, useToast } from "@/shared/lib";
 import { Button, Spinner, Toast } from "@/shared/ui";
 import KakaoRoadview, { type KakaoRoadviewStatus } from "@/shared/ui/kakao-roadview";
 
@@ -34,14 +35,36 @@ export default function AdventureHintView({ groupId: groupIdParam }: AdventureHi
   const mapHref = `/groups/${groupId}/adventure/map`;
   const { data: mission, isPending: isMissionPending } = useCurrentMission(groupId);
   const { mutate: requestHint, isPending: isHintPending } = useMissionHint(groupId);
-  const setHintTarget = useAdventureStore((state) => state.setHintTarget);
+  const { mutate: replaceMission } = useReplaceMission(groupId);
   const { toastMessage, showToast } = useToast();
+  const router = useRouter();
+  /** 힌트 하나당 교체는 한 번만 요청함 */
+  const replaceRequestedRef = useRef<MissionHint | null>(null);
 
   const [hint, setHint] = useState<MissionHint | null>(null);
   const [roadviewStatus, setRoadviewStatus] = useState<KakaoRoadviewStatus>("loading");
   // 서버가 내려준 표시 시간(view_seconds)으로 카운트다운함. 힌트를 받기 전에는 서버 기본값으로 안내
   const hintLimitSeconds = hint?.viewSeconds ?? DEFAULT_HINT_VIEW_SECONDS;
   const { remainingSeconds, isStarted, isExpired, start } = useHintCountdown(hintLimitSeconds);
+
+  // 실제로 파노라마가 없을 때(empty)만 교체함. SDK 로드 실패 같은 지도 장애는 loading에 머물러 교체하지 않음
+  useEffect(() => {
+    if (roadviewStatus !== "empty" || hint === null || replaceRequestedRef.current === hint) return;
+    replaceRequestedRef.current = hint;
+    replaceMission(hint.missionId, {
+      onSuccess: () => {
+        // 교체된 미션은 시작·힌트 기록이 없으므로 지도 화면으로 돌아가 현재 위치에서 다시 시작함
+        showToast(ERROR_MESSAGES.missionReplaced);
+        setTimeout(() => router.replace(mapHref), TOAST_DURATION_MS);
+      },
+      onError: (error) =>
+        showToast(
+          isApiError(error, 409)
+            ? ERROR_MESSAGES.missionReplaceUnavailable
+            : ERROR_MESSAGES.requestFailed,
+        ),
+    });
+  }, [roadviewStatus, hint, replaceMission, showToast, router, mapHref]);
 
   function handleHintStartClick() {
     if (mission == null) {
@@ -51,7 +74,6 @@ export default function AdventureHintView({ groupId: groupIdParam }: AdventureHi
     requestHint(mission.id, {
       onSuccess: (result) => {
         setHint(result);
-        setHintTarget({ missionId: result.missionId, location: result.location });
         start();
       },
       onError: (error) => showToast(getHintErrorMessage(error)),

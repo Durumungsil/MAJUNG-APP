@@ -33,11 +33,22 @@ function configure() {
   };
 }
 
+/** 장소 상세(이름·좌표·사진) 조회는 지도를 그리지 않으므로 키만 있으면 됨 */
+export function hasGooglePlacesConfig(): boolean {
+  return Boolean(GOOGLE_MAPS_API_KEY);
+}
+
 /** 구글 Maps SDK를 처음 부를 때만 불러오고, 이후에는 불러온 라이브러리를 그대로 돌려줌 */
 export async function loadGoogleMaps(): Promise<GoogleMapsLibraries> {
   configure();
   const [maps, marker] = await Promise.all([importLibrary("maps"), importLibrary("marker")]);
   return { maps, marker };
+}
+
+/** Places 라이브러리 (장소 상세 조회용). 지도 라이브러리와 같은 키·설정을 씀 */
+export async function loadGooglePlaces(): Promise<google.maps.PlacesLibrary> {
+  configure();
+  return importLibrary("places");
 }
 
 /** 키 인증 실패(잘못된 키, 허용되지 않은 도메인 등)를 구독. 이미 실패했으면 바로 알림 */

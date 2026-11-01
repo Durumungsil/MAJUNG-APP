@@ -14,10 +14,11 @@ export {
   createAdventureProcess,
   fetchCurrentMission,
   fetchMissionHint,
+  replaceMission,
   startMission,
 } from "./api/adventure-api";
 export { adventureKeys } from "./api/query-keys";
-export { useAdventureProcess, useCurrentMission } from "./api/queries";
+export { useAdventureProcess, useCurrentMission, useMissionDistance } from "./api/queries";
 export { getTodayInSeoul } from "./lib/travel-date";
 export { loadProcessId, saveProcessId } from "./lib/process-id-storage";
-export { getRemainingDistanceLabel } from "./lib/remaining-distance";
+export { formatDistance } from "./lib/remaining-distance";

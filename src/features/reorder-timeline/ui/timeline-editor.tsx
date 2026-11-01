@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { TimelineStopCard, type ItineraryDay, type TimelineStop } from "@/entities/journey";
+import { PlaceName } from "@/entities/place";
 import { Button } from "@/shared/ui";
 import { reorderStopPlaces } from "../lib/reorder-stops";
 import { useLongPressReorder } from "../model/use-long-press-reorder";
@@ -47,7 +48,11 @@ export default function TimelineEditor({
       <ol aria-label="타임라인" className="flex flex-col gap-5 select-none">
         {stops.map((stop, index) => (
           <li key={stop.id} {...getItemProps(index)} className="[-webkit-touch-callout:none]">
-            <TimelineStopCard stop={stop} highlighted={draggingIndex === index} />
+            <TimelineStopCard
+              stop={stop}
+              placeName={<PlaceName placeId={stop.placeId} />}
+              highlighted={draggingIndex === index}
+            />
           </li>
         ))}
       </ol>

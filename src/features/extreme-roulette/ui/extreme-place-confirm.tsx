@@ -1,11 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { PlaceDetailSheet } from "@/entities/place";
+import { PlaceDetailSheet, useResolvedPlace } from "@/entities/place";
 import { MapPinIcon } from "@/shared/assets";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
 import { useToast } from "@/shared/lib";
-import { MapOverlay, RouteMap, Toast, type BottomSheetSnap } from "@/shared/ui";
+import {
+  ErrorState,
+  MapOverlay,
+  RouteMap,
+  Skeleton,
+  Toast,
+  type BottomSheetSnap,
+} from "@/shared/ui";
 import { useGroupAllergies } from "../api/queries";
 import { getFocusPoints } from "../lib/focus-points";
 import { useExtremeStore } from "../model/extreme-store";
@@ -27,6 +34,8 @@ export default function ExtremePlaceConfirm({
   onClose,
 }: ExtremePlaceConfirmProps) {
   const { kind, place } = result;
+  // 룰렛 응답에 좌표가 없으면 Google SDK로 받아서 지도에 표시함
+  const resolved = useResolvedPlace(place);
   const [snap, setSnap] = useState<BottomSheetSnap>("peek");
   const [allergyWarningOpen, setAllergyWarningOpen] = useState(false);
   const confirm = useExtremeStore((state) => state.confirm);
@@ -54,6 +63,10 @@ export default function ExtremePlaceConfirm({
     else confirmPlace();
   }
 
+  function handleLocationRetry() {
+    void resolved.refetch();
+  }
+
   function handleAllergyWarningClose() {
     setAllergyWarningOpen(false);
   }
@@ -61,15 +74,23 @@ export default function ExtremePlaceConfirm({
   return (
     <>
       {/* 고정 비율이면 세로로 긴 화면에서 지도가 중간에 끊기므로, 남은 높이를 모두 채움 */}
-      <RouteMap
-        fitPoints={getFocusPoints(place.location)}
-        label={`${place.name} 위치 지도`}
-        className="min-h-0 w-full flex-1"
-      >
-        <MapOverlay position={place.location}>
-          <MapPinIcon variant="active" className="h-[47.78px] w-[33.72px]" />
-        </MapOverlay>
-      </RouteMap>
+      {resolved.location ? (
+        <RouteMap
+          fitPoints={getFocusPoints(resolved.location)}
+          label={`${resolved.name ?? ""} 위치 지도`}
+          className="min-h-0 w-full flex-1"
+        >
+          <MapOverlay position={resolved.location}>
+            <MapPinIcon variant="active" className="h-[47.78px] w-[33.72px]" />
+          </MapOverlay>
+        </RouteMap>
+      ) : resolved.isPending ? (
+        <Skeleton className="min-h-0 w-full flex-1 rounded-none" />
+      ) : (
+        <div className="flex min-h-0 flex-1">
+          <ErrorState onRetry={handleLocationRetry} />
+        </div>
+      )}
       <PlaceDetailSheet
         place={place}
         snap={snap}

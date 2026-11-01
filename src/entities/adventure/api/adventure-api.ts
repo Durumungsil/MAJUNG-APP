@@ -14,8 +14,10 @@ import type {
   CreateAdventureRequest,
   CreateAdventureResponse,
   CurrentMissionResponse,
+  MissionDistanceResponse,
   MissionHintResponse,
   MissionLocationRequest,
+  ReplaceMissionRequest,
   StartMissionResponse,
 } from "./dto";
 
@@ -67,21 +69,25 @@ export async function fetchAdventureProcess(
   };
 }
 
+function toCurrentMission(data: CurrentMissionResponse): CurrentMission {
+  return {
+    id: data.mission_id,
+    order: data.order,
+    status: data.status,
+    title: data.title,
+    objective: data.objective,
+    hintCount: data.hint_count,
+    startedAt: data.started_at,
+  };
+}
+
 /** 현재 미션 조회 - 오늘 진행할 수 있는 미션이 없으면(404) null */
 export async function fetchCurrentMission(groupId: number): Promise<CurrentMission | null> {
   try {
     const data = await apiRequest<CurrentMissionResponse>(
       `/api/v1/groups/${groupId}/missions/current`,
     );
-    return {
-      id: data.mission_id,
-      order: data.order,
-      status: data.status,
-      title: data.title,
-      objective: data.objective,
-      hintCount: data.hint_count,
-      startedAt: data.started_at,
-    };
+    return toCurrentMission(data);
   } catch (error) {
     if (isApiError(error, 404)) return null;
     throw error;
@@ -114,13 +120,47 @@ export async function fetchMissionHint(groupId: number, missionId: number): Prom
   };
 }
 
-/** 미션 완료 - 서버가 위치를 검증함. 목적지 반경 밖이면 400이고 미션은 다시 시도할 수 있음 */
+/** 남은 거리 - 목적지까지 직선거리(m). 힌트를 쓴 미션만 조회할 수 있고, 안 썼으면 409 */
+export async function fetchMissionDistance(
+  groupId: number,
+  missionId: number,
+  position: LatLngLiteral,
+): Promise<number> {
+  const data = await apiRequest<MissionDistanceResponse>(
+    `/api/v1/groups/${groupId}/missions/${missionId}/distance`,
+    { method: "POST", body: toLocationRequest(position) },
+  );
+  return data.distance_meters;
+}
+
+/**
+ * 미션 교체 - 힌트 장소에 로드뷰가 없을 때만 요청함 (지도 API 장애는 해당 없음).
+ * 성공하면 시작 시각·힌트 횟수가 초기화된 미션이 와서 다시 시작해야 함.
+ * 대체 장소가 없거나 3회를 넘으면 409이고 기존 미션이 유지됨
+ */
+export async function replaceMission(groupId: number, missionId: number): Promise<CurrentMission> {
+  const body: ReplaceMissionRequest = { reason: "ROADVIEW_UNAVAILABLE" };
+  const data = await apiRequest<CurrentMissionResponse>(
+    `/api/v1/groups/${groupId}/missions/${missionId}/replace`,
+    { method: "POST", body },
+  );
+  return toCurrentMission(data);
+}
+
+/**
+ * 미션 완료 - 서버가 위치·GPS 정확도·경과 시간·이동 속도를 검증함.
+ * 검증에 실패하면 400이고 미션은 다시 시도할 수 있음
+ */
 export async function completeMission(
   groupId: number,
   missionId: number,
   position: LatLngLiteral,
+  accuracyMeters: number,
 ): Promise<CompletedMission> {
-  const body: CompleteMissionRequest = toLocationRequest(position);
+  const body: CompleteMissionRequest = {
+    ...toLocationRequest(position),
+    accuracy_meters: accuracyMeters,
+  };
   const data = await apiRequest<CompleteMissionResponse>(
     `/api/v1/groups/${groupId}/missions/${missionId}/complete`,
     { method: "POST", body },
