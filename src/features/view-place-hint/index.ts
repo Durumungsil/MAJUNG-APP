@@ -2,5 +2,6 @@ export { default as HintIntroModal } from "./ui/hint-intro-modal";
 export { default as HintExpiredModal } from "./ui/hint-expired-modal";
 export { useHintCountdown } from "./model/use-hint-countdown";
 export { useMissionHint } from "./api/use-mission-hint";
+export { useReplaceMission } from "./api/use-replace-mission";
 export { formatRemainingHintTime } from "./lib/hint-countdown";
 export { DEFAULT_HINT_VIEW_SECONDS } from "./config/hint";

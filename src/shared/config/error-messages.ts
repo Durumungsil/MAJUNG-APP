@@ -21,6 +21,8 @@ export const ERROR_MESSAGES = {
   adventureUnavailable: "모험을 시작할 수 없어요. 여행 정보를 확인해 주세요",
   noCurrentMission: "지금 진행할 수 있는 미션이 없어요",
   hintUnavailable: "지금은 힌트를 볼 수 없어요",
+  missionReplaced: "로드뷰가 없는 장소라 다른 장소로 바꿨어요. 다시 출발해 주세요",
+  missionReplaceUnavailable: "바꿀 수 있는 다른 장소가 없어요",
   locationRequired: "현재 위치를 확인한 뒤 다시 시도해 주세요",
   extremeUnavailable: "지금은 익스트림 모드를 진행할 수 없어요",
   rouletteNoCandidate: "조건에 맞는 곳이 없어 룰렛을 돌릴 수 없어요",
