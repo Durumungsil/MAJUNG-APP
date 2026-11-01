@@ -3,6 +3,7 @@ import { apiRequest } from "@/shared/api";
 import type {
   MyPreference,
   PreferenceSummary,
+  ProfileStatus,
   TransportType,
   TravelCategory,
 } from "../model/types";
@@ -30,6 +31,7 @@ type PreferenceSummaryResponse = {
   allergies: string[];
   completed_member_count: number;
   member_count: number;
+  profile_status: ProfileStatus;
 };
 
 /** 내 취향 조회 - 현재 회차에 없으면 이전 회차 취향을 불러옴 */
@@ -58,6 +60,7 @@ export async function fetchPreferenceSummary(groupId: number): Promise<Preferenc
     budget: { min: data.budget.min, max: data.budget.max },
     completedMemberCount: data.completed_member_count,
     memberCount: data.member_count,
+    profileStatus: data.profile_status,
   };
 }
 

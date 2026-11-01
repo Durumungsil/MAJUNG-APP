@@ -4,7 +4,21 @@ export type TransportType =
   "WALK" | "BICYCLE" | "BUS" | "TRAIN" | "TAXI" | "CAR" | "OWN_CAR" | "AIRPLANE";
 
 export type TravelCategory =
-  "HEALING" | "FESTIVAL" | "SHOPPING" | "CULTURE" | "ACTIVITY" | "FOOD" | "NATURE";
+  | "HEALING"
+  | "FESTIVAL"
+  | "SHOPPING"
+  | "CULTURE"
+  | "ACTIVITY"
+  | "FOOD"
+  | "NATURE"
+  | "CAFE"
+  | "SIGHTSEEING";
+
+/**
+ * 그룹 취향 프로필 생성 상태. 설문이 바뀔 때마다 서버가 비동기로 다시 만듦.
+ * FAILED여도 서버가 설문 수치로 바로 집계해 추천하므로 다음 단계는 진행할 수 있음
+ */
+export type ProfileStatus = "PENDING" | "RUNNING" | "DONE" | "FAILED";
 
 export type FoodScore = {
   food: string;
@@ -34,4 +48,5 @@ export type PreferenceSummary = {
   budget: { min: number | null; max: number | null };
   completedMemberCount: number;
   memberCount: number;
+  profileStatus: ProfileStatus;
 };
