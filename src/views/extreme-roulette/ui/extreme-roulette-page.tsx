@@ -3,7 +3,7 @@
 import { notFound } from "next/navigation";
 import { parseGroupId } from "@/entities/group";
 import { ExtremeRoulette, isRouletteKind, type RouletteResult } from "@/features/extreme-roulette";
-import { Screen } from "@/shared/ui";
+import { ModeTitle, Screen } from "@/shared/ui";
 
 type ExtremeRoulettePageProps = {
   groupId: string;
@@ -22,8 +22,11 @@ export default function ExtremeRoulettePage({
   }
 
   return (
-    <Screen className="justify-center">
-      <ExtremeRoulette groupId={groupId} kind={kind} getDetailHref={getDetailHref} />
+    <Screen>
+      <ModeTitle className="mt-7.75">EXTREME MODE</ModeTitle>
+      <div className="mt-7.75">
+        <ExtremeRoulette groupId={groupId} kind={kind} getDetailHref={getDetailHref} />
+      </div>
     </Screen>
   );
 }
