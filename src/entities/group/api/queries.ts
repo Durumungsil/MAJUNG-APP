@@ -1,7 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, type Query } from "@tanstack/react-query";
 import { notFound } from "next/navigation";
 import { isApiError } from "@/shared/api";
 import { parseGroupId } from "../lib/group-role";
+import type { Group } from "../model/types";
 import { fetchGroup, fetchInviteCode, fetchMyGroups, fetchTrips } from "./group-api";
 import { groupKeys } from "./query-keys";
 
@@ -17,12 +18,17 @@ export function useGroup(groupId: number) {
  * 라우트의 groupId로 그룹 상세를 조회함.
  * ID 형식이 틀렸거나, 없는 그룹(404)이거나, 내가 속하지 않은 그룹(403)이면 404 화면을 보여줌
  */
-export function useGroupByParam(groupIdParam: string) {
+export function useGroupByParam(
+  groupIdParam: string,
+  /** 다른 멤버의 변경(예: 대표자의 모드 선택)을 기다릴 때만 주기적으로 다시 조회함 */
+  refetchInterval?: (group: Group | undefined) => number | false,
+) {
   const groupId = parseGroupId(groupIdParam);
   const query = useQuery({
     queryKey: groupKeys.detail(groupId ?? 0),
     queryFn: () => fetchGroup(groupId ?? 0),
     enabled: groupId !== null,
+    refetchInterval: (current: Query<Group>) => refetchInterval?.(current.state.data) ?? false,
   });
 
   if (groupId === null || isApiError(query.error, 403, 404)) notFound();

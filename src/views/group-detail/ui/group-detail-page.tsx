@@ -22,8 +22,25 @@ type GroupDetailPageProps = {
   groupId: string;
 };
 
+/** 대표자의 모드 선택을 확인하는 주기 */
+const WAITING_POLL_INTERVAL_MS = 5000;
+
+/** 대표자가 모드를 고르기를 기다리는 단계인지 (고르면 멤버에게 설문 버튼이 나타남) */
+function isWaitingForMode(group: Pick<Group, "tripId" | "status" | "mode">) {
+  return group.tripId !== null && group.status === "PLANNING" && group.mode === null;
+}
+
+function getGroupPollInterval(group: Group | undefined) {
+  return group && isWaitingForMode(group) ? WAITING_POLL_INTERVAL_MS : false;
+}
+
 export default function GroupDetailPage({ groupId }: GroupDetailPageProps) {
-  const { data: group, isPending, isError, refetch } = useGroupByParam(groupId);
+  const {
+    data: group,
+    isPending,
+    isError,
+    refetch,
+  } = useGroupByParam(groupId, getGroupPollInterval);
 
   function handleRetry() {
     void refetch();
