@@ -1,6 +1,6 @@
 "use client";
 
-import type { Place } from "@/entities/place";
+import { PlaceName, type Place } from "@/entities/place";
 import { Button, Modal } from "@/shared/ui";
 
 type RouletteResultModalProps = {
@@ -26,7 +26,7 @@ export default function RouletteResultModal({
     >
       <div className="flex flex-col items-center text-center">
         <h2 id="roulette-result-title" className="text-xl text-text-primary">
-          {place?.name}
+          {place && <PlaceName placeId={place.id} name={place.name} />}
         </h2>
         <p className="text-xs text-text-muted">상세 정보를 확인하고 확정해요</p>
       </div>

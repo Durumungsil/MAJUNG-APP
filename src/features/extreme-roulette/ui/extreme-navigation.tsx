@@ -1,14 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Place } from "@/entities/place";
+import { useResolvedPlace, type Place } from "@/entities/place";
 import { MapPinIcon } from "@/shared/assets";
 import CurrentLocationMarker from "@/shared/assets/markers/current-location-marker";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
 import { useToast } from "@/shared/lib";
 import { useCurrentPosition } from "@/shared/lib/use-current-position";
 import type { LatLng } from "@/shared/model";
-import { Button, MapOverlay, MapPolyline, RouteMap, Toast } from "@/shared/ui";
+import {
+  Button,
+  ErrorState,
+  MapOverlay,
+  MapPolyline,
+  RouteMap,
+  Skeleton,
+  Toast,
+} from "@/shared/ui";
 import { getFocusPoints } from "../lib/focus-points";
 
 /** 겹칠 때 위에 보일 순서 */
@@ -28,37 +36,52 @@ export default function ExtremeNavigation({ place, exitHref }: ExtremeNavigation
   const [fitOrigin, setFitOrigin] = useState<LatLng | null>(null);
   if (position && !fitOrigin) setFitOrigin(position);
 
-  const destination = place.location;
-  const fitPoints = fitOrigin ? [fitOrigin, destination] : getFocusPoints(destination);
+  // 룰렛 응답에 좌표가 없으면 Google SDK로 받음
+  const resolved = useResolvedPlace(place);
+  const destination = resolved.location;
   const locationFailed = status === "denied" || status === "unavailable";
 
   useEffect(() => {
     if (locationFailed) showToast(ERROR_MESSAGES.currentLocationUnavailable);
   }, [locationFailed, showToast]);
 
+  function handleLocationRetry() {
+    void resolved.refetch();
+  }
+
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-background">
-      {/* RouteMap 루트가 relative라서 absolute로 채우면 cn이 덮어쓰지 못해 높이가 0이 됨 → flex로 남은 높이를 채움 */}
-      <RouteMap
-        fitPoints={fitPoints}
-        label={`${place.name}까지 길 안내 지도`}
-        className="min-h-0 flex-1"
-      >
-        {position && (
-          <MapPolyline path={[position, destination]} colorClassName="text-primary-700" />
-        )}
-        <MapOverlay position={destination} zIndex={Z_INDEX.destination}>
-          <MapPinIcon variant="active" className="h-[47.78px] w-[33.72px]" />
-        </MapOverlay>
-        {position && (
-          <MapOverlay position={position} zIndex={Z_INDEX.current}>
-            {/* 오버레이는 아래 가운데가 좌표이므로, 원형 마커는 절반 내려 가운데가 좌표에 오게 함 */}
-            <div className="translate-y-1/2">
-              <CurrentLocationMarker />
-            </div>
+      {destination === null ? (
+        resolved.isPending ? (
+          <Skeleton className="min-h-0 flex-1 rounded-none" />
+        ) : (
+          <div className="flex min-h-0 flex-1">
+            <ErrorState onRetry={handleLocationRetry} />
+          </div>
+        )
+      ) : (
+        // RouteMap 루트가 relative라서 absolute로 채우면 cn이 덮어쓰지 못해 높이가 0이 됨 → flex로 남은 높이를 채움
+        <RouteMap
+          fitPoints={fitOrigin ? [fitOrigin, destination] : getFocusPoints(destination)}
+          label={`${resolved.name ?? ""}까지 길 안내 지도`}
+          className="min-h-0 flex-1"
+        >
+          {position && (
+            <MapPolyline path={[position, destination]} colorClassName="text-primary-700" />
+          )}
+          <MapOverlay position={destination} zIndex={Z_INDEX.destination}>
+            <MapPinIcon variant="active" className="h-[47.78px] w-[33.72px]" />
           </MapOverlay>
-        )}
-      </RouteMap>
+          {position && (
+            <MapOverlay position={position} zIndex={Z_INDEX.current}>
+              {/* 오버레이는 아래 가운데가 좌표이므로, 원형 마커는 절반 내려 가운데가 좌표에 오게 함 */}
+              <div className="translate-y-1/2">
+                <CurrentLocationMarker />
+              </div>
+            </MapOverlay>
+          )}
+        </RouteMap>
+      )}
       <nav className="flex shrink-0 flex-col px-8 pt-8 pb-[max(--spacing(7.5),var(--safe-bottom))]">
         <Button size="xl" href={exitHref}>
           길 안내 종료하기

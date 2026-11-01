@@ -1,5 +1,6 @@
-import { MOCK_PLACE_DETAIL, type Place } from "@/entities/place";
+import type { Place } from "@/entities/place";
 import { apiRequest } from "@/shared/api";
+import { toLatLng } from "@/shared/lib";
 import { ROULETTE_DRAW_PATH, ROULETTE_KIND_BY_TYPE } from "../config/roulette-kinds";
 import type { RouletteKind, RouletteResult } from "../model/types";
 import type {
@@ -9,18 +10,13 @@ import type {
   RouletteResultResponse,
 } from "./dto";
 
-/**
- * 룰렛 장소 → 마중 Place. 카테고리는 화면에 표시하지 않으므로 비움.
- * 응답에 없는 상세 정보는 장소 상세 API가 나오기 전까지 목 데이터로 채움
- */
+/** 룰렛 장소 → 마중 Place. 이름·빈 좌표는 화면에서 Google SDK로 채움 */
 function toPlace(place: RoulettePlaceDto): Place {
   return {
-    ...MOCK_PLACE_DETAIL,
     id: place.place_id,
-    name: place.name,
-    category: "",
-    address: place.address,
-    location: { lat: place.latitude, lng: place.longitude },
+    name: null,
+    category: place.category,
+    location: toLatLng(place.latitude, place.longitude),
   };
 }
 
