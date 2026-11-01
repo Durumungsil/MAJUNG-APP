@@ -2,36 +2,51 @@
 
 import { useMemo, useState } from "react";
 import type { TimelineStop } from "@/entities/journey";
-import type { LatLng } from "@/shared/model";
-import { PlaceDetailSheet, getNearbyPlaces, type Place } from "@/entities/place";
+import {
+  PlaceDetailSheet,
+  useNearbyPlaces,
+  usePlaceDetailsMap,
+  type Place,
+} from "@/entities/place";
 import { MapPinIcon, RecommendPinIcon } from "@/shared/assets";
+import type { LatLng } from "@/shared/model";
 import { RouteMap, MapOverlay, MapPolyline, type BottomSheetSnap } from "@/shared/ui";
+import { toLocatedStops } from "../lib/located-stops";
 import MapMarkerButton from "./map-marker-button";
 
 /** 겹칠 때 위에 보일 순서 */
 const Z_INDEX = { nearby: 1, route: 2, activeRoute: 3 } as const;
 
-type LocatedStop = TimelineStop & { location: LatLng };
+type LocatedPlace = Place & { location: LatLng };
 
 type MapExplorerProps = {
+  groupId: number;
   stops: TimelineStop[];
 };
 
-function hasLocation(stop: TimelineStop): stop is LocatedStop {
-  return stop.location !== null;
+function hasLocation(place: Place): place is LocatedPlace {
+  return place.location !== null;
 }
 
-export default function MapExplorer({ stops: allStops }: MapExplorerProps) {
-  // 좌표가 없는 장소는 지도에 그릴 수 없으므로 뺌
-  const stops = useMemo(() => allStops.filter(hasLocation), [allStops]);
+export default function MapExplorer({ groupId, stops: allStops }: MapExplorerProps) {
+  // 서버 좌표 캐시가 만료된 장소만 Google SDK로 좌표를 다시 받음
+  const missingPlaceIds = useMemo(
+    () => allStops.filter((stop) => stop.location === null).map((stop) => stop.placeId),
+    [allStops],
+  );
+  const detailsById = usePlaceDetailsMap(missingPlaceIds);
+  const stops = useMemo(() => toLocatedStops(allStops, detailsById), [allStops, detailsById]);
+
   const [activeStopId, setActiveStopId] = useState<string | null>(null);
   const [previewPlace, setPreviewPlace] = useState<Place | null>(null);
   const [snap, setSnap] = useState<BottomSheetSnap>("peek");
 
   const activeStop = stops.find((stop) => stop.id === activeStopId) ?? null;
+  // 기준 장소가 바뀌면 key가 바뀌어 이전 주변 추천 결과를 쓰지 않음
+  const { data: nearby } = useNearbyPlaces(groupId, activeStop?.placeId ?? null);
   const nearbyPlaces = useMemo(
-    () => (activeStop ? getNearbyPlaces(activeStop.location) : []),
-    [activeStop],
+    () => (activeStop ? (nearby ?? []) : []).filter(hasLocation),
+    [activeStop, nearby],
   );
   const routePath = useMemo(() => stops.map((stop) => stop.location), [stops]);
 
@@ -61,7 +76,7 @@ export default function MapExplorer({ stops: allStops }: MapExplorerProps) {
         {nearbyPlaces.map((place) => (
           <MapOverlay key={place.id} position={place.location} zIndex={Z_INDEX.nearby}>
             <MapMarkerButton
-              label={`추천 장소 ${place.name} 보기`}
+              label={`추천 장소 ${place.name ?? ""} 보기`}
               pressed={previewPlace?.id === place.id}
               onClick={() => handleNearbyMarkerClick(place)}
             >
@@ -69,7 +84,7 @@ export default function MapExplorer({ stops: allStops }: MapExplorerProps) {
             </MapMarkerButton>
           </MapOverlay>
         ))}
-        {stops.map((stop) => {
+        {stops.map((stop, index) => {
           const isActive = stop.id === activeStopId;
           return (
             <MapOverlay
@@ -78,7 +93,7 @@ export default function MapExplorer({ stops: allStops }: MapExplorerProps) {
               zIndex={isActive ? Z_INDEX.activeRoute : Z_INDEX.route}
             >
               <MapMarkerButton
-                label={`${stop.placeName} 주변 추천 장소 보기`}
+                label={`${index + 1}번째 장소 주변 추천 장소 보기`}
                 pressed={isActive}
                 onClick={() => handleStopMarkerClick(stop.id)}
               >

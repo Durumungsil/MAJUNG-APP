@@ -1,14 +1,13 @@
 import type { LatLng } from "@/shared/model";
 
-/** 타임라인의 한 칸. 시간은 "HH:mm" */
+/** 타임라인의 한 칸. 시간은 "HH:mm". 장소 이름은 응답에 없어 Google SDK로 따로 조회함 */
 export type TimelineStop = {
   id: string;
-  /** 백엔드 destination_id */
-  destinationId: number;
+  /** Google place_id */
+  placeId: string;
   startTime: string;
   endTime: string;
-  placeName: string;
-  /** 타임라인 응답에 좌표가 추가되기 전까지는 null일 수 있음 */
+  /** 서버의 좌표 캐시가 만료되면 null */
   location: LatLng | null;
 };
 

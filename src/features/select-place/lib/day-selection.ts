@@ -1,5 +1,7 @@
-/** 방문일(YYYY-MM-DD)별로 고른 장소 id. 배열 순서가 그날 고른 순서 */
-export type DaySelection = Readonly<Record<string, readonly number[]>>;
+import type { SelectionStop } from "./selection-payload";
+
+/** 방문일(YYYY-MM-DD)별로 고른 장소. 배열 순서가 그날 고른 순서 */
+export type DaySelection = Readonly<Record<string, readonly SelectionStop[]>>;
 
 /**
  * date에 장소를 추가함. 한 장소는 타임라인에 한 번만 들어가므로
@@ -8,25 +10,26 @@ export type DaySelection = Readonly<Record<string, readonly number[]>>;
 export function addPlaceToDate(
   selection: DaySelection,
   date: string,
-  placeId: number,
+  stop: SelectionStop,
 ): DaySelection {
-  const next: Record<string, readonly number[]> = {};
-  for (const [selectedDate, placeIds] of Object.entries(selection)) {
-    const rest = placeIds.filter((id) => id !== placeId);
+  const next: Record<string, readonly SelectionStop[]> = {};
+  for (const [selectedDate, stops] of Object.entries(selection)) {
+    const rest = stops.filter(({ placeId }) => placeId !== stop.placeId);
     if (rest.length > 0) next[selectedDate] = rest;
   }
-  next[date] = [...(next[date] ?? []), placeId];
+  next[date] = [...(next[date] ?? []), stop];
   return next;
 }
 
 export function getSelectedCount(selection: DaySelection): number {
-  return Object.values(selection).reduce((count, placeIds) => count + placeIds.length, 0);
+  return Object.values(selection).reduce((count, stops) => count + stops.length, 0);
+}
+
+export function isPlaceSelected(stops: readonly SelectionStop[], placeId: string): boolean {
+  return stops.some((stop) => stop.placeId === placeId);
 }
 
 /** 선택 저장 body로 바꿀 수 있게 날짜별 방문 목록으로 펼침 */
 export function toSelectionDays(selection: DaySelection) {
-  return Object.entries(selection).map(([date, placeIds]) => ({
-    date,
-    stops: placeIds.map((destinationId) => ({ destinationId })),
-  }));
+  return Object.entries(selection).map(([date, stops]) => ({ date, stops }));
 }

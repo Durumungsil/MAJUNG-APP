@@ -1,15 +1,19 @@
+import type { ReactNode } from "react";
 import { cn } from "@/shared/lib";
 import { formatTimeRange } from "../lib/format-time-range";
 import type { TimelineStop } from "../model/types";
 
 type TimelineStopCardProps = {
-  stop: Pick<TimelineStop, "startTime" | "endTime" | "placeName">;
+  stop: Pick<TimelineStop, "startTime" | "endTime">;
+  /** 일정 응답에 이름이 없어 장소 이름 조회 컴포넌트를 받음 */
+  placeName: ReactNode;
   highlighted?: boolean;
   className?: string;
 };
 
 export default function TimelineStopCard({
   stop,
+  placeName,
   highlighted = false,
   className,
 }: TimelineStopCardProps) {
@@ -23,7 +27,7 @@ export default function TimelineStopCard({
     >
       <span className="whitespace-nowrap">{formatTimeRange(stop)}</span>
       {/* 긴 장소 이름은 줄바꿈하지 않고 말줄임표로 자름 */}
-      <span className="min-w-0 flex-1 truncate">{stop.placeName}</span>
+      <span className="min-w-0 flex-1 truncate">{placeName}</span>
     </div>
   );
 }
