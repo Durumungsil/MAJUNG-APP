@@ -3,9 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { getModeStartHref, useGroupByParam } from "@/entities/group";
-import { usePreferenceSummary } from "@/entities/preference";
+import { isPreferenceReady, usePreferenceSummary } from "@/entities/preference";
 import { Button, Screen, Spinner } from "@/shared/ui";
-import { isEveryoneDone } from "../lib/next-step";
 
 type SurveyWaitingPageProps = {
   groupId: string;
@@ -20,9 +19,9 @@ export default function SurveyWaitingPage({ groupId }: SurveyWaitingPageProps) {
   const { data: group } = useGroupByParam(groupId);
   const { data: summary } = usePreferenceSummary(group?.id ?? null, SUMMARY_POLL_INTERVAL_MS);
   const nextHref = group ? getModeStartHref(group) : `/groups/${groupId}`;
-  const everyoneDone = summary !== undefined && isEveryoneDone(summary);
+  const everyoneDone = summary !== undefined && isPreferenceReady(summary);
 
-  // 전원이 입력을 마치면 다음 단계로 자동 이동
+  // 전원이 입력을 마치고 그룹 취향 프로필이 만들어지면 다음 단계로 자동 이동
   useEffect(() => {
     if (everyoneDone) router.replace(nextHref);
   }, [everyoneDone, nextHref, router]);
