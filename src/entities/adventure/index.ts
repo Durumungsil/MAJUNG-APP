@@ -22,3 +22,4 @@ export { useAdventureProcess, useCurrentMission, useMissionDistance } from "./ap
 export { getTodayInSeoul } from "./lib/travel-date";
 export { loadProcessId, saveProcessId } from "./lib/process-id-storage";
 export { formatDistance } from "./lib/remaining-distance";
+export { getMissionChange, type MissionChange } from "./lib/mission-change";
