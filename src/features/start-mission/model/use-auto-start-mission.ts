@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { CurrentMission } from "@/entities/adventure";
+import { isApiError } from "@/shared/api";
 import type { LatLngLiteral } from "@/shared/model/lat-lng";
 import { useStartMission } from "../api/start-mission";
 
@@ -14,7 +15,10 @@ type AutoStartMissionOptions = {
   onError: (error: unknown) => void;
 };
 
-/** 아직 시작하지 않은 미션이면 현재 위치를 출발점으로 미션을 시작함. 미션마다 한 번만 요청 */
+/**
+ * 아직 시작하지 않은 미션이면 현재 위치를 출발점으로 미션을 시작함. 미션마다 한 번만 요청.
+ * 다른 기기에서 먼저 진행해 409가 오면 알리지 않음 (현재 미션을 다시 받아 화면을 맞춤)
+ */
 export function useAutoStartMission({
   groupId,
   mission,
@@ -31,6 +35,13 @@ export function useAutoStartMission({
     if (!enabled || !isNotStarted || missionId === null || position === null) return;
     if (requestedMissionIdRef.current === missionId) return;
     requestedMissionIdRef.current = missionId;
-    mutate({ missionId, position }, { onError });
+    mutate(
+      { missionId, position },
+      {
+        onError: (error) => {
+          if (!isApiError(error, 409)) onError(error);
+        },
+      },
+    );
   }, [enabled, isNotStarted, missionId, position, mutate, onError]);
 }
