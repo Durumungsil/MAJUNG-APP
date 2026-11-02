@@ -14,6 +14,7 @@ import {
 } from "@/entities/group";
 import { useSessionStore } from "@/entities/session";
 import { AvatarStack, findLeaderName, useGroupMembers } from "@/entities/user";
+import { getTodayInSeoul } from "@/shared/lib";
 import { Button, CopyButton, ErrorState, InfoRow, Screen, Skeleton, TextLink } from "@/shared/ui";
 import { getPrimaryAction } from "../lib/primary-action";
 import GroupDetailHeader from "./group-detail-header";
@@ -74,7 +75,12 @@ function GroupDetailContent({ group }: { group: Group }) {
 
   const leaderName = members ? findLeaderName(members) : null;
   const inviteExpiresAt = inviteCode?.expiresAt ? formatExpiresAt(inviteCode.expiresAt) : null;
-  const primaryAction = getPrimaryAction({ group, isLeader, myPreferencesCompleted });
+  const primaryAction = getPrimaryAction({
+    group,
+    isLeader,
+    myPreferencesCompleted,
+    today: getTodayInSeoul(),
+  });
 
   return (
     <Screen>

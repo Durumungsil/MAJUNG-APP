@@ -1,5 +1,6 @@
 export { cn } from "./cn";
 export { copyToClipboard } from "./copy-to-clipboard";
+export { getTodayInSeoul } from "./seoul-date";
 export { toLatLng } from "./to-lat-lng";
 export { useDragScroll } from "./use-drag-scroll";
 export { useIntersection } from "./use-intersection";
