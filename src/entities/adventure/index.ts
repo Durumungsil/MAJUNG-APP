@@ -18,6 +18,7 @@ export {
   startMission,
 } from "./api/adventure-api";
 export { adventureKeys } from "./api/query-keys";
+export { CURRENT_MISSION_POLLING_MS } from "./config/polling";
 export { useAdventureProcess, useCurrentMission, useMissionDistance } from "./api/queries";
 export { getTodayInSeoul } from "./lib/travel-date";
 export { loadProcessId, saveProcessId } from "./lib/process-id-storage";
