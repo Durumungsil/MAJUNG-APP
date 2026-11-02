@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { parseGroupId } from "@/entities/group";
 import MapIcon from "@/shared/assets/icons/map-icon";
@@ -8,6 +7,7 @@ import PathDistanceIcon from "@/shared/assets/icons/path-distance-icon";
 import SearchIcon from "@/shared/assets/icons/search-icon";
 import CurrentLocationMarker from "@/shared/assets/markers/current-location-marker";
 import { MissionSuccessModal } from "@/features/complete-mission";
+import { useEndModeExit } from "@/features/end-mode";
 import { Button, ErrorState, Screen, Skeleton, Toast } from "@/shared/ui";
 import GoogleMap from "@/shared/ui/google-map";
 import { DEFAULT_MAP_CENTER } from "../config/default-center";
@@ -33,6 +33,7 @@ export default function AdventureMainView({ groupId: groupIdParam }: AdventureMa
     exploreAround,
     goToNextPlace,
   } = useMissionFlow(groupId);
+  const { exit, isExiting, toastMessage: exitToastMessage } = useEndModeExit({ groupId, isLeader });
 
   function handleRetry() {
     void currentMissionQuery.refetch();
@@ -44,6 +45,10 @@ export default function AdventureMainView({ groupId: groupIdParam }: AdventureMa
 
   function handleNextPlaceClick() {
     goToNextPlace();
+  }
+
+  function handleExitClick() {
+    void exit();
   }
 
   if (currentMissionQuery.isError) {
@@ -93,9 +98,15 @@ export default function AdventureMainView({ groupId: groupIdParam }: AdventureMa
             </Button>
           )}
         </div>
-        <Link href={`/groups/${groupId}`} className="text-l text-text-muted">
+        <button
+          type="button"
+          onClick={handleExitClick}
+          disabled={isExiting}
+          aria-busy={isExiting}
+          className="text-l text-text-muted"
+        >
           모험 모드 종료하기
-        </Link>
+        </button>
       </nav>
 
       <MissionSuccessModal
@@ -105,6 +116,7 @@ export default function AdventureMainView({ groupId: groupIdParam }: AdventureMa
         onNextPlaceClick={handleNextPlaceClick}
       />
       <Toast open={toastMessage !== null} message={toastMessage ?? ""} />
+      <Toast open={exitToastMessage !== null} message={exitToastMessage ?? ""} />
     </main>
   );
 }

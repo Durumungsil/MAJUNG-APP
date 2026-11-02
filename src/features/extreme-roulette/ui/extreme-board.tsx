@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Button } from "@/shared/ui";
 import { useRouletteResult } from "../api/queries";
 import { ROULETTE_KINDS } from "../config/roulette-kinds";
@@ -13,8 +12,10 @@ type ExtremeBoardProps = {
   /** 룰렛은 대표자만 돌림. false면 카드의 룰렛 버튼을 숨김 */
   canSpin: boolean;
   getRouletteHref: (kind: RouletteKind) => string;
-  /** 종료 후 이동할 경로 */
-  exitHref: string;
+  /** 종료하기를 누르면 부름. 종료에 성공하면 true (이 기기의 확정 기록을 지움) */
+  onExit: () => Promise<boolean>;
+  /** 종료 요청 중이면 버튼에 진행 상태를 표시함 */
+  isExiting: boolean;
 };
 
 /** 익스트림 메인: 장소·음식점 카드와 종료 버튼 */
@@ -22,18 +23,16 @@ export default function ExtremeBoard({
   groupId,
   canSpin,
   getRouletteHref,
-  exitHref,
+  onExit,
+  isExiting,
 }: ExtremeBoardProps) {
-  const router = useRouter();
   const selections = useExtremeStore(
     (state) => state.selectionsByGroup[groupId] ?? EMPTY_SELECTIONS,
   );
   const reset = useExtremeStore((state) => state.reset);
 
-  // TODO: 익스트림 모드 종료 API 연동
-  function handleExitClick() {
-    reset(groupId);
-    router.push(exitHref);
+  async function handleExitClick() {
+    if (await onExit()) reset(groupId);
   }
 
   return (
@@ -49,7 +48,13 @@ export default function ExtremeBoard({
           />
         ))}
       </div>
-      <Button size="xl" onClick={handleExitClick} className="mt-auto mb-5">
+      <Button
+        size="xl"
+        onClick={handleExitClick}
+        disabled={isExiting}
+        aria-busy={isExiting}
+        className="mt-auto mb-5"
+      >
         익스트림 모드 종료하기
       </Button>
     </div>
