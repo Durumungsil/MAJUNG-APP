@@ -10,5 +10,8 @@ export const GOOGLE_MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAP_ID ?? "";
 /** 구글 OAuth 웹 클라이언트 ID (공개 값). 백엔드 GOOGLE_CLIENT_IDS에 들어 있는 값과 같아야 함 */
 export const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
 
-/** 마중 백엔드 API 주소 (예: http://localhost:8080) */
+/** 마중 백엔드 API 주소 (예: https://durumungsil.parafara.com) */
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+
+/** 기본 서버가 죽었을 때 대신 붙을 2차 백엔드 주소 (예: http://localhost:8080). 비워두면 대체 없음 */
+export const API_FALLBACK_BASE_URL = process.env.NEXT_PUBLIC_API_FALLBACK_BASE_URL ?? "";
