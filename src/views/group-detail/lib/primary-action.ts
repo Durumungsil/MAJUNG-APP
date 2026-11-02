@@ -1,4 +1,5 @@
 import { getModeStartHref, type Group } from "@/entities/group";
+import { isTripPeriodOver } from "./trip-period";
 
 export type PrimaryAction = { label: string; href: string };
 
@@ -10,11 +11,6 @@ type PrimaryActionInput = {
   /** 오늘 날짜(Asia/Seoul) YYYY-MM-DD */
   today: string;
 };
-
-/** 여행 종료일이 지났는지. 날짜가 같은 YYYY-MM-DD 형식이라 문자열 비교로 판단함 */
-function isTripPeriodOver(endDate: string | null, today: string): boolean {
-  return endDate !== null && endDate < today;
-}
 
 /**
  * 그룹 상세 하단 버튼. 여행 상태·모드·내 설문 여부에 따라 다음에 할 일로 안내함.
