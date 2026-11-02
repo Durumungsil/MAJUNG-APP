@@ -10,7 +10,8 @@ type PlaceDetailSheetProps = {
   snap: BottomSheetSnap;
   onSnapChange: (snap: BottomSheetSnap) => void;
   onClose: () => void;
-  onSelect: (place: Place) => void;
+  /** 없으면 하단 선택 버튼을 보여주지 않음 (선택 권한이 없는 멤버 등) */
+  onSelect?: (place: Place) => void;
   /** 하단 버튼 문구 */
   selectLabel?: string;
 };
@@ -29,7 +30,7 @@ export default function PlaceDetailSheet({
   if (!place) return null;
 
   function handleSelectClick() {
-    if (place) onSelect(place);
+    if (place) onSelect?.(place);
   }
 
   return (
@@ -40,9 +41,11 @@ export default function PlaceDetailSheet({
       onClose={onClose}
       labelledBy={titleId}
       footer={
-        <Button size="xl" onClick={handleSelectClick}>
-          {selectLabel}
-        </Button>
+        onSelect && (
+          <Button size="xl" onClick={handleSelectClick}>
+            {selectLabel}
+          </Button>
+        )
       }
     >
       {/* 장소를 바꾸면 사진 상태를 새로 시작하도록 key를 줌 */}

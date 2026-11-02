@@ -7,7 +7,8 @@ import type { RouletteKind } from "../model/types";
 type ExtremeSelectionCardProps = {
   kind: RouletteKind;
   place: Place | null;
-  rouletteHref: string;
+  /** 없으면 룰렛 버튼을 보여주지 않음 (룰렛은 대표자만 돌림) */
+  rouletteHref: string | null;
 };
 
 /** 익스트림 메인의 장소/음식점 카드. 고른 장소가 없으면 안내 문구를 보여줌 */
@@ -39,9 +40,11 @@ export default function ExtremeSelectionCard({
       ) : (
         <p className="text-l text-text-muted">{copy.emptyLabel}</p>
       )}
-      <Button size="xl-compact" href={rouletteHref}>
-        {copy.cardSpinLabel}
-      </Button>
+      {rouletteHref !== null && (
+        <Button size="xl-compact" href={rouletteHref}>
+          {copy.cardSpinLabel}
+        </Button>
+      )}
     </section>
   );
 }

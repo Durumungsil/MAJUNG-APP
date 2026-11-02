@@ -10,13 +10,20 @@ import ExtremeSelectionCard from "./extreme-selection-card";
 
 type ExtremeBoardProps = {
   groupId: number;
+  /** 룰렛은 대표자만 돌림. false면 카드의 룰렛 버튼을 숨김 */
+  canSpin: boolean;
   getRouletteHref: (kind: RouletteKind) => string;
   /** 종료 후 이동할 경로 */
   exitHref: string;
 };
 
 /** 익스트림 메인: 장소·음식점 카드와 종료 버튼 */
-export default function ExtremeBoard({ groupId, getRouletteHref, exitHref }: ExtremeBoardProps) {
+export default function ExtremeBoard({
+  groupId,
+  canSpin,
+  getRouletteHref,
+  exitHref,
+}: ExtremeBoardProps) {
   const router = useRouter();
   const selections = useExtremeStore(
     (state) => state.selectionsByGroup[groupId] ?? EMPTY_SELECTIONS,
@@ -38,7 +45,7 @@ export default function ExtremeBoard({ groupId, getRouletteHref, exitHref }: Ext
             groupId={groupId}
             kind={kind}
             rouletteId={selections[kind]}
-            rouletteHref={getRouletteHref(kind)}
+            rouletteHref={canSpin ? getRouletteHref(kind) : null}
           />
         ))}
       </div>
@@ -53,7 +60,7 @@ type ConfirmedSelectionCardProps = {
   groupId: number;
   kind: RouletteKind;
   rouletteId: number | null;
-  rouletteHref: string;
+  rouletteHref: string | null;
 };
 
 /** 확정한 룰렛 결과 ID로 장소를 다시 받아 카드에 보여줌. 받는 중이거나 못 받으면 확정 전처럼 보임 */

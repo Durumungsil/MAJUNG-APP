@@ -1,7 +1,8 @@
 "use client";
 
 import { notFound } from "next/navigation";
-import { parseGroupId } from "@/entities/group";
+import { getGroupRole, parseGroupId, useGroup } from "@/entities/group";
+import { useSessionStore } from "@/entities/session";
 import { ExtremeBoard, type RouletteKind } from "@/features/extreme-roulette";
 import { ModeTitle, Screen } from "@/shared/ui";
 
@@ -12,6 +13,10 @@ type ExtremeMainPageProps = {
 export default function ExtremeMainPage({ groupId: groupIdParam }: ExtremeMainPageProps) {
   const groupId = parseGroupId(groupIdParam);
   if (groupId === null) notFound();
+  const { data: group } = useGroup(groupId);
+  const userId = useSessionStore((state) => state.session?.userId ?? null);
+  // 룰렛 돌리기·확정은 대표자만 함. 그룹을 불러오기 전에는 버튼을 보여주지 않음
+  const isLeader = group !== undefined && getGroupRole(group, userId) === "leader";
 
   function getRouletteHref(kind: RouletteKind) {
     return `/groups/${groupId}/extreme/roulette/${kind}`;
@@ -23,6 +28,7 @@ export default function ExtremeMainPage({ groupId: groupIdParam }: ExtremeMainPa
       <div className="mt-12 flex flex-1 flex-col">
         <ExtremeBoard
           groupId={groupId}
+          canSpin={isLeader}
           getRouletteHref={getRouletteHref}
           exitHref={`/groups/${groupId}`}
         />

@@ -22,6 +22,8 @@ import AllergyWarningModal from "./allergy-warning-modal";
 type ExtremePlaceConfirmProps = {
   groupId: number;
   result: RouletteResult;
+  /** 확정은 대표자만 함. false면 확정 버튼을 보여주지 않음 */
+  canConfirm: boolean;
   onConfirmed: () => void;
   onClose: () => void;
 };
@@ -30,6 +32,7 @@ type ExtremePlaceConfirmProps = {
 export default function ExtremePlaceConfirm({
   groupId,
   result,
+  canConfirm,
   onConfirmed,
   onClose,
 }: ExtremePlaceConfirmProps) {
@@ -96,7 +99,7 @@ export default function ExtremePlaceConfirm({
         snap={snap}
         onSnapChange={setSnap}
         onClose={onClose}
-        onSelect={handleSelect}
+        onSelect={canConfirm ? handleSelect : undefined}
         selectLabel="장소 확정하기"
       />
       <AllergyWarningModal
