@@ -27,7 +27,7 @@ type PlaceSelectListProps = {
   /** 다음 페이지 요청이 실패하면 자동으로 다시 부르지 않고 더 보기 버튼을 보여줌 */
   isLoadMoreError: boolean;
   onLoadMore: () => void;
-  /** 대표자만 타임라인을 만들 수 있으므로 멤버에게는 생성 버튼을 숨김 */
+  /** 대표자만 타임라인을 만들 수 있으므로 멤버에게는 생성 버튼과 상세 시트의 장소 선택 버튼을 숨김 */
   canSubmit: boolean;
   /** 타임라인 생성 요청 중이면 버튼에 진행 상태를 표시함 */
   isSubmitting: boolean;
@@ -128,7 +128,7 @@ export default function PlaceSelectList({
         snap={snap}
         onSnapChange={setSnap}
         onClose={handleSheetClose}
-        onSelect={handlePlaceSelect}
+        onSelect={canSubmit ? handlePlaceSelect : undefined}
       />
     </>
   );

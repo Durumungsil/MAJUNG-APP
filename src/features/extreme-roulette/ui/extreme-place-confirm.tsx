@@ -22,6 +22,8 @@ import AllergyWarningModal from "./allergy-warning-modal";
 type ExtremePlaceConfirmProps = {
   groupId: number;
   result: RouletteResult;
+  /** 확정은 대표자만 함. false면 확정 버튼을 보여주지 않음 */
+  canConfirm: boolean;
   onConfirmed: () => void;
   onClose: () => void;
 };
@@ -30,6 +32,7 @@ type ExtremePlaceConfirmProps = {
 export default function ExtremePlaceConfirm({
   groupId,
   result,
+  canConfirm,
   onConfirmed,
   onClose,
 }: ExtremePlaceConfirmProps) {
@@ -43,9 +46,9 @@ export default function ExtremePlaceConfirm({
   // 음식점만 확정 전에 알러지를 알려주므로 음식점일 때만 미리 받아 둠
   const allergiesQuery = useGroupAllergies(groupId, kind === "food");
 
-  // 확정 API가 없어 확정 결과는 브라우저 메모리에만 둠 (.local.claude.md 백엔드 요청 6번)
+  // 확정 API가 없어 확정 결과는 이 탭의 sessionStorage에만 둠 (.local.claude.md 백엔드 요청 6번)
   function confirmPlace() {
-    confirm(kind, place);
+    confirm(groupId, kind, result.id);
     onConfirmed();
   }
 
@@ -96,7 +99,7 @@ export default function ExtremePlaceConfirm({
         snap={snap}
         onSnapChange={setSnap}
         onClose={onClose}
-        onSelect={handleSelect}
+        onSelect={canConfirm ? handleSelect : undefined}
         selectLabel="장소 확정하기"
       />
       <AllergyWarningModal

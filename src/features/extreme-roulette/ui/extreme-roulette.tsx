@@ -14,12 +14,19 @@ import RouletteWheel from "./roulette-wheel";
 type ExtremeRouletteProps = {
   groupId: number;
   kind: RouletteKind;
+  /** 룰렛은 대표자만 돌림 (멤버끼리 결과가 갈리지 않게). false면 돌리기 버튼을 숨김 */
+  canSpin: boolean;
   /** 결과 장소의 상세 화면 경로 */
   getDetailHref: (result: RouletteResult) => string;
 };
 
 /** 장소/음식점 룰렛. 돌리고 나면 결과 모달에서 상세 확인 또는 다시 돌리기 */
-export default function ExtremeRoulette({ groupId, kind, getDetailHref }: ExtremeRouletteProps) {
+export default function ExtremeRoulette({
+  groupId,
+  kind,
+  canSpin,
+  getDetailHref,
+}: ExtremeRouletteProps) {
   const copy = ROULETTE_KIND_COPY[kind];
   const { mutateAsync: draw } = useDrawRoulette(groupId, kind);
   const { toastMessage, showToast } = useToast();
@@ -38,7 +45,7 @@ export default function ExtremeRoulette({ groupId, kind, getDetailHref }: Extrem
   });
 
   function handleSpinClick() {
-    spin();
+    if (canSpin) spin();
   }
 
   return (
@@ -48,11 +55,23 @@ export default function ExtremeRoulette({ groupId, kind, getDetailHref }: Extrem
           <h1 className="text-xl">{copy.title}</h1>
           <p className="text-s">{copy.description}</p>
         </div>
-        <RouletteWheel rotation={rotation} spinning={spinning} onStartClick={handleSpinClick} />
+        <RouletteWheel
+          rotation={rotation}
+          spinning={spinning}
+          onStartClick={handleSpinClick}
+          disabled={!canSpin}
+        />
       </div>
-      <Button size="xl-compact" onClick={handleSpinClick} disabled={spinning} aria-busy={spinning}>
-        {copy.spinLabel}
-      </Button>
+      {canSpin && (
+        <Button
+          size="xl-compact"
+          onClick={handleSpinClick}
+          disabled={spinning}
+          aria-busy={spinning}
+        >
+          {copy.spinLabel}
+        </Button>
+      )}
       <RouletteResultModal
         place={result?.place ?? null}
         detailHref={result ? getDetailHref(result) : ""}

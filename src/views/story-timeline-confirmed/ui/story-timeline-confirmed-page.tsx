@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGroupByParam, type Group } from "@/entities/group";
+import { getGroupRole, useGroupByParam, type Group } from "@/entities/group";
 import {
   TimelineStopCard,
   getDayStops,
@@ -11,8 +11,10 @@ import {
   withItineraryId,
 } from "@/entities/journey";
 import { PlaceName } from "@/entities/place";
+import { useSessionStore } from "@/entities/session";
+import { useEndModeExit } from "@/features/end-mode";
 import { isApiError } from "@/shared/api";
-import { ErrorState, Screen, Skeleton, TextLink } from "@/shared/ui";
+import { ErrorState, Screen, Skeleton, TextLink, Toast } from "@/shared/ui";
 import { StoryLayout, TimelineMissing } from "@/widgets/story-layout";
 
 const SKELETON_CARD_COUNT = 4;
@@ -55,9 +57,16 @@ function ConfirmedContent({ group, itineraryId }: { group: Group; itineraryId: n
   } = useItinerary(group.id, itineraryId);
   const dates = getTripDates(group.startDate ?? "", group.endDate ?? "");
   const isMissing = itineraryId === null || isApiError(error, 404);
+  const userId = useSessionStore((state) => state.session?.userId ?? null);
+  const isLeader = getGroupRole(group, userId) === "leader";
+  const { exit, isExiting, toastMessage } = useEndModeExit({ groupId: group.id, isLeader });
 
   function handleRetry() {
     void refetch();
+  }
+
+  function handleExitClick() {
+    void exit();
   }
 
   if (!isMissing && isPending) return <ConfirmedSkeleton />;
@@ -87,15 +96,19 @@ function ConfirmedContent({ group, itineraryId }: { group: Group; itineraryId: n
               </li>
             ))}
           </ol>
-          {/* TODO: 스토리모드 종료 API가 생기면 종료 요청 후 이동 */}
-          <TextLink
-            href={`/groups/${group.id}`}
-            className="mt-6 self-center text-l text-text-muted no-underline"
+          {/* 대표자는 여행 회차를 끝낸 뒤, 멤버는 끝내지 않고 그룹 상세로 이동함 */}
+          <button
+            type="button"
+            onClick={handleExitClick}
+            disabled={isExiting}
+            aria-busy={isExiting}
+            className="mt-6 self-center whitespace-nowrap text-l text-text-muted"
           >
             스토리 모드 종료하기
-          </TextLink>
+          </button>
         </>
       )}
+      <Toast open={toastMessage !== null} message={toastMessage ?? ""} />
     </StoryLayout>
   );
 }

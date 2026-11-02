@@ -6,9 +6,16 @@ type RouletteWheelProps = {
   rotation: number;
   spinning: boolean;
   onStartClick: () => void;
+  /** 돌릴 권한이 없으면 가운데 start 버튼을 누를 수 없음 */
+  disabled?: boolean;
 };
 
-export default function RouletteWheel({ rotation, spinning, onStartClick }: RouletteWheelProps) {
+export default function RouletteWheel({
+  rotation,
+  spinning,
+  onStartClick,
+  disabled = false,
+}: RouletteWheelProps) {
   // 회전 각도는 매번 달라지는 동적 값이라 style로 지정함
   const wheelStyle: CSSProperties = { transform: `rotate(${rotation}deg)` };
 
@@ -25,7 +32,7 @@ export default function RouletteWheel({ rotation, spinning, onStartClick }: Roul
         <button
           type="button"
           onClick={onStartClick}
-          disabled={spinning}
+          disabled={spinning || disabled}
           aria-label="룰렛 돌리기"
           className="absolute top-1/2 left-1/2 flex size-12.5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white"
         >

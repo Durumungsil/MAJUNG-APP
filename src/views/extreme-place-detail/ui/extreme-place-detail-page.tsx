@@ -1,7 +1,8 @@
 "use client";
 
 import { notFound, useRouter } from "next/navigation";
-import { parseGroupId } from "@/entities/group";
+import { getGroupRole, parseGroupId, useGroup } from "@/entities/group";
+import { useSessionStore } from "@/entities/session";
 import {
   ExtremePlaceConfirm,
   isRouletteKind,
@@ -28,6 +29,10 @@ export default function ExtremePlaceDetailPage({
   if (groupId === null || rouletteId === null || !isRouletteKind(kind)) notFound();
 
   const router = useRouter();
+  const { data: group } = useGroup(groupId);
+  const userId = useSessionStore((state) => state.session?.userId ?? null);
+  // 룰렛 돌리기·확정은 대표자만 함. 그룹을 불러오기 전에는 버튼을 보여주지 않음
+  const isLeader = group !== undefined && getGroupRole(group, userId) === "leader";
   const {
     data: result,
     isPending,
@@ -77,6 +82,7 @@ export default function ExtremePlaceDetailPage({
       <ExtremePlaceConfirm
         groupId={groupId}
         result={result}
+        canConfirm={isLeader}
         onConfirmed={handleConfirmed}
         onClose={handleClose}
       />

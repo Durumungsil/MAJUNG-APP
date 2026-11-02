@@ -14,11 +14,12 @@ export function useDrawRoulette(groupId: number, kind: RouletteKind) {
   });
 }
 
-/** 룰렛 결과 (상세·길 안내 화면) */
-export function useRouletteResult(groupId: number, rouletteId: number) {
+/** 룰렛 결과 (상세·길 안내 화면, 메인의 확정 카드). rouletteId가 없으면(null) 요청하지 않음 */
+export function useRouletteResult(groupId: number, rouletteId: number | null) {
   return useQuery({
-    queryKey: rouletteKeys.result(groupId, rouletteId),
-    queryFn: () => fetchRouletteResult(groupId, rouletteId),
+    queryKey: rouletteKeys.result(groupId, rouletteId ?? 0),
+    queryFn: () => fetchRouletteResult(groupId, rouletteId ?? 0),
+    enabled: rouletteId !== null,
   });
 }
 

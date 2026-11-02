@@ -1,7 +1,8 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { getTodayInSeoul, loadProcessId } from "@/entities/adventure";
+import { loadProcessId } from "@/entities/adventure";
+import { getTodayInSeoul } from "@/shared/lib";
 
 function subscribe() {
   return () => {};

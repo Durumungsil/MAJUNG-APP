@@ -1,12 +1,15 @@
 import { getModeStartHref, type Group } from "@/entities/group";
+import { isTripPeriodOver } from "./trip-period";
 
 export type PrimaryAction = { label: string; href: string };
 
 type PrimaryActionInput = {
-  group: Pick<Group, "id" | "tripId" | "status" | "mode">;
+  group: Pick<Group, "id" | "tripId" | "status" | "mode" | "endDate">;
   isLeader: boolean;
   /** 아직 모르면 undefined (그룹 목록을 불러오는 중) */
   myPreferencesCompleted: boolean | undefined;
+  /** 오늘 날짜(Asia/Seoul) YYYY-MM-DD */
+  today: string;
 };
 
 /**
@@ -17,14 +20,18 @@ export function getPrimaryAction({
   group,
   isLeader,
   myPreferencesCompleted,
+  today,
 }: PrimaryActionInput): PrimaryAction | null {
   // 진행 중인 여행이 없거나 끝났으면 새 여행을 시작함
   if (group.tripId === null || group.status === "COMPLETED") {
     return isLeader ? { label: "새 여행 시작하기", href: `/groups/${group.id}/trips/new` } : null;
   }
 
+  // 여행 기간이 끝났으면 모드를 이어서 진행하지 않음
+  const canContinue = !isTripPeriodOver(group.endDate, today);
+
   if (group.status === "IN_PROGRESS") {
-    return { label: "이어서 하기", href: getModeStartHref(group) };
+    return canContinue ? { label: "이어서 하기", href: getModeStartHref(group) } : null;
   }
 
   // PLANNING: 모드 선택 → 취향 설문 → 모드 시작 순서
@@ -35,7 +42,7 @@ export function getPrimaryAction({
     return { label: "취향 설문 작성하기", href: `/groups/${group.id}/survey` };
   }
   if (myPreferencesCompleted === true) {
-    return { label: "이어서 하기", href: getModeStartHref(group) };
+    return canContinue ? { label: "이어서 하기", href: getModeStartHref(group) } : null;
   }
   return null;
 }
