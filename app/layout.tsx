@@ -8,6 +8,11 @@ import "@/app/styles/index.css";
 export const metadata: Metadata = {
   title: "MAJUNG",
   description: "MAJUNG",
+  appleWebApp: {
+    capable: true,
+    title: "MAJUNG",
+    statusBarStyle: "default",
+  },
 };
 
 export const viewport: Viewport = {
