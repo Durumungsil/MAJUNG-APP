@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "@/shared/config/env";
+import { API_BASE_URL, API_FALLBACK_BASE_URL } from "@/shared/config/env";
 
 /** 백엔드 공통 응답 형태 { success, message, data } */
 type ApiResponse<T> = {
@@ -40,6 +40,31 @@ export function configureApiAuth(handlers: AuthHandlers) {
   authHandlers = handlers;
 }
 
+/** 서버 앱까지 요청이 닿지 못했다는 뜻의 게이트웨이 응답 (Cloudflare 52x 포함) */
+const SERVER_DOWN_STATUSES = new Set([502, 503, 504, 520, 521, 522, 523, 524, 525, 526, 530]);
+
+/** 기본 서버가 죽은 걸 확인한 뒤 이 시간 동안은 바로 2차 서버로 보냄 */
+const PRIMARY_RETRY_COOLDOWN_MS = 30_000;
+
+let primaryDownUntil = 0;
+
+/** 기본 서버로 보내고, 서버가 죽어 있으면 2차 서버(API_FALLBACK_BASE_URL)로 다시 보냄 */
+async function fetchWithFallback(path: string, init: RequestInit): Promise<Response> {
+  if (!API_FALLBACK_BASE_URL) return fetch(`${API_BASE_URL}${path}`, init);
+
+  if (Date.now() < primaryDownUntil) return fetch(`${API_FALLBACK_BASE_URL}${path}`, init);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, init);
+    if (!SERVER_DOWN_STATUSES.has(response.status)) return response;
+  } catch {
+    // 연결 자체가 안 됨 (DNS 실패, 연결 거부, CORS 응답 없음 등)
+  }
+
+  primaryDownUntil = Date.now() + PRIMARY_RETRY_COOLDOWN_MS;
+  return fetch(`${API_FALLBACK_BASE_URL}${path}`, init);
+}
+
 /** 백엔드 API를 호출하고 응답의 data만 돌려줌 */
 export async function apiRequest<T>(
   path: string,
@@ -50,7 +75,7 @@ export async function apiRequest<T>(
   const accessToken = authHandlers?.getAccessToken();
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetchWithFallback(path, {
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),
