@@ -42,9 +42,3 @@ yarn-error.log*
 next-env.d.ts
 
 .local.claude.md
-# PWA (next-pwa 빌드 산출물)
-public/sw.js
-public/sw.js.map
-public/workbox-*.js
-public/workbox-*.js.map
-public/swe-worker-*.js
