@@ -25,6 +25,7 @@ export default function AdventureMainView({ groupId: groupIdParam }: AdventureMa
     position,
     currentMissionQuery,
     mission,
+    isLeader,
     phase,
     succeededMission,
     remainingDistanceLabel,
@@ -75,13 +76,14 @@ export default function AdventureMainView({ groupId: groupIdParam }: AdventureMa
           <Button href={`/groups/${groupId}/adventure/journey`} size="xl" icon={<MapIcon />}>
             나의 여정 보기
           </Button>
+          {/* 힌트는 대표자만 봄 (힌트 횟수가 그룹 랭크에 반영되므로 여러 기기에서 중복으로 오르지 않게) */}
           {currentMissionQuery.isPending ? (
             <Skeleton className="h-11 w-full" />
           ) : phase === "exploring" ? (
             <Button size="xl" icon={<SearchIcon />} onClick={handleNextPlaceClick}>
               다음 장소 찾기
             </Button>
-          ) : mission === null ? (
+          ) : !isLeader ? null : mission === null ? (
             <Button size="xl" icon={<SearchIcon />} disabled>
               장소 힌트 보기
             </Button>

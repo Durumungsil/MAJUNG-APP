@@ -3,7 +3,8 @@
 import { notFound, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useCurrentMission, type MissionHint } from "@/entities/adventure";
-import { parseGroupId } from "@/entities/group";
+import { getGroupRole, parseGroupId, useGroup } from "@/entities/group";
+import { useSessionStore } from "@/entities/session";
 import {
   formatRemainingHintTime,
   HintExpiredModal,
@@ -38,6 +39,9 @@ export default function AdventureHintView({ groupId: groupIdParam }: AdventureHi
   const { mutate: replaceMission } = useReplaceMission(groupId);
   const { toastMessage, showToast } = useToast();
   const router = useRouter();
+  const { data: group } = useGroup(groupId);
+  const userId = useSessionStore((state) => state.session?.userId ?? null);
+  const isMember = group !== undefined && getGroupRole(group, userId) === "member";
   /** 힌트 하나당 교체는 한 번만 요청함 */
   const replaceRequestedRef = useRef<MissionHint | null>(null);
 
@@ -46,6 +50,11 @@ export default function AdventureHintView({ groupId: groupIdParam }: AdventureHi
   // 서버가 내려준 표시 시간(view_seconds)으로 카운트다운함. 힌트를 받기 전에는 서버 기본값으로 안내
   const hintLimitSeconds = hint?.viewSeconds ?? DEFAULT_HINT_VIEW_SECONDS;
   const { remainingSeconds, isStarted, isExpired, start } = useHintCountdown(hintLimitSeconds);
+
+  // 힌트는 대표자만 봄. 멤버가 주소로 들어오면 지도 화면으로 돌려보냄 (힌트 횟수가 중복으로 오르지 않게)
+  useEffect(() => {
+    if (isMember) router.replace(mapHref);
+  }, [isMember, router, mapHref]);
 
   // 실제로 파노라마가 없을 때(empty)만 교체함. SDK 로드 실패 같은 지도 장애는 loading에 머물러 교체하지 않음
   useEffect(() => {
@@ -67,6 +76,7 @@ export default function AdventureHintView({ groupId: groupIdParam }: AdventureHi
   }, [roadviewStatus, hint, replaceMission, showToast, router, mapHref]);
 
   function handleHintStartClick() {
+    if (isMember) return;
     if (mission == null) {
       showToast(ERROR_MESSAGES.noCurrentMission);
       return;
