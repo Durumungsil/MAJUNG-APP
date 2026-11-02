@@ -43,9 +43,9 @@ export default function ExtremePlaceConfirm({
   // 음식점만 확정 전에 알러지를 알려주므로 음식점일 때만 미리 받아 둠
   const allergiesQuery = useGroupAllergies(groupId, kind === "food");
 
-  // 확정 API가 없어 확정 결과는 브라우저 메모리에만 둠 (.local.claude.md 백엔드 요청 6번)
+  // 확정 API가 없어 확정 결과는 이 탭의 sessionStorage에만 둠 (.local.claude.md 백엔드 요청 6번)
   function confirmPlace() {
-    confirm(kind, place);
+    confirm(groupId, kind, result.id);
     onConfirmed();
   }
 
