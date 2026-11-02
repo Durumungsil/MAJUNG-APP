@@ -14,6 +14,7 @@ import { useAutoStartMission } from "@/features/start-mission";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
 import { useToast } from "@/shared/lib";
 import { useCurrentPosition } from "@/shared/lib/use-current-position";
+import { CURRENT_MISSION_POLLING_MS } from "../config/polling";
 
 /**
  * 모험모드 메인 화면의 미션 흐름.
@@ -22,7 +23,7 @@ import { useCurrentPosition } from "@/shared/lib/use-current-position";
 export function useMissionFlow(groupId: number) {
   const router = useRouter();
   const { position, accuracyMeters } = useCurrentPosition();
-  const currentMissionQuery = useCurrentMission(groupId);
+  const currentMissionQuery = useCurrentMission(groupId, CURRENT_MISSION_POLLING_MS);
   const mission = currentMissionQuery.data ?? null;
 
   const phase = useAdventureStore((state) => state.phase);

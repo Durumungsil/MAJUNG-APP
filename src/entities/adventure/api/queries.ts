@@ -5,10 +5,15 @@ import { fetchAdventureProcess, fetchCurrentMission, fetchMissionDistance } from
 import { adventureKeys } from "./query-keys";
 
 /** 오늘 진행할 미션. 없으면 data가 null */
-export function useCurrentMission(groupId: number) {
+export function useCurrentMission(
+  groupId: number,
+  /** 다른 멤버(대표자)의 진행을 따라가야 할 때만 주기적으로 다시 조회함. 백그라운드 탭에서는 멈춤 */
+  refetchInterval?: number,
+) {
   return useQuery({
     queryKey: adventureKeys.currentMission(groupId),
     queryFn: () => fetchCurrentMission(groupId),
+    refetchInterval,
   });
 }
 
