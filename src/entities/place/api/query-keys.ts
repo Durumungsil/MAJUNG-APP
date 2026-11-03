@@ -9,5 +9,6 @@ export const placeKeys = {
   nearby: (groupId: number, placeId: string) =>
     [...placeKeys.all, "nearby", groupId, placeId] as const,
   details: (placeId: string) => [...placeKeys.all, "details", placeId] as const,
-  photo: (placeId: string) => [...placeKeys.all, "photo", placeId] as const,
+  /** 상세 시트 정보 (주소·영업시간·평점·사진·리뷰) */
+  detailInfo: (placeId: string) => [...placeKeys.all, "detail-info", placeId] as const,
 };

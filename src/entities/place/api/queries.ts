@@ -6,7 +6,7 @@ import {
   RECOMMENDATION_STALE_MS,
 } from "../config/constants";
 import type { Place, PlaceCategory, PlaceDetails } from "../model/types";
-import { fetchPlaceDetails, fetchPlacePhoto } from "./google-place-api";
+import { fetchPlaceDetailInfo, fetchPlaceDetails } from "./google-place-api";
 import { fetchNearbyPlaces, fetchRecommendedPlaces } from "./place-api";
 import { placeKeys } from "./query-keys";
 
@@ -94,11 +94,22 @@ export function usePlaceDetailsMap(placeIds: readonly string[]): ReadonlyMap<str
   });
 }
 
-/** 상세 화면 사진 1장. 목록에서는 쓰지 말 것 (사진 요청은 따로 과금됨) */
-export function usePlacePhoto(placeId: string) {
+/**
+ * 상세 시트 정보. 목록에서는 쓰지 말 것 (평점·리뷰·사진이 포함돼 단가가 높음).
+ * 받은 이름·좌표로 이름·좌표 캐시도 채워서 같은 장소의 가벼운 요청을 다시 보내지 않음
+ */
+export function usePlaceDetailInfo(placeId: string) {
+  const queryClient = useQueryClient();
   return useQuery({
-    queryKey: placeKeys.photo(placeId),
-    queryFn: () => fetchPlacePhoto(placeId),
+    queryKey: placeKeys.detailInfo(placeId),
+    queryFn: async () => {
+      const info = await fetchPlaceDetailInfo(placeId);
+      queryClient.setQueryData<PlaceDetails>(placeKeys.details(placeId), {
+        name: info.name,
+        location: info.location,
+      });
+      return info;
+    },
     ...GOOGLE_PLACE_QUERY_OPTIONS,
   });
 }

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { PERSISTED_QUERY_OPTIONS } from "@/shared/api";
 import type { LatLngLiteral } from "@/shared/model/lat-lng";
 import { roundPosition } from "../lib/round-position";
 import { fetchAdventureProcess, fetchCurrentMission, fetchMissionDistance } from "./adventure-api";
@@ -17,12 +18,13 @@ export function useCurrentMission(
   });
 }
 
-/** processId를 아직 모르면(null) 요청하지 않음 */
+/** processId를 아직 모르면(null) 요청하지 않음. AI가 만든 커리큘럼이라 새로고침 뒤에도 남김 */
 export function useAdventureProcess(groupId: number, processId: number | null) {
   return useQuery({
     queryKey: adventureKeys.process(groupId, processId ?? 0),
     queryFn: () => fetchAdventureProcess(groupId, processId ?? 0),
     enabled: processId !== null,
+    ...PERSISTED_QUERY_OPTIONS,
   });
 }
 
