@@ -16,6 +16,7 @@ import { useSessionStore } from "@/entities/session";
 import { AvatarStack, findLeaderName, useGroupMembers } from "@/entities/user";
 import { getTodayInSeoul } from "@/shared/lib";
 import { Button, CopyButton, ErrorState, InfoRow, Screen, Skeleton, TextLink } from "@/shared/ui";
+import { getGroupPollInterval } from "../lib/poll-interval";
 import { getPrimaryAction } from "../lib/primary-action";
 import { useAutoEndTrip } from "../model/use-auto-end-trip";
 import GroupDetailHeader from "./group-detail-header";
@@ -24,25 +25,20 @@ type GroupDetailPageProps = {
   groupId: string;
 };
 
-/** 대표자의 모드 선택을 확인하는 주기 */
-const WAITING_POLL_INTERVAL_MS = 5000;
-
-/** 대표자가 모드를 고르기를 기다리는 단계인지 (고르면 멤버에게 설문 버튼이 나타남) */
-function isWaitingForMode(group: Pick<Group, "tripId" | "status" | "mode">) {
-  return group.tripId !== null && group.status === "PLANNING" && group.mode === null;
-}
-
-function getGroupPollInterval(group: Group | undefined) {
-  return group && isWaitingForMode(group) ? WAITING_POLL_INTERVAL_MS : false;
-}
-
 export default function GroupDetailPage({ groupId }: GroupDetailPageProps) {
+  const userId = useSessionStore((state) => state.session?.userId ?? null);
+  // 세션을 불러오기 전(userId null)에는 멤버로 보지 않음
   const {
     data: group,
     isPending,
     isError,
     refetch,
-  } = useGroupByParam(groupId, getGroupPollInterval);
+  } = useGroupByParam(groupId, (current) =>
+    getGroupPollInterval(
+      current,
+      userId !== null && current !== undefined && getGroupRole(current, userId) === "member",
+    ),
+  );
 
   function handleRetry() {
     void refetch();

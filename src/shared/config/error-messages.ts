@@ -10,6 +10,7 @@ export const ERROR_MESSAGES = {
   leaderOnly: "그룹 대표자만 할 수 있어요",
   noActiveTrip: "진행 중인 여행이 없어요",
   tripInProgress: "아직 끝나지 않은 여행이 있어요",
+  tripEnded: "여행이 종료돼서 그룹으로 돌아갈게요",
   leaderCannotLeave: "대표자를 다른 멤버에게 넘긴 뒤 탈퇴할 수 있어요",
   surveyBudgetInvalid: "예산은 0원부터 1억 원까지 숫자로 입력해 주세요",
   surveyTransportRequired: "선호하는 교통수단을 선택해 주세요",
