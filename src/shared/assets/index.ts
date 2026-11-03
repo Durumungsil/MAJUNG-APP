@@ -1,4 +1,5 @@
 export { default as Logo } from "./icons/logo";
+export { default as GoogleLogoIcon } from "./icons/google-logo-icon";
 export { default as PlusIcon } from "./icons/plus-icon";
 export { default as SettingsIcon } from "./icons/settings-icon";
 export { default as LocationIcon } from "./icons/location-icon";

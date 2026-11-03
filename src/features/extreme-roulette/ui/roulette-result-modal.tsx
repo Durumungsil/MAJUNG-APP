@@ -1,7 +1,7 @@
 "use client";
 
 import { PlaceName, type Place } from "@/entities/place";
-import { Button, Modal } from "@/shared/ui";
+import { Button, GoogleMapsAttribution, Modal } from "@/shared/ui";
 
 type RouletteResultModalProps = {
   place: Place | null;
@@ -29,6 +29,7 @@ export default function RouletteResultModal({
           {place && <PlaceName placeId={place.id} name={place.name} />}
         </h2>
         <p className="text-xs text-text-muted">상세 정보를 확인하고 확정해요</p>
+        <GoogleMapsAttribution className="mt-1" />
       </div>
       <div className="flex gap-3">
         <Button size="md" variant="tertiary" href={detailHref}>

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { ScheduleHeader } from "@/entities/journey";
 import { cn } from "@/shared/lib";
-import { ModeTitle, Screen, StripeBackground } from "@/shared/ui";
+import { GoogleMapsAttribution, ModeTitle, Screen, StripeBackground } from "@/shared/ui";
 
 type StoryLayoutProps = {
   startDate: string;
@@ -50,6 +50,8 @@ export default function StoryLayout({
           {guide && <p className="text-s text-text-primary">{guide}</p>}
         </div>
         <div className={cn("flex flex-col", fillHeight && "min-h-0 flex-1")}>{children}</div>
+        {/* 추천 목록·타임라인의 장소 이름은 Google Places 데이터라 지도 없이 보여줄 때 출처를 붙임 */}
+        <GoogleMapsAttribution className="-mt-3 shrink-0 self-end" />
       </div>
     </Screen>
   );

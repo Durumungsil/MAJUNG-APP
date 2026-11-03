@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useSessionStore } from "@/entities/session";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
+import { HOME_PATH } from "@/shared/config/routes";
 import { Button, Spinner } from "@/shared/ui";
 import { loginWithGoogle } from "../api/login-with-google";
 import { getIdTokenNonce, parseGoogleAuthFragment } from "../lib/google-oauth";
@@ -43,7 +44,7 @@ export default function GoogleLoginCallback() {
           refreshToken: response.refresh_token,
         });
         // TODO: first_login이 true면 온보딩 화면으로 분기 (화면 확정 후)
-        router.replace("/");
+        router.replace(HOME_PATH);
       } catch {
         setFailed(true);
       }

@@ -15,3 +15,6 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
 /** 기본 서버가 죽었을 때 대신 붙을 2차 백엔드 주소 (예: http://localhost:8080). 비워두면 대체 없음 */
 export const API_FALLBACK_BASE_URL = process.env.NEXT_PUBLIC_API_FALLBACK_BASE_URL ?? "";
+
+/** Search Console 소유권 확인용 HTML 태그의 content 값. 루트 layout의 <head>에 들어감 */
+export const GOOGLE_SITE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "";

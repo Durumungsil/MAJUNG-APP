@@ -7,6 +7,7 @@ export { default as CopyButton } from "./copy-button";
 export { default as DropdownMenu, type DropdownMenuItem } from "./dropdown-menu";
 export { default as ErrorState } from "./error-state";
 export { default as FormRow } from "./form-row";
+export { default as GoogleMapsAttribution } from "./google-maps-attribution";
 export { default as InfoRow } from "./info-row";
 export { MapOverlay, MapPolyline, RouteMap } from "./route-map";
 export { default as Modal } from "./modal";

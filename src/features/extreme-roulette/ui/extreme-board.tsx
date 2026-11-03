@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/shared/ui";
+import { Button, GoogleMapsAttribution } from "@/shared/ui";
 import { ROULETTE_KINDS } from "../config/roulette-kinds";
 import { useExtremeStore } from "../model/extreme-store";
 import type { RouletteKind } from "../model/types";
@@ -37,6 +37,8 @@ export default function ExtremeBoard({ getRouletteHref, exitHref }: ExtremeBoard
           />
         ))}
       </div>
+      {/* 카드의 장소 이름은 Google Places 데이터라 출처를 붙임 */}
+      <GoogleMapsAttribution className="mt-3 self-end" />
       <Button size="xl" onClick={handleExitClick} className="mt-auto mb-5">
         익스트림 모드 종료하기
       </Button>
