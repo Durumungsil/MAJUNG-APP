@@ -15,3 +15,6 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
 /** 기본 서버가 죽었을 때 대신 붙을 2차 백엔드 주소 (예: http://localhost:8080). 비워두면 대체 없음 */
 export const API_FALLBACK_BASE_URL = process.env.NEXT_PUBLIC_API_FALLBACK_BASE_URL ?? "";
+
+/** production 빌드 여부 (서비스 워커처럼 배포 환경에서만 켜는 기능에 사용) */
+export const IS_PRODUCTION = process.env.NODE_ENV === "production";
