@@ -33,6 +33,10 @@ export default function PlaceDetailSheet({
     if (place) onSelect?.(place);
   }
 
+  function handleReviewsExpand() {
+    onSnapChange("full");
+  }
+
   return (
     <BottomSheet
       open
@@ -48,8 +52,13 @@ export default function PlaceDetailSheet({
         )
       }
     >
-      {/* 장소를 바꾸면 사진 상태를 새로 시작하도록 key를 줌 */}
-      <PlaceDetail key={place.id} place={place} titleId={titleId} />
+      {/* 장소를 바꾸면 리뷰 펼침 상태를 새로 시작하도록 key를 줌 */}
+      <PlaceDetail
+        key={place.id}
+        place={place}
+        titleId={titleId}
+        onReviewsExpand={handleReviewsExpand}
+      />
     </BottomSheet>
   );
 }

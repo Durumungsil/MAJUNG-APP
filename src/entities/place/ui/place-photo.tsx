@@ -1,24 +1,17 @@
-"use client";
-
 import Image from "next/image";
-import { Skeleton } from "@/shared/ui";
-import { usePlacePhoto } from "../api/queries";
+import type { PlacePhoto as PlacePhotoData } from "../model/types";
 
 type PlacePhotoProps = {
-  placeId: string;
+  photo: PlacePhotoData | null;
   placeName: string;
 };
 
 /**
- * 상세 화면의 Google 사진 1장과 출처. 사진이 없거나 못 불러오면 Figma처럼 회색 칸만 둠.
+ * 상세 화면의 Google 사진 1장과 출처. 사진이 없으면 Figma처럼 회색 칸만 둠.
  * Google 정책상 사진 작성자와 Google Maps 출처를 사진과 함께 표시해야 함.
  * 사진이 없어도 장소 이름이 Google 데이터이므로 Google Maps 출처는 항상 표시함
  */
-export default function PlacePhoto({ placeId, placeName }: PlacePhotoProps) {
-  const { data: photo, isPending } = usePlacePhoto(placeId);
-
-  if (isPending) return <Skeleton className="h-30 w-45" />;
-
+export default function PlacePhoto({ photo, placeName }: PlacePhotoProps) {
   return (
     <figure className="flex flex-col gap-1">
       <div className="relative h-30 w-45 overflow-hidden rounded-lg bg-natural-400">

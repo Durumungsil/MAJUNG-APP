@@ -18,3 +18,6 @@ export const PLACE_PHOTO_MAX_WIDTH_PX = 360;
 
 /** Google 장소 이름을 불러오지 못했을 때 대신 보여주는 문구 */
 export const UNKNOWN_PLACE_NAME = "이름을 불러오지 못한 장소";
+
+/** 상세 시트에 처음 보여주는 리뷰 수. "리뷰 더보기"를 누르면 Google이 주는 만큼(최대 5개) 모두 보여줌 */
+export const PLACE_REVIEW_PREVIEW_COUNT = 1;
