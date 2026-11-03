@@ -1,6 +1,8 @@
 @theme inline {
   --font-sans: var(--font-primary), system-ui, -apple-system, sans-serif;
   --font-point: var(--font-secondary), var(--font-primary), sans-serif;
+  /* Google 로그인 버튼·출처 표기 전용. Google 가이드가 Roboto를 지정해서 따로 둠 (파일은 로드하지 않고 기기 글꼴 사용) */
+  --font-google: Roboto, Arial, sans-serif;
 }
 
 @theme {

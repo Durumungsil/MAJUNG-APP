@@ -42,6 +42,11 @@
   --color-text-primary: #0f172a;
   --color-text-secondary: #556070;
   --color-text-muted: #8490a1;
+
+  /* Google 로그인 버튼 규격 색 (Figma 팔레트가 아니라 Google 브랜딩 가이드가 정한 값. 바꾸지 말 것) */
+  --color-google-surface: #ffffff;
+  --color-google-border: #747775;
+  --color-google-text: #1f1f1f;
 }
 
 :root {

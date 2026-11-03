@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/shared/ui";
+import { Button, GoogleMapsAttribution } from "@/shared/ui";
 import { useRouletteResult } from "../api/queries";
 import { ROULETTE_KINDS } from "../config/roulette-kinds";
 import { EMPTY_SELECTIONS, useExtremeStore } from "../model/extreme-store";
@@ -48,6 +48,8 @@ export default function ExtremeBoard({
           />
         ))}
       </div>
+      {/* 카드의 장소 이름은 Google Places 데이터라 출처를 붙임 */}
+      <GoogleMapsAttribution className="mt-3 self-end" />
       <Button
         size="xl"
         onClick={handleExitClick}
