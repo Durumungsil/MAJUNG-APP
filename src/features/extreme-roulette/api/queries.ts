@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { isApiError } from "@/shared/api";
+import { isApiError, PERSISTED_QUERY_OPTIONS } from "@/shared/api";
 import type { RouletteKind } from "../model/types";
 import { rouletteKeys } from "./query-keys";
 import { drawRoulette, fetchGroupAllergies, fetchRouletteResult } from "./roulette-api";
@@ -14,12 +14,16 @@ export function useDrawRoulette(groupId: number, kind: RouletteKind) {
   });
 }
 
-/** 룰렛 결과 (상세·길 안내 화면, 메인의 확정 카드). rouletteId가 없으면(null) 요청하지 않음 */
+/**
+ * 룰렛 결과 (상세·길 안내 화면, 메인의 확정 카드). rouletteId가 없으면(null) 요청하지 않음.
+ * 추첨 결과라 다시 만들 수 없으므로 새로고침 뒤에도 남김
+ */
 export function useRouletteResult(groupId: number, rouletteId: number | null) {
   return useQuery({
     queryKey: rouletteKeys.result(groupId, rouletteId ?? 0),
     queryFn: () => fetchRouletteResult(groupId, rouletteId ?? 0),
     enabled: rouletteId !== null,
+    ...PERSISTED_QUERY_OPTIONS,
   });
 }
 
