@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { adventureKeys, startMission } from "@/entities/adventure";
+import { isApiError } from "@/shared/api";
 import type { LatLngLiteral } from "@/shared/model/lat-lng";
 
 type StartMissionValues = {
@@ -8,6 +9,7 @@ type StartMissionValues = {
   position: LatLngLiteral;
 };
 
+/** 미션 시작 - 409(이미 완료됨 등)는 다른 기기에서 먼저 진행한 것이므로 현재 미션을 다시 받아 화면을 맞춤 */
 export function useStartMission(groupId: number) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -15,5 +17,9 @@ export function useStartMission(groupId: number) {
       startMission(groupId, missionId, position),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: adventureKeys.currentMission(groupId) }),
+    onError: (error) => {
+      if (isApiError(error, 409))
+        return queryClient.invalidateQueries({ queryKey: adventureKeys.currentMission(groupId) });
+    },
   });
 }

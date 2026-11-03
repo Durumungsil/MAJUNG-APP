@@ -22,7 +22,8 @@ type AutoCompleteMissionOptions = {
 
 /**
  * 현재 위치로 미션 완료를 요청함. 도착 여부는 서버가 판정하고,
- * 아직 멀거나 GPS가 부정확하면(400) 조용히 넘어가서 다음 위치에서 다시 요청함
+ * 아직 멀거나 GPS가 부정확하면(400) 조용히 넘어가서 다음 위치에서 다시 요청함.
+ * 다른 기기에서 먼저 완료한 경우(409)도 알리지 않음 (현재 미션을 다시 받아 성공 모달로 이어짐)
  */
 export function useAutoCompleteMission({
   groupId,
@@ -50,7 +51,7 @@ export function useAutoCompleteMission({
       {
         onSuccess: onComplete,
         onError: (error) => {
-          if (!isApiError(error, 400)) onError(error);
+          if (!isApiError(error, 400, 409)) onError(error);
         },
       },
     );

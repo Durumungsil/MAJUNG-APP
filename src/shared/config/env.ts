@@ -18,3 +18,6 @@ export const API_FALLBACK_BASE_URL = process.env.NEXT_PUBLIC_API_FALLBACK_BASE_U
 
 /** Search Console 소유권 확인용 HTML 태그의 content 값. 루트 layout의 <head>에 들어감 */
 export const GOOGLE_SITE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "";
+
+/** production 빌드 여부 (서비스 워커처럼 배포 환경에서만 켜는 기능에 사용) */
+export const IS_PRODUCTION = process.env.NODE_ENV === "production";

@@ -3,11 +3,11 @@ import {
   adventureKeys,
   createAdventureProcess,
   fetchCurrentMission,
-  getTodayInSeoul,
   loadProcessId,
   saveProcessId,
 } from "@/entities/adventure";
 import { ApiError, isApiError } from "@/shared/api";
+import { getTodayInSeoul } from "@/shared/lib";
 import { ADVENTURE_MISSION_COUNT } from "../config/mission-count";
 
 /**
