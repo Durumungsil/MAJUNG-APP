@@ -82,6 +82,15 @@ function toReviews(reviews: google.maps.places.Review[] | undefined): PlaceRevie
   );
 }
 
+/**
+ * 장소 사진 1장 (카드 썸네일용). 상세 시트 요청(평점·리뷰 포함)보다 싼 사진 필드만 받음.
+ * 사진 이미지는 화면에 그릴 때 따로 과금됨
+ */
+export async function fetchPlacePhoto(placeId: string): Promise<PlacePhoto | null> {
+  const place = await fetchGooglePlace(placeId, ["photos"]);
+  return toPhoto(place.photos?.[0]);
+}
+
 /** 상세 시트용 장소 정보 (이름·대표 업종·좌표·주소·영업시간·평점·사진 1장·리뷰) */
 export async function fetchPlaceDetailInfo(placeId: string): Promise<PlaceDetailInfo> {
   const place = await fetchGooglePlace(placeId, DETAIL_INFO_FIELDS);

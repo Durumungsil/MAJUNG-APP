@@ -1,4 +1,4 @@
-import { PlaceName, type Place } from "@/entities/place";
+import { PlaceName, PlaceThumbnail, type Place } from "@/entities/place";
 import { cn } from "@/shared/lib";
 import { Button } from "@/shared/ui";
 import { ROULETTE_KIND_COPY } from "../config/roulette-kinds";
@@ -29,8 +29,8 @@ export default function ExtremeSelectionCard({
     >
       {place ? (
         <div className="flex h-16.5 gap-6">
-          {/* 사진은 상세 화면에서만 조회함 (Google 사진 요청은 따로 과금됨) */}
-          <div className="relative flex-1 overflow-hidden rounded-lg bg-natural-400" />
+          {/* 확정한 장소의 사진. 사진 필드만 받는 가벼운 요청이고, 확정 직전 상세에서 받은 사진이 있으면 그대로 씀 */}
+          <PlaceThumbnail placeId={place.id} placeName={place.name} className="flex-1" />
           <div className="flex min-w-0 flex-1 flex-col">
             <p className="truncate text-l text-text-primary">
               <PlaceName placeId={place.id} name={place.name} />
