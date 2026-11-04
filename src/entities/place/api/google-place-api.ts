@@ -29,10 +29,11 @@ export async function fetchPlaceDetails(placeId: string): Promise<PlaceDetails> 
 
 /**
  * 상세 시트에 필요한 정보를 한 번에 받음 (요청을 나누면 건마다 과금됨).
- * 평점·리뷰는 Enterprise + Atmosphere 등급 필드
+ * 평점·리뷰는 Enterprise + Atmosphere 등급 필드라, 같은 요청에 대표 업종을 더해도 등급이 오르지 않음
  */
 const DETAIL_INFO_FIELDS = [
   "displayName",
+  "primaryTypeDisplayName",
   "location",
   "formattedAddress",
   "regularOpeningHours",
@@ -81,11 +82,12 @@ function toReviews(reviews: google.maps.places.Review[] | undefined): PlaceRevie
   );
 }
 
-/** 상세 시트용 장소 정보 (이름·좌표·주소·영업시간·평점·사진 1장·리뷰) */
+/** 상세 시트용 장소 정보 (이름·대표 업종·좌표·주소·영업시간·평점·사진 1장·리뷰) */
 export async function fetchPlaceDetailInfo(placeId: string): Promise<PlaceDetailInfo> {
   const place = await fetchGooglePlace(placeId, DETAIL_INFO_FIELDS);
   return {
     name: place.displayName ?? "",
+    primaryTypeName: place.primaryTypeDisplayName || null,
     location: place.location?.toJSON() ?? null,
     address: place.formattedAddress ?? null,
     rating: place.rating ?? null,

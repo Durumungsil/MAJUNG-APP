@@ -1,3 +1,4 @@
+import { GroupListShortcut } from "@/widgets/group-list-shortcut";
 import { TripEndGuard } from "@/widgets/trip-end-guard";
 
 export default async function Layout({
@@ -8,6 +9,7 @@ export default async function Layout({
   return (
     <>
       {children}
+      <GroupListShortcut startPath={`/groups/${groupId}/adventure`} />
       <TripEndGuard groupId={groupId} />
     </>
   );
