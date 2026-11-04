@@ -12,3 +12,10 @@ export const TRIP_MODE_LABEL: Record<TripMode, string> = {
   ADVENTURE: "ADVENTURE",
   EXTREME: "EXTREME",
 };
+
+/** 버튼 문구에 쓰는 한국어 모드 이름. 모드 화면의 "스토리 모드 종료하기" 등과 같게 표기 */
+export const TRIP_MODE_NAME: Record<TripMode, string> = {
+  STORY: "스토리",
+  ADVENTURE: "모험",
+  EXTREME: "익스트림",
+};
