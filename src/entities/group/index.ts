@@ -11,7 +11,7 @@ export type {
 } from "./model/types";
 export { MAX_GROUP_MEMBERS, MIN_GROUP_MEMBERS } from "./config/constants";
 export { GROUP_POLL_INTERVAL_MS } from "./config/polling";
-export { TRIP_MODE_LABEL, TRIP_STATUS_LABEL } from "./config/labels";
+export { TRIP_MODE_LABEL, TRIP_MODE_NAME, TRIP_STATUS_LABEL } from "./config/labels";
 export { formatCardDate } from "./lib/format-card-date";
 export { formatExpiresAt } from "./lib/format-expires-at";
 export { toGroupFormValues, toGroupPayload, type GroupPayload } from "./lib/group-form";
