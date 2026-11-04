@@ -5,8 +5,14 @@ import {
   RECOMMENDATION_PAGE_SIZE,
   RECOMMENDATION_STALE_MS,
 } from "../config/constants";
-import type { Place, PlaceCategory, PlaceDetails } from "../model/types";
-import { fetchPlaceDetailInfo, fetchPlaceDetails } from "./google-place-api";
+import type {
+  Place,
+  PlaceCategory,
+  PlaceDetailInfo,
+  PlaceDetails,
+  PlacePhoto,
+} from "../model/types";
+import { fetchPlaceDetailInfo, fetchPlaceDetails, fetchPlacePhoto } from "./google-place-api";
 import { fetchNearbyPlaces, fetchRecommendedPlaces } from "./place-api";
 import { placeKeys } from "./query-keys";
 
@@ -129,4 +135,19 @@ export function useResolvedPlace(place: Place | null) {
     isError: needsDetails && isError,
     refetch,
   };
+}
+
+/**
+ * 장소 사진 1장. 상세 시트에서 이미 받은 장소(예: 방금 확정한 장소)는 그 사진을 그대로 써서 다시 요청하지 않음.
+ * 사진이 없는 장소면 data가 null
+ */
+export function usePlacePhoto(placeId: string) {
+  const queryClient = useQueryClient();
+  return useQuery<PlacePhoto | null>({
+    queryKey: placeKeys.photo(placeId),
+    queryFn: () => fetchPlacePhoto(placeId),
+    initialData: () =>
+      queryClient.getQueryData<PlaceDetailInfo>(placeKeys.detailInfo(placeId))?.photo,
+    ...GOOGLE_PLACE_QUERY_OPTIONS,
+  });
 }
