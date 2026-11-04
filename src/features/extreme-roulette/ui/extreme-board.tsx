@@ -1,9 +1,9 @@
 "use client";
 
 import { Button, GoogleMapsAttribution } from "@/shared/ui";
-import { useRouletteResult } from "../api/queries";
+import { useConfirmedRoulettes } from "../api/queries";
+import { CONFIRMED_ROULETTE_POLLING_MS } from "../config/polling";
 import { ROULETTE_KINDS } from "../config/roulette-kinds";
-import { EMPTY_SELECTIONS, useExtremeStore } from "../model/extreme-store";
 import type { RouletteKind } from "../model/types";
 import ExtremeSelectionCard from "./extreme-selection-card";
 
@@ -12,7 +12,7 @@ type ExtremeBoardProps = {
   /** 룰렛은 대표자만 돌림. false면 카드의 룰렛 버튼을 숨김 */
   canSpin: boolean;
   getRouletteHref: (kind: RouletteKind) => string;
-  /** 종료하기를 누르면 부름. 종료에 성공하면 true (이 기기의 확정 기록을 지움) */
+  /** 종료하기를 누르면 부름. 종료에 성공하면 true */
   onExit: () => Promise<boolean>;
   /** 종료 요청 중이면 버튼에 진행 상태를 표시함 */
   isExiting: boolean;
@@ -26,24 +26,25 @@ export default function ExtremeBoard({
   onExit,
   isExiting,
 }: ExtremeBoardProps) {
-  const selections = useExtremeStore(
-    (state) => state.selectionsByGroup[groupId] ?? EMPTY_SELECTIONS,
+  // 확정은 대표자만 하므로, 멤버 화면만 대표자의 확정을 따라가도록 다시 조회함
+  const { data: confirmed } = useConfirmedRoulettes(
+    groupId,
+    canSpin ? undefined : CONFIRMED_ROULETTE_POLLING_MS,
   );
-  const reset = useExtremeStore((state) => state.reset);
 
-  async function handleExitClick() {
-    if (await onExit()) reset(groupId);
+  function handleExitClick() {
+    void onExit();
   }
 
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex flex-col gap-10.5">
         {ROULETTE_KINDS.map((kind) => (
-          <ConfirmedSelectionCard
+          // 받는 중이거나 못 받으면 확정 전처럼 보임
+          <ExtremeSelectionCard
             key={kind}
-            groupId={groupId}
             kind={kind}
-            rouletteId={selections[kind]}
+            place={confirmed?.[kind]?.place ?? null}
             rouletteHref={canSpin ? getRouletteHref(kind) : null}
           />
         ))}
@@ -60,26 +61,5 @@ export default function ExtremeBoard({
         익스트림 모드 종료하기
       </Button>
     </div>
-  );
-}
-
-type ConfirmedSelectionCardProps = {
-  groupId: number;
-  kind: RouletteKind;
-  rouletteId: number | null;
-  rouletteHref: string | null;
-};
-
-/** 확정한 룰렛 결과 ID로 장소를 다시 받아 카드에 보여줌. 받는 중이거나 못 받으면 확정 전처럼 보임 */
-function ConfirmedSelectionCard({
-  groupId,
-  kind,
-  rouletteId,
-  rouletteHref,
-}: ConfirmedSelectionCardProps) {
-  const { data: result } = useRouletteResult(groupId, rouletteId);
-
-  return (
-    <ExtremeSelectionCard kind={kind} place={result?.place ?? null} rouletteHref={rouletteHref} />
   );
 }
