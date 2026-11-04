@@ -2,7 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { PERSISTED_QUERY_OPTIONS } from "@/shared/api";
 import type { LatLngLiteral } from "@/shared/model/lat-lng";
 import { roundPosition } from "../lib/round-position";
-import { fetchAdventureProcess, fetchCurrentMission, fetchMissionDistance } from "./adventure-api";
+import {
+  fetchCurrentMission,
+  fetchMissionDistance,
+  fetchTodayAdventureProcess,
+} from "./adventure-api";
 import { adventureKeys } from "./query-keys";
 
 /** 오늘 진행할 미션. 없으면 data가 null */
@@ -18,12 +22,16 @@ export function useCurrentMission(
   });
 }
 
-/** processId를 아직 모르면(null) 요청하지 않음. AI가 만든 커리큘럼이라 새로고침 뒤에도 남김 */
-export function useAdventureProcess(groupId: number, processId: number | null) {
+/** 오늘 커리큘럼 진행도. 오늘 커리큘럼이 없으면 data가 null. AI가 만든 커리큘럼이라 새로고침 뒤에도 남김 */
+export function useTodayAdventureProcess(
+  groupId: number,
+  /** 대표자의 미션 완료를 따라가야 할 때만 주기적으로 다시 조회함 */
+  refetchInterval?: number,
+) {
   return useQuery({
-    queryKey: adventureKeys.process(groupId, processId ?? 0),
-    queryFn: () => fetchAdventureProcess(groupId, processId ?? 0),
-    enabled: processId !== null,
+    queryKey: adventureKeys.todayProcess(groupId),
+    queryFn: () => fetchTodayAdventureProcess(groupId),
+    refetchInterval,
     ...PERSISTED_QUERY_OPTIONS,
   });
 }

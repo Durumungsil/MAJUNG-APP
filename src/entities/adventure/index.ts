@@ -13,13 +13,13 @@ export {
   completeMission,
   createAdventureProcess,
   fetchCurrentMission,
+  fetchTodayAdventureProcess,
   fetchMissionHint,
   replaceMission,
   startMission,
 } from "./api/adventure-api";
 export { adventureKeys } from "./api/query-keys";
 export { CURRENT_MISSION_POLLING_MS } from "./config/polling";
-export { useAdventureProcess, useCurrentMission, useMissionDistance } from "./api/queries";
-export { loadProcessId, saveProcessId } from "./lib/process-id-storage";
+export { useCurrentMission, useMissionDistance, useTodayAdventureProcess } from "./api/queries";
 export { formatDistance } from "./lib/remaining-distance";
 export { getMissionChange, type MissionChange } from "./lib/mission-change";
