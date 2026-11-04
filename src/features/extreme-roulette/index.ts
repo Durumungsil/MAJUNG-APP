@@ -1,5 +1,6 @@
 export type { RouletteKind, RouletteResult } from "./model/types";
 export { isRouletteKind } from "./lib/roulette-kind";
+export { getSpinBlock } from "./lib/spin-block";
 export { parseRouletteId } from "./lib/roulette-id";
 export { useRouletteResult } from "./api/queries";
 export { useExtremeConflictRedirect } from "./model/use-extreme-conflict-redirect";

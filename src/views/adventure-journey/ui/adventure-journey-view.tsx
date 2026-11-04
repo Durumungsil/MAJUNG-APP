@@ -1,12 +1,11 @@
 "use client";
 
 import { notFound } from "next/navigation";
-import { useAdventureProcess } from "@/entities/adventure";
+import { CURRENT_MISSION_POLLING_MS, useTodayAdventureProcess } from "@/entities/adventure";
 import { parseGroupId } from "@/entities/group";
 import { JourneyStopCard } from "@/entities/journey";
 import { Button, ErrorState, Skeleton } from "@/shared/ui";
 import { toJourneyStops } from "../lib/to-journey-stops";
-import { useTodayProcessId } from "../model/use-today-process-id";
 
 interface AdventureJourneyViewProps {
   groupId: string;
@@ -18,21 +17,19 @@ export default function AdventureJourneyView({ groupId: groupIdParam }: Adventur
   const groupId = parseGroupId(groupIdParam);
   if (groupId === null) notFound();
 
-  const processId = useTodayProcessId(groupId);
-  const { data: process, isPending, isError, refetch } = useAdventureProcess(groupId, processId);
+  // 미션 완료는 대표자 기기에서 일어나므로, 다른 멤버 화면에도 반영되게 주기적으로 다시 조회함
+  const {
+    data: process,
+    isPending,
+    isError,
+    refetch,
+  } = useTodayAdventureProcess(groupId, CURRENT_MISSION_POLLING_MS);
 
   function handleRetry() {
     void refetch();
   }
 
   function renderContent() {
-    if (processId === null) {
-      return (
-        <p className="flex flex-1 items-center justify-center text-m text-text-muted">
-          오늘 확인할 수 있는 여정이 없어요
-        </p>
-      );
-    }
     if (isPending) {
       return (
         <div className="flex flex-col gap-5 px-page">
@@ -43,6 +40,13 @@ export default function AdventureJourneyView({ groupId: groupIdParam }: Adventur
       );
     }
     if (isError) return <ErrorState onRetry={handleRetry} />;
+    if (process === null) {
+      return (
+        <p className="flex flex-1 items-center justify-center text-m text-text-muted">
+          오늘 확인할 수 있는 여정이 없어요
+        </p>
+      );
+    }
 
     return (
       <ol className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-page">
