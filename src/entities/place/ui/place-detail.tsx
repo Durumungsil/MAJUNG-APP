@@ -17,7 +17,7 @@ type PlaceDetailProps = {
   onReviewsExpand: () => void;
 };
 
-/** 장소 상세. 이름·카테고리·영업 상태·주소·사진 1장·평점·리뷰를 한 번의 Google 요청으로 보여줌 */
+/** 장소 상세. 이름·카테고리·대표 업종·영업 상태·주소·사진 1장·평점·리뷰를 한 번의 Google 요청으로 보여줌 */
 export default function PlaceDetail({ place, titleId, onReviewsExpand }: PlaceDetailProps) {
   const { data, isPending, isError, refetch } = usePlaceDetailInfo(place.id);
   const [reviewsExpanded, setReviewsExpanded] = useState(false);
@@ -54,6 +54,7 @@ export default function PlaceDetail({ place, titleId, onReviewsExpand }: PlaceDe
         )}
         {data && (
           <>
+            {data.primaryTypeName && <p className="text-s">{data.primaryTypeName}</p>}
             <PlaceOpenStatus openingHours={data.openingHours} />
             {data.address && <p className="text-s">{data.address}</p>}
           </>
