@@ -8,6 +8,7 @@ import {
   addPlaceToDate,
   getSelectedCount,
   isPlaceSelected,
+  removePlaceFromDate,
   toSelectionDays,
   type DaySelection,
 } from "../lib/day-selection";
@@ -66,9 +67,15 @@ export default function PlaceSelectList({
     setPreviewPlace(null);
   }
 
+  // 이미 고른 장소면 시트 버튼이 선택 취소로 바뀜
+  const isPreviewSelected =
+    previewPlace !== null && isPlaceSelected(selectedStopsOfDate, previewPlace.id);
+
   function handlePlaceSelect(place: Place) {
     setSelection((prev) =>
-      addPlaceToDate(prev, date, { placeId: place.id, category: place.category }),
+      isPlaceSelected(prev[date] ?? [], place.id)
+        ? removePlaceFromDate(prev, date, place.id)
+        : addPlaceToDate(prev, date, { placeId: place.id, category: place.category }),
     );
     setPreviewPlace(null);
   }
@@ -129,6 +136,7 @@ export default function PlaceSelectList({
         onSnapChange={setSnap}
         onClose={handleSheetClose}
         onSelect={canSubmit ? handlePlaceSelect : undefined}
+        selectLabel={isPreviewSelected ? "선택 취소하기" : undefined}
       />
     </>
   );

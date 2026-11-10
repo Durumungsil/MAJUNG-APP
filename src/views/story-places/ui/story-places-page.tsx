@@ -15,7 +15,11 @@ import {
 import { isApiError } from "@/shared/api";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
 import { useToast } from "@/shared/lib";
-import { StoryLayout, useStoryConflictRedirect } from "@/widgets/story-layout";
+import {
+  StoryLayout,
+  useConfirmedTimelineRedirect,
+  useStoryConflictRedirect,
+} from "@/widgets/story-layout";
 import { ErrorState, Screen, Skeleton, Toast } from "@/shared/ui";
 
 const GUIDE = "원하는 장소를 선택해 타임라인을 생성하세요";
@@ -41,10 +45,16 @@ export default function StoryPlacesPage({ groupId }: StoryPlacesPageProps) {
     );
   }
 
-  return <StoryPlacesContent group={group} />;
+  return <StoryPlacesContent group={group} onGroupRefetch={handleRetry} />;
 }
 
-function StoryPlacesContent({ group }: { group: Group }) {
+type StoryPlacesContentProps = {
+  group: Group;
+  /** 409를 받으면 여행 상태(확정 여부)를 다시 받음 */
+  onGroupRefetch: () => void;
+};
+
+function StoryPlacesContent({ group, onGroupRefetch }: StoryPlacesContentProps) {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [category, setCategory] = useState<PlaceCategory | null>(null);
   const dates = getTripDates(group.startDate ?? "", group.endDate ?? "");
@@ -60,6 +70,10 @@ function StoryPlacesContent({ group }: { group: Group }) {
     loadMore,
   } = useRecommendedPlaces(group.id, category);
   const { isConflict, toastMessage } = useStoryConflictRedirect(error, group.id);
+  const { isConfirmed, toastMessage: confirmedToastMessage } = useConfirmedTimelineRedirect({
+    group,
+    itineraryId: null,
+  });
   const router = useRouter();
   const userId = useSessionStore((state) => state.session?.userId ?? null);
   const isLeader = getGroupRole(group, userId) === "leader";
@@ -85,8 +99,11 @@ function StoryPlacesContent({ group }: { group: Group }) {
         }),
       onError: (saveError) => {
         if (isApiError(saveError, 403)) showToast(ERROR_MESSAGES.leaderOnly);
-        else if (isApiError(saveError, 409)) showToast(ERROR_MESSAGES.storyUnavailable);
-        else showToast(ERROR_MESSAGES.requestFailed);
+        else if (isApiError(saveError, 409)) {
+          // 다른 기기에서 먼저 확정했으면 그룹 상태를 다시 받아 확정 화면으로 보냄
+          showToast(ERROR_MESSAGES.storyUnavailable);
+          onGroupRefetch();
+        } else showToast(ERROR_MESSAGES.requestFailed);
       },
     });
   }
@@ -103,11 +120,12 @@ function StoryPlacesContent({ group }: { group: Group }) {
   }
 
   // 탭을 바꿀 때마다 화면 전체를 다시 그리지 않도록, 전체 스켈레톤은 처음 들어왔을 때(전체 탭)만 보여줌
-  if ((isPending && category === null) || isConflict) {
+  if ((isPending && category === null) || isConflict || isConfirmed) {
+    const redirectToastMessage = confirmedToastMessage ?? toastMessage;
     return (
       <>
         <StoryPlacesSkeleton />
-        <Toast open={toastMessage !== null} message={toastMessage ?? ""} />
+        <Toast open={redirectToastMessage !== null} message={redirectToastMessage ?? ""} />
       </>
     );
   }

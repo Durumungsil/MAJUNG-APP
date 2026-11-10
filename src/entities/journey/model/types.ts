@@ -25,5 +25,9 @@ export type Itinerary = {
   startDate: string;
   /** YYYY-MM-DD */
   endDate: string;
+  /** 하루 일정 시작 시각 "HH:mm". 방문 시간은 이 범위 안에서만 바꿀 수 있음 */
+  dayStartTime: string;
+  /** 하루 일정 종료 시각 "HH:mm" */
+  dayEndTime: string;
   days: ItineraryDay[];
 };

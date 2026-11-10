@@ -10,6 +10,8 @@ type GroupMembersResponse = {
   members: {
     user_id: number;
     user_name: string;
+    /** 구글 프로필 사진. 배포 후 다시 로그인하기 전까지는 null */
+    profile_image_url: string | null;
     is_owner: boolean;
     // preferences_completed도 내려오지만 누가 설문을 마쳤는지 드러나지 않도록 쓰지 않음
     joined_at: string;
@@ -24,7 +26,7 @@ export async function fetchGroupMembers(groupId: number): Promise<Member[]> {
     data.members.map((member) => ({
       id: member.user_id,
       nickname: member.user_name,
-      avatarUrl: null,
+      avatarUrl: member.profile_image_url,
       isLeader: member.is_owner,
     })),
   );

@@ -28,6 +28,7 @@ export type GroupDetailResponse = {
   status: TripStatus | null;
   mode: TripMode | null;
   preferences_completed: number;
+  my_preferences_completed: boolean;
   travel_start_date: string | null;
   travel_end_date: string | null;
 };

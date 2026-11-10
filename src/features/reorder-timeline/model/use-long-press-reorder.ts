@@ -7,16 +7,20 @@ const MOVE_CANCEL_PX = 8;
 
 type UseLongPressReorderOptions = {
   onMove: (from: number, to: number) => void;
+  /** 꾹 누르거나 끌지 않고 짧게 눌렀을 때 (키보드 Enter·Space 포함) */
+  onTap?: (index: number) => void;
 };
 
 /**
  * 항목을 꾹 누르면 집어 들고, 손가락이 지나가는 항목 위치로 옮김.
  * getItemProps가 항목 요소에 data-reorder-index를 달아 위치를 찾음
  */
-export function useLongPressReorder({ onMove }: UseLongPressReorderOptions) {
+export function useLongPressReorder({ onMove, onTap }: UseLongPressReorderOptions) {
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pressStart = useRef<{ x: number; y: number } | null>(null);
+  /** 이번 누름이 꾹 누르기나 끌기(스크롤)였으면 뒤따르는 click을 탭으로 보지 않음 */
+  const suppressClick = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -48,10 +52,12 @@ export function useLongPressReorder({ onMove }: UseLongPressReorderOptions) {
   function getItemProps(index: number) {
     function handlePointerDown(event: PointerEvent<HTMLElement>) {
       pressStart.current = { x: event.clientX, y: event.clientY };
+      suppressClick.current = false;
       const target = event.currentTarget;
       const pointerId = event.pointerId;
       clearTimer();
       timer.current = setTimeout(() => {
+        suppressClick.current = true;
         target.setPointerCapture(pointerId);
         setDraggingIndex(index);
       }, LONG_PRESS_MS);
@@ -65,6 +71,7 @@ export function useLongPressReorder({ onMove }: UseLongPressReorderOptions) {
           Math.hypot(event.clientX - start.x, event.clientY - start.y) > MOVE_CANCEL_PX
         ) {
           clearTimer();
+          suppressClick.current = true;
         }
         return;
       }
@@ -85,8 +92,17 @@ export function useLongPressReorder({ onMove }: UseLongPressReorderOptions) {
       setDraggingIndex(null);
     }
 
+    function handleClick() {
+      if (suppressClick.current) {
+        suppressClick.current = false;
+        return;
+      }
+      onTap?.(index);
+    }
+
     return {
       "data-reorder-index": index,
+      onClick: handleClick,
       onPointerDown: handlePointerDown,
       onPointerMove: handlePointerMove,
       onPointerUp: handlePointerEnd,
