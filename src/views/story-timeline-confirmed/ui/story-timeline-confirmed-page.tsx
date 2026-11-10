@@ -84,7 +84,7 @@ function ConfirmedContent({ group, itineraryId }: { group: Group; itineraryId: n
       onSelectedDayIndexChange={setSelectedDayIndex}
     >
       {isMissing ? (
-        <TimelineMissing groupId={group.id} />
+        <TimelineMissing groupId={group.id} canSelectPlaces={group.status !== "IN_PROGRESS"} />
       ) : isError || !itinerary ? (
         <ErrorState onRetry={handleRetry} />
       ) : (

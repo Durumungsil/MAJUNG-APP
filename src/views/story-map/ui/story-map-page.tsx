@@ -61,7 +61,7 @@ function StoryMapContent({ group, itineraryId }: { group: Group; itineraryId: nu
     <main className="flex flex-1 flex-col pb-[calc(var(--safe-bottom)+--spacing(11))]">
       {isMissing ? (
         <div className="px-page">
-          <TimelineMissing groupId={group.id} />
+          <TimelineMissing groupId={group.id} canSelectPlaces={group.status !== "IN_PROGRESS"} />
         </div>
       ) : isError || !itinerary ? (
         <ErrorState onRetry={handleRetry} />
