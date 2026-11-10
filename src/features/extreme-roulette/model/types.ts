@@ -9,3 +9,6 @@ export type RouletteResult = {
   kind: RouletteKind;
   place: Place;
 };
+
+/** 종류별로 확정한 룰렛 결과. 아직 확정하지 않았으면 null */
+export type ConfirmedRoulettes = Record<RouletteKind, RouletteResult | null>;

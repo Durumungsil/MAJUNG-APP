@@ -2,7 +2,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isApiError, PERSISTED_QUERY_OPTIONS } from "@/shared/api";
 import type { RouletteKind } from "../model/types";
 import { rouletteKeys } from "./query-keys";
-import { drawRoulette, fetchGroupAllergies, fetchRouletteResult } from "./roulette-api";
+import {
+  confirmRoulette,
+  drawRoulette,
+  fetchConfirmedRoulettes,
+  fetchGroupAllergies,
+  fetchRouletteResult,
+} from "./roulette-api";
 
 /** 룰렛 추첨. 결과는 상세·길 안내 화면에서 바로 쓰도록 조회 캐시에 넣어 둠 */
 export function useDrawRoulette(groupId: number, kind: RouletteKind) {
@@ -15,7 +21,7 @@ export function useDrawRoulette(groupId: number, kind: RouletteKind) {
 }
 
 /**
- * 룰렛 결과 (상세·길 안내 화면, 메인의 확정 카드). rouletteId가 없으면(null) 요청하지 않음.
+ * 룰렛 결과 (상세·길 안내 화면). rouletteId가 없으면(null) 요청하지 않음.
  * 추첨 결과라 다시 만들 수 없으므로 새로고침 뒤에도 남김
  */
 export function useRouletteResult(groupId: number, rouletteId: number | null) {
@@ -24,6 +30,31 @@ export function useRouletteResult(groupId: number, rouletteId: number | null) {
     queryFn: () => fetchRouletteResult(groupId, rouletteId ?? 0),
     enabled: rouletteId !== null,
     ...PERSISTED_QUERY_OPTIONS,
+  });
+}
+
+/** 종류별 확정 결과 (익스트림 메인 카드) */
+export function useConfirmedRoulettes(
+  groupId: number,
+  /** 대표자의 확정을 따라가야 하는 멤버만 주기적으로 다시 조회함 */
+  refetchInterval?: number,
+) {
+  return useQuery({
+    queryKey: rouletteKeys.confirmed(groupId),
+    queryFn: () => fetchConfirmedRoulettes(groupId),
+    refetchInterval,
+  });
+}
+
+/** 룰렛 결과 확정. 메인 카드가 새 확정을 보여주도록 확정 결과를 다시 받음 */
+export function useConfirmRoulette(groupId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (rouletteId: number) => confirmRoulette(groupId, rouletteId),
+    onSuccess: (result) => {
+      queryClient.setQueryData(rouletteKeys.result(groupId, result.id), result);
+      return queryClient.invalidateQueries({ queryKey: rouletteKeys.confirmed(groupId) });
+    },
   });
 }
 

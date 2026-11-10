@@ -2,8 +2,9 @@ import type { Place } from "@/entities/place";
 import { apiRequest } from "@/shared/api";
 import { toLatLng } from "@/shared/lib";
 import { ROULETTE_DRAW_PATH, ROULETTE_KIND_BY_TYPE } from "../config/roulette-kinds";
-import type { RouletteKind, RouletteResult } from "../model/types";
+import type { ConfirmedRoulettes, RouletteKind, RouletteResult } from "../model/types";
 import type {
+  CurrentRouletteResponse,
   DrawRouletteResponse,
   MinimumConstraintsResponse,
   RoulettePlaceDto,
@@ -49,6 +50,29 @@ export async function fetchRouletteResult(
     `/api/v2/groups/${groupId}/roulette/${rouletteId}`,
   );
   return toRouletteResult(data);
+}
+
+/** 룰렛 결과 확정 - 대표자가 고른 결과를 서버에 남겨 다른 멤버도 같은 카드를 봄 */
+export async function confirmRoulette(
+  groupId: number,
+  rouletteId: number,
+): Promise<RouletteResult> {
+  const data = await apiRequest<RouletteResultResponse>(
+    `/api/v2/groups/${groupId}/roulette/${rouletteId}/confirm`,
+    { method: "PUT" },
+  );
+  return toRouletteResult(data);
+}
+
+/** 현재 회차의 종류별 최신 확정 결과 */
+export async function fetchConfirmedRoulettes(groupId: number): Promise<ConfirmedRoulettes> {
+  const data = await apiRequest<CurrentRouletteResponse>(
+    `/api/v2/groups/${groupId}/roulette/current`,
+  );
+  return {
+    place: data.destination && toRouletteResult(data.destination),
+    food: data.restaurant && toRouletteResult(data.restaurant),
+  };
 }
 
 /** 최소 조건 로드 - 그룹 멤버 알레르기 합집합만 꺼냄 (누가 냈는지·몇 명인지는 쓰지 않음) */

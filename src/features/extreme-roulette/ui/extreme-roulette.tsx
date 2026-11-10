@@ -6,6 +6,8 @@ import { useToast } from "@/shared/lib";
 import { Button, Toast } from "@/shared/ui";
 import { useDrawRoulette } from "../api/queries";
 import { ROULETTE_KIND_COPY } from "../config/roulette-kinds";
+import { SPIN_BLOCK_MESSAGE } from "../config/spin";
+import type { SpinBlock } from "../lib/spin-block";
 import type { RouletteKind, RouletteResult } from "../model/types";
 import { useRouletteSpin } from "../model/use-roulette-spin";
 import RouletteResultModal from "./roulette-result-modal";
@@ -14,8 +16,11 @@ import RouletteWheel from "./roulette-wheel";
 type ExtremeRouletteProps = {
   groupId: number;
   kind: RouletteKind;
-  /** 룰렛은 대표자만 돌림 (멤버끼리 결과가 갈리지 않게). false면 돌리기 버튼을 숨김 */
-  canSpin: boolean;
+  /**
+   * 룰렛은 대표자만 돌림 (멤버끼리 결과가 갈리지 않게). 돌릴 수 없으면 그 이유이고,
+   * 이때는 돌리기 버튼 대신 안내 문구를 보여줌
+   */
+  spinBlock: SpinBlock | null;
   /** 결과 장소의 상세 화면 경로 */
   getDetailHref: (result: RouletteResult) => string;
 };
@@ -24,9 +29,10 @@ type ExtremeRouletteProps = {
 export default function ExtremeRoulette({
   groupId,
   kind,
-  canSpin,
+  spinBlock,
   getDetailHref,
 }: ExtremeRouletteProps) {
+  const canSpin = spinBlock === null;
   const copy = ROULETTE_KIND_COPY[kind];
   const { mutateAsync: draw } = useDrawRoulette(groupId, kind);
   const { toastMessage, showToast } = useToast();
@@ -62,7 +68,7 @@ export default function ExtremeRoulette({
           disabled={!canSpin}
         />
       </div>
-      {canSpin && (
+      {canSpin ? (
         <Button
           size="xl-compact"
           onClick={handleSpinClick}
@@ -71,6 +77,10 @@ export default function ExtremeRoulette({
         >
           {copy.spinLabel}
         </Button>
+      ) : (
+        spinBlock !== "loading" && (
+          <p className="text-center text-m text-text-muted">{SPIN_BLOCK_MESSAGE[spinBlock]}</p>
+        )
       )}
       <RouletteResultModal
         place={result?.place ?? null}

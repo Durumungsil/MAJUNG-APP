@@ -20,3 +20,4 @@ export { default as MapPinIcon } from "./icons/map-pin-icon";
 export { default as RecommendPinIcon } from "./icons/recommend-pin-icon";
 export { default as RoulettePointerIcon } from "./icons/roulette-pointer-icon";
 export { default as RouletteWheelImage } from "./images/roulette-wheel-image";
+export { default as MajungCharacterImage } from "./images/majung-character-image";

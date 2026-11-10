@@ -79,6 +79,8 @@ export type PlaceReview = {
 
 /** 상세 시트에 보여주는 Google 장소 정보 (한 번의 요청으로 받음) */
 export type PlaceDetailInfo = PlaceDetails & {
+  /** Google 대표 업종의 한국어 이름 (예: "돈가스 전문점"). 세부 업종 없이 "음식점"만 오기도 함 */
+  primaryTypeName: string | null;
   address: string | null;
   rating: number | null;
   openingHours: PlaceOpeningHours | null;

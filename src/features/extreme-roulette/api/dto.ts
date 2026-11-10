@@ -24,13 +24,23 @@ export type DrawRouletteResponse = {
   drawn_at: string;
 };
 
-/** GET /roulette/{rouletteId} 응답 */
+/** GET /roulette/{rouletteId}, PUT /roulette/{rouletteId}/confirm 응답 */
 export type RouletteResultResponse = {
   roulette_id: number;
   group_id: number;
   type: RouletteType;
   place: RoulettePlaceDto;
   drawn_at: string;
+  /** 확정하지 않은 결과면 null */
+  confirmed_at: string | null;
+};
+
+/** GET /roulette/current 응답. 종류별 최신 확정 결과이며 확정하지 않은 종류는 null */
+export type CurrentRouletteResponse = {
+  group_id: number;
+  trip_id: number;
+  destination: RouletteResultResponse | null;
+  restaurant: RouletteResultResponse | null;
 };
 
 /** GET /constraints/minimum 응답. 멤버 수(source_member_count)는 익명성 때문에 화면에서 쓰지 않음 */

@@ -46,14 +46,7 @@ export async function createAdventureProcess(
   };
 }
 
-/** 진행도 조회 */
-export async function fetchAdventureProcess(
-  groupId: number,
-  processId: number,
-): Promise<AdventureProcess> {
-  const data = await apiRequest<AdventureProcessResponse>(
-    `/api/v1/groups/${groupId}/adventure/process/${processId}`,
-  );
+function toAdventureProcess(data: AdventureProcessResponse): AdventureProcess {
   return {
     id: data.process_id,
     status: data.status,
@@ -67,6 +60,24 @@ export async function fetchAdventureProcess(
       completedAt: mission.completed_at ?? null,
     })),
   };
+}
+
+/**
+ * 오늘 커리큘럼 진행도 - 멤버 누구나 조회할 수 있고, 미션을 모두 끝낸 뒤에도 돌려줌.
+ * 오늘 만든 커리큘럼이 없거나 진행 중인 여행 회차가 없으면(404) null
+ */
+export async function fetchTodayAdventureProcess(
+  groupId: number,
+): Promise<AdventureProcess | null> {
+  try {
+    const data = await apiRequest<AdventureProcessResponse>(
+      `/api/v1/groups/${groupId}/adventure/process/today`,
+    );
+    return toAdventureProcess(data);
+  } catch (error) {
+    if (isApiError(error, 404)) return null;
+    throw error;
+  }
 }
 
 function toCurrentMission(data: CurrentMissionResponse): CurrentMission {

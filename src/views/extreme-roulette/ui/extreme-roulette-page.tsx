@@ -3,7 +3,12 @@
 import { notFound } from "next/navigation";
 import { getGroupRole, parseGroupId, useGroup } from "@/entities/group";
 import { useSessionStore } from "@/entities/session";
-import { ExtremeRoulette, isRouletteKind, type RouletteResult } from "@/features/extreme-roulette";
+import {
+  ExtremeRoulette,
+  getSpinBlock,
+  isRouletteKind,
+  type RouletteResult,
+} from "@/features/extreme-roulette";
 import { ModeTitle, Screen } from "@/shared/ui";
 
 type ExtremeRoulettePageProps = {
@@ -21,6 +26,7 @@ export default function ExtremeRoulettePage({
   const userId = useSessionStore((state) => state.session?.userId ?? null);
   // 룰렛 돌리기·확정은 대표자만 함. 그룹을 불러오기 전에는 버튼을 보여주지 않음
   const isLeader = group !== undefined && getGroupRole(group, userId) === "leader";
+  const spinBlock = getSpinBlock(group, isLeader);
 
   function getDetailHref(result: RouletteResult) {
     return `/groups/${groupId}/extreme/roulette/${kind}/${result.id}`;
@@ -33,7 +39,7 @@ export default function ExtremeRoulettePage({
         <ExtremeRoulette
           groupId={groupId}
           kind={kind}
-          canSpin={isLeader}
+          spinBlock={spinBlock}
           getDetailHref={getDetailHref}
         />
       </div>

@@ -6,7 +6,7 @@ import { CURRENT_MISSION_POLLING_MS, useCurrentMission } from "@/entities/advent
 import { getGroupRole, useGroupByParam } from "@/entities/group";
 import { useSessionStore } from "@/entities/session";
 import { StartAdventureButton } from "@/features/start-adventure";
-import { ErrorState, ModeTitle, Screen, Skeleton } from "@/shared/ui";
+import { CloseHeader, ErrorState, ModeTitle, Screen, Skeleton } from "@/shared/ui";
 
 type AdventureStartPageProps = {
   groupId: string;
@@ -16,6 +16,9 @@ export default function AdventureStartPage({ groupId }: AdventureStartPageProps)
   const { data: group, isPending, isError, refetch } = useGroupByParam(groupId);
   const userId = useSessionStore((state) => state.session?.userId ?? null);
 
+  // 모드 시작 전에는 그룹 상세로 나갈 수 있음
+  const closeHref = `/groups/${groupId}`;
+
   function handleRetry() {
     void refetch();
   }
@@ -23,6 +26,7 @@ export default function AdventureStartPage({ groupId }: AdventureStartPageProps)
   if (isPending) {
     return (
       <Screen>
+        <CloseHeader closeHref={closeHref} />
         <Skeleton className="mt-5 h-40" />
       </Screen>
     );
@@ -30,6 +34,7 @@ export default function AdventureStartPage({ groupId }: AdventureStartPageProps)
   if (isError) {
     return (
       <Screen>
+        <CloseHeader closeHref={closeHref} />
         <ErrorState onRetry={handleRetry} />
       </Screen>
     );
@@ -37,7 +42,11 @@ export default function AdventureStartPage({ groupId }: AdventureStartPageProps)
 
   return (
     <Screen className="items-center">
-      <ModeTitle size="lg" className="mt-59.25">
+      {/* 헤더 높이(아이콘 size-4)만큼 제목 위 여백을 줄여 기존 위치를 유지함 */}
+      <div className="self-stretch">
+        <CloseHeader closeHref={closeHref} />
+      </div>
+      <ModeTitle size="lg" className="mt-55.25">
         ADVENTURE
         <br />
         MODE
@@ -62,5 +71,9 @@ function FollowLeaderStart({ groupId }: { groupId: number }) {
     if (hasMission) router.replace(`/groups/${groupId}/adventure/map`);
   }, [hasMission, groupId, router]);
 
-  return null;
+  return (
+    <p className="mt-41.75 text-center text-m text-text-muted">
+      대표자가 모험을 시작하면 자동으로 이동해요
+    </p>
+  );
 }
