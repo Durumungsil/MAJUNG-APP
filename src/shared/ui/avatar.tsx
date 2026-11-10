@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 import { cn } from "@/shared/lib";
 
 type AvatarSize = "sm" | "md";
@@ -17,9 +20,15 @@ type AvatarProps = {
 };
 
 export default function Avatar({ src, alt, size = "sm", className }: AvatarProps) {
+  // 불러오지 못한 주소를 기억해 두고 빈 원으로 바꿈. 주소가 바뀌면 다시 시도함
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const classes = cn("shrink-0 rounded-full object-cover", SIZE[size].className, className);
 
-  if (!src) {
+  function handleImageError() {
+    setFailedSrc(src);
+  }
+
+  if (!src || failedSrc === src) {
     return (
       <span
         role={alt ? "img" : undefined}
@@ -30,6 +39,15 @@ export default function Avatar({ src, alt, size = "sm", className }: AvatarProps
   }
 
   return (
-    <Image src={src} alt={alt} width={SIZE[size].px} height={SIZE[size].px} className={classes} />
+    <Image
+      src={src}
+      alt={alt}
+      width={SIZE[size].px}
+      height={SIZE[size].px}
+      // 구글 프로필 사진 서버는 referrer가 붙으면 403을 주는 경우가 있음
+      referrerPolicy="no-referrer"
+      onError={handleImageError}
+      className={classes}
+    />
   );
 }
