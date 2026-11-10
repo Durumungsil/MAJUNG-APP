@@ -5,6 +5,23 @@ export function isTripPeriodOver(endDate: string | null, today: string): boolean
   return endDate !== null && endDate < today;
 }
 
+/**
+ * 대표자가 그룹 상세 메뉴에서 여행을 끝낼 수 있는지.
+ * 모드를 고르지 않은 여행은 서버가 끝내주지 않으므로(409) 메뉴를 보여주지 않음
+ */
+export function canEndTrip(
+  group: Pick<Group, "tripId" | "status" | "mode">,
+  isLeader: boolean,
+): boolean {
+  return (
+    isLeader &&
+    group.tripId !== null &&
+    group.status !== null &&
+    group.status !== "COMPLETED" &&
+    group.mode !== null
+  );
+}
+
 type AutoEndTripInput = {
   group: Pick<Group, "tripId" | "status" | "mode" | "endDate">;
   isLeader: boolean;

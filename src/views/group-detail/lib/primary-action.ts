@@ -6,8 +6,7 @@ export type PrimaryAction = { label: string; href: string };
 type PrimaryActionInput = {
   group: Pick<Group, "id" | "tripId" | "status" | "mode" | "endDate">;
   isLeader: boolean;
-  /** 아직 모르면 undefined (그룹 목록을 불러오는 중) */
-  myPreferencesCompleted: boolean | undefined;
+  myPreferencesCompleted: boolean;
   /** 오늘 날짜(Asia/Seoul) YYYY-MM-DD */
   today: string;
 };
@@ -31,18 +30,20 @@ export function getPrimaryAction({
   const canContinue = !isTripPeriodOver(group.endDate, today);
 
   if (group.status === "IN_PROGRESS") {
-    return canContinue ? { label: "이어서 하기", href: getModeStartHref(group) } : null;
+    // 스토리모드는 타임라인을 확정하면 IN_PROGRESS가 되므로 확정된 타임라인으로 바로 감
+    const href =
+      group.mode === "STORY"
+        ? `/groups/${group.id}/story/timeline/confirmed`
+        : getModeStartHref(group);
+    return canContinue ? { label: "이어서 하기", href } : null;
   }
 
   // PLANNING: 모드 선택 → 취향 설문 → 모드 시작 순서
   if (group.mode === null) {
     return isLeader ? { label: "여행 시작하기", href: `/groups/${group.id}/mode` } : null;
   }
-  if (myPreferencesCompleted === false) {
+  if (!myPreferencesCompleted) {
     return { label: "취향 설문 작성하기", href: `/groups/${group.id}/survey` };
   }
-  if (myPreferencesCompleted === true) {
-    return canContinue ? { label: "이어서 하기", href: getModeStartHref(group) } : null;
-  }
-  return null;
+  return canContinue ? { label: "이어서 하기", href: getModeStartHref(group) } : null;
 }

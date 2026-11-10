@@ -3,6 +3,7 @@
 import { useGroupByParam } from "@/entities/group";
 import { ModeSelectForm } from "@/features/select-mode";
 import { CloseHeader, ErrorState, Screen, Skeleton } from "@/shared/ui";
+import { getAfterModeHref } from "../lib/after-mode-href";
 
 type ModeSelectPageProps = {
   groupId: string;
@@ -39,7 +40,10 @@ export default function ModeSelectPage({ groupId }: ModeSelectPageProps) {
         )}
       </div>
       {!isPending && (
-        <ModeSelectForm groupId={group.id} confirmHref={`/groups/${group.id}/survey`} />
+        <ModeSelectForm
+          groupId={group.id}
+          confirmHref={getAfterModeHref(group.id, group.myPreferencesCompleted)}
+        />
       )}
     </Screen>
   );

@@ -9,7 +9,6 @@ import {
   useGroupByParam,
   useGroupTrips,
   useInviteCode,
-  useMyGroups,
   type Group,
 } from "@/entities/group";
 import { useSessionStore } from "@/entities/session";
@@ -18,6 +17,7 @@ import { getTodayInSeoul } from "@/shared/lib";
 import { Button, CopyButton, ErrorState, InfoRow, Screen, Skeleton, TextLink } from "@/shared/ui";
 import { getGroupPollInterval } from "../lib/poll-interval";
 import { getPrimaryAction } from "../lib/primary-action";
+import { canEndTrip } from "../lib/trip-period";
 import { useAutoEndTrip } from "../model/use-auto-end-trip";
 import GroupDetailHeader from "./group-detail-header";
 
@@ -65,24 +65,19 @@ function GroupDetailContent({ group }: { group: Group }) {
   const { data: members } = useGroupMembers(group.id);
   const { data: trips } = useGroupTrips(group.id);
   const { data: inviteCode } = useInviteCode(group.id, isLeader);
-  // 상세 응답에는 내 설문 여부가 없어서 그룹 목록(대부분 캐시에 있음)에서 가져옴
-  const { data: myGroups } = useMyGroups();
-  const myPreferencesCompleted = myGroups?.find(
-    (item) => item.id === group.id,
-  )?.myPreferencesCompleted;
 
   const leaderName = members ? findLeaderName(members) : null;
   const inviteExpiresAt = inviteCode?.expiresAt ? formatExpiresAt(inviteCode.expiresAt) : null;
   const primaryAction = getPrimaryAction({
     group,
     isLeader,
-    myPreferencesCompleted,
+    myPreferencesCompleted: group.myPreferencesCompleted,
     today: getTodayInSeoul(),
   });
 
   return (
     <Screen>
-      <GroupDetailHeader groupId={group.id} role={role} />
+      <GroupDetailHeader groupId={group.id} role={role} canEndTrip={canEndTrip(group, isLeader)} />
       <div className="mt-8 flex flex-col gap-10">
         <GroupTitleBar group={group} />
         <dl className="flex flex-col gap-6">

@@ -52,6 +52,7 @@ export async function fetchGroup(groupId: number): Promise<Group> {
     status: data.status,
     mode: data.mode,
     preferencesCompletedCount: data.preferences_completed,
+    myPreferencesCompleted: data.my_preferences_completed,
     startDate: data.travel_start_date,
     endDate: data.travel_end_date,
   };

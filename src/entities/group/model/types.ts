@@ -34,6 +34,8 @@ export type Group = {
   mode: TripMode | null;
   /** 취향 입력을 마친 멤버 수 (누가 했는지는 알 수 없음) */
   preferencesCompletedCount: number;
+  /** 내가 현재 여행 회차의 취향 설문을 냈는지 */
+  myPreferencesCompleted: boolean;
   /** YYYY-MM-DD */
   startDate: string | null;
   /** YYYY-MM-DD */
