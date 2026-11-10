@@ -21,6 +21,19 @@ export function addPlaceToDate(
   return next;
 }
 
+/** date에서 장소를 뺌. 그날 고른 장소가 하나도 남지 않으면 날짜도 지움 */
+export function removePlaceFromDate(
+  selection: DaySelection,
+  date: string,
+  placeId: string,
+): DaySelection {
+  const next: Record<string, readonly SelectionStop[]> = { ...selection };
+  const rest = (selection[date] ?? []).filter((stop) => stop.placeId !== placeId);
+  if (rest.length > 0) next[date] = rest;
+  else delete next[date];
+  return next;
+}
+
 export function getSelectedCount(selection: DaySelection): number {
   return Object.values(selection).reduce((count, stops) => count + stops.length, 0);
 }
