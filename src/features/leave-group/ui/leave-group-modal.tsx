@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { isApiError } from "@/shared/api";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
-import { useToast } from "@/shared/lib";
+import { usePrefetchRoute, useToast } from "@/shared/lib";
 import { Button, Modal, Toast } from "@/shared/ui";
 import { useLeaveGroup } from "../api/leave-group";
 
@@ -22,6 +22,7 @@ export default function LeaveGroupModal({
   onClose,
 }: LeaveGroupModalProps) {
   const router = useRouter();
+  usePrefetchRoute("/groups");
   const { mutate: leaveGroup, isPending } = useLeaveGroup(groupId);
   const { toastMessage, showToast } = useToast();
 

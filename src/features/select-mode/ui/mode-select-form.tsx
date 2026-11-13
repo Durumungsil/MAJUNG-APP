@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, type CSSProperties } from "react";
 import { isApiError } from "@/shared/api";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
-import { cn, useToast } from "@/shared/lib";
+import { cn, usePrefetchRoute, useToast } from "@/shared/lib";
 import { Button, Toast } from "@/shared/ui";
 import { useSelectMode } from "../api/select-mode";
 import { DEFAULT_MODE_INDEX, TRAVEL_MODES } from "../config/modes";
@@ -23,6 +23,7 @@ type ModeSelectFormProps = {
 
 export default function ModeSelectForm({ groupId, confirmHref }: ModeSelectFormProps) {
   const router = useRouter();
+  usePrefetchRoute(confirmHref);
   const [position, setPosition] = useState(DEFAULT_MODE_INDEX);
   const { mutate: selectMode, isPending } = useSelectMode(groupId);
   const { toastMessage, showToast } = useToast();

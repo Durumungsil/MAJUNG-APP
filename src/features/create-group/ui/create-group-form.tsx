@@ -3,13 +3,14 @@
 import { useRouter } from "next/navigation";
 import { GroupForm, toGroupPayload, type GroupFormValues } from "@/entities/group";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
-import { useToast } from "@/shared/lib";
+import { usePrefetchRoute, useToast } from "@/shared/lib";
 import { Toast } from "@/shared/ui";
 import { useCreateGroup } from "../api/create-group";
 import { useCreatedGroupStore } from "../model/created-group-store";
 
 export default function CreateGroupForm() {
   const router = useRouter();
+  usePrefetchRoute("/groups");
   const setInviteCode = useCreatedGroupStore((state) => state.setInviteCode);
   const { mutate: createGroup, isPending } = useCreateGroup();
   const { toastMessage, showToast } = useToast();

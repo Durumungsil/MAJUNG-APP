@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useId, useState, type ChangeEvent, type FormEvent } from "react";
 import { isApiError } from "@/shared/api";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
-import { useToast } from "@/shared/lib";
+import { usePrefetchRoute, useToast } from "@/shared/lib";
 import { Button, FormRow, TextField, Toast } from "@/shared/ui";
 import { useStartTrip } from "../api/start-trip";
 
@@ -25,6 +25,7 @@ function getStartTripErrorMessage(error: unknown): string {
 export default function StartTripForm({ groupId, defaultRegion }: StartTripFormProps) {
   const id = useId();
   const router = useRouter();
+  usePrefetchRoute(`/groups/${groupId}/mode`);
   // 종료일 선택기가 시작일 이전 날짜를 고를 수 없도록 min으로 씀
   const [startDate, setStartDate] = useState("");
   const { mutate: startTrip, isPending } = useStartTrip(groupId);

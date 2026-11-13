@@ -14,10 +14,9 @@ import { PlaceName } from "@/entities/place";
 import { useSessionStore } from "@/entities/session";
 import { useEndModeExit } from "@/features/end-mode";
 import { isApiError } from "@/shared/api";
-import { ErrorState, Screen, Skeleton, TextLink, Toast } from "@/shared/ui";
+import { ErrorState, Screen, TextLink, Toast } from "@/shared/ui";
 import { StoryLayout, TimelineMissing } from "@/widgets/story-layout";
-
-const SKELETON_CARD_COUNT = 4;
+import ConfirmedSkeleton from "./story-timeline-confirmed-skeleton";
 
 type StoryTimelineConfirmedPageProps = {
   groupId: string;
@@ -110,18 +109,5 @@ function ConfirmedContent({ group, itineraryId }: { group: Group; itineraryId: n
       )}
       <Toast open={toastMessage !== null} message={toastMessage ?? ""} />
     </StoryLayout>
-  );
-}
-
-function ConfirmedSkeleton() {
-  return (
-    <Screen>
-      <div className="mt-5 flex flex-col gap-5">
-        <Skeleton className="h-8 w-1/2" />
-        {Array.from({ length: SKELETON_CARD_COUNT }, (_, index) => (
-          <Skeleton key={index} className="h-15" />
-        ))}
-      </div>
-    </Screen>
   );
 }

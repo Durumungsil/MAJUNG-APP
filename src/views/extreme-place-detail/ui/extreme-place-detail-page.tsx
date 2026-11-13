@@ -11,7 +11,9 @@ import {
   useRouletteResult,
 } from "@/features/extreme-roulette";
 import { isApiError } from "@/shared/api";
-import { ErrorState, Screen, Skeleton, Toast } from "@/shared/ui";
+import { ErrorState, Screen, Toast } from "@/shared/ui";
+import ExtremePlaceDetailSkeleton from "./extreme-place-detail-skeleton";
+import { usePrefetchRoute } from "@/shared/lib";
 
 type ExtremePlaceDetailPageProps = {
   groupId: string;
@@ -42,12 +44,17 @@ export default function ExtremePlaceDetailPage({
   } = useRouletteResult(groupId, rouletteId);
   const { isConflict, toastMessage } = useExtremeConflictRedirect(error, groupId);
 
+  const navigateHref = `/groups/${groupId}/extreme/navigate/${rouletteId}`;
+  const rouletteHref = `/groups/${groupId}/extreme/roulette/${kind}`;
+  usePrefetchRoute(navigateHref);
+  usePrefetchRoute(rouletteHref);
+
   function handleConfirmed() {
-    router.push(`/groups/${groupId}/extreme/navigate/${rouletteId}`);
+    router.push(navigateHref);
   }
 
   function handleClose() {
-    router.push(`/groups/${groupId}/extreme/roulette/${kind}`);
+    router.push(rouletteHref);
   }
 
   function handleRetry() {
@@ -56,17 +63,7 @@ export default function ExtremePlaceDetailPage({
 
   if (isApiError(error, 404)) notFound();
   if (isConflict) return <Toast open={toastMessage !== null} message={toastMessage ?? ""} />;
-  if (isPending) {
-    return (
-      <main className="flex h-dvh flex-col overflow-hidden">
-        <Skeleton className="min-h-0 w-full flex-1 rounded-none" />
-        <div className="flex flex-col gap-3 px-8 pt-6 pb-[calc(var(--safe-bottom)+--spacing(11))]">
-          <Skeleton className="h-9 w-2/3" />
-          <Skeleton className="h-5 w-full" />
-        </div>
-      </main>
-    );
-  }
+  if (isPending) return <ExtremePlaceDetailSkeleton />;
   if (isError) {
     return (
       <Screen>

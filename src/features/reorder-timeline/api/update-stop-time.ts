@@ -69,7 +69,9 @@ export function useSaveTimelineTimes(groupId: number, itineraryId: number) {
         syncStopTime(await updateStopTime(groupId, itineraryId, id, slot));
       }
     },
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: journeyKeys.itinerary(groupId, itineraryId) }),
+    // 저장한 시간은 이미 캐시에 반영했으므로 다시 받기를 기다리지 않고 다음 단계(선택 저장·확정)로 넘어감
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: journeyKeys.itinerary(groupId, itineraryId) });
+    },
   });
 }

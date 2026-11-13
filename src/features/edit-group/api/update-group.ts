@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { groupKeys, type GroupPayload } from "@/entities/group";
+import { groupKeys, patchGroupDetail, type GroupPayload } from "@/entities/group";
 import { apiRequest } from "@/shared/api";
 
 /** 그룹 설정 수정 (PATCH) - 그룹명·인원은 그룹에, 지역·기간은 진행 중인 여행 회차에 반영됨 */
@@ -20,6 +20,16 @@ export function useUpdateGroup(groupId: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: GroupPayload) => updateGroup(groupId, payload),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: groupKeys.all }),
+    // 고친 값을 캐시에 바로 넣고, 다시 받기는 기다리지 않아 그룹 상세로 바로 돌아감
+    onSuccess: (_, payload) => {
+      patchGroupDetail(queryClient, groupId, {
+        name: payload.groupName,
+        region: payload.region,
+        maxMembers: payload.maxMembers,
+        startDate: payload.startDate,
+        endDate: payload.endDate,
+      });
+      void queryClient.invalidateQueries({ queryKey: groupKeys.all });
+    },
   });
 }

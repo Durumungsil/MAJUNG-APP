@@ -1,7 +1,8 @@
 "use client";
 
 import { useGroupByParam } from "@/entities/group";
-import { Button, CloseHeader, ErrorState, ModeTitle, Screen, Skeleton } from "@/shared/ui";
+import { Button, CloseHeader, ErrorState, ModeTitle, Screen } from "@/shared/ui";
+import StoryStartSkeleton from "./story-start-skeleton";
 
 type StoryStartPageProps = {
   groupId: string;
@@ -17,14 +18,7 @@ export default function StoryStartPage({ groupId }: StoryStartPageProps) {
     void refetch();
   }
 
-  if (isPending) {
-    return (
-      <Screen>
-        <CloseHeader closeHref={closeHref} />
-        <Skeleton className="mt-5 h-40" />
-      </Screen>
-    );
-  }
+  if (isPending) return <StoryStartSkeleton groupId={groupId} />;
   if (isError) {
     return (
       <Screen>

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { groupKeys } from "@/entities/group";
+import { groupKeys, patchGroupDetail } from "@/entities/group";
 import { fetchMyPreference, preferenceKeys } from "@/entities/preference";
 import { apiRequest } from "@/shared/api";
 import type { PreferencePayload } from "../lib/preference-payload";
@@ -22,11 +22,19 @@ export function useSavePreference(groupId: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: PreferencePayload) => savePreference(groupId, payload),
-    onSuccess: () =>
-      Promise.all([
-        queryClient.invalidateQueries({ queryKey: preferenceKeys.summary(groupId) }),
-        queryClient.invalidateQueries({ queryKey: groupKeys.all }),
-      ]),
+    // 제출 완료를 캐시에 바로 넣고, 다시 받기는 기다리지 않아 대기 화면으로 바로 넘어감
+    onSuccess: () => {
+      patchGroupDetail(queryClient, groupId, (group) =>
+        group.myPreferencesCompleted
+          ? {}
+          : {
+              myPreferencesCompleted: true,
+              preferencesCompletedCount: group.preferencesCompletedCount + 1,
+            },
+      );
+      void queryClient.invalidateQueries({ queryKey: preferenceKeys.summary(groupId) });
+      void queryClient.invalidateQueries({ queryKey: groupKeys.all });
+    },
   });
 }
 

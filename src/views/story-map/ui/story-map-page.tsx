@@ -12,8 +12,9 @@ import {
 } from "@/entities/journey";
 import { MapExplorer } from "@/features/explore-map";
 import { isApiError } from "@/shared/api";
-import { ErrorState, Screen, Skeleton, TextLink } from "@/shared/ui";
+import { ErrorState, Screen, TextLink } from "@/shared/ui";
 import { TimelineMissing } from "@/widgets/story-layout";
+import StoryMapSkeleton from "./story-map-skeleton";
 
 type StoryMapPageProps = {
   groupId: string;
@@ -91,18 +92,6 @@ function StoryMapContent({ group, itineraryId }: { group: Group; itineraryId: nu
           </div>
         </>
       )}
-    </main>
-  );
-}
-
-function StoryMapSkeleton() {
-  return (
-    <main className="flex flex-1 flex-col">
-      <Skeleton className="aspect-[402/674] w-full rounded-none" />
-      <div className="mt-8 flex flex-col gap-5 px-page">
-        <Skeleton className="h-8 w-1/2" />
-        <Skeleton className="h-6 w-2/3" />
-      </div>
     </main>
   );
 }

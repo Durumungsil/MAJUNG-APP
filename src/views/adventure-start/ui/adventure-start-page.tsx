@@ -6,7 +6,8 @@ import { CURRENT_MISSION_POLLING_MS, useCurrentMission } from "@/entities/advent
 import { getGroupRole, useGroupByParam } from "@/entities/group";
 import { useSessionStore } from "@/entities/session";
 import { StartAdventureButton } from "@/features/start-adventure";
-import { CloseHeader, ErrorState, ModeTitle, Screen, Skeleton } from "@/shared/ui";
+import { CloseHeader, ErrorState, ModeTitle, Screen } from "@/shared/ui";
+import AdventureStartSkeleton from "./adventure-start-skeleton";
 
 type AdventureStartPageProps = {
   groupId: string;
@@ -23,14 +24,7 @@ export default function AdventureStartPage({ groupId }: AdventureStartPageProps)
     void refetch();
   }
 
-  if (isPending) {
-    return (
-      <Screen>
-        <CloseHeader closeHref={closeHref} />
-        <Skeleton className="mt-5 h-40" />
-      </Screen>
-    );
-  }
+  if (isPending) return <AdventureStartSkeleton groupId={groupId} />;
   if (isError) {
     return (
       <Screen>

@@ -21,6 +21,9 @@ export function useJoinGroup() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: joinByInviteCode,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: groupKeys.all }),
+    // 참여한 그룹 상세는 다음 화면에서 새로 받으므로 다시 받기를 기다리지 않음
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: groupKeys.all });
+    },
   });
 }

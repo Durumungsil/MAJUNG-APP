@@ -24,11 +24,11 @@ import {
 import { useSaveDestinationSelection } from "@/features/select-place";
 import { isApiError } from "@/shared/api";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
-import { useToast } from "@/shared/lib";
-import { ErrorState, Screen, Skeleton, TextLink, Toast } from "@/shared/ui";
+import { usePrefetchRoute, useToast } from "@/shared/lib";
+import { ErrorState, Screen, TextLink, Toast } from "@/shared/ui";
 import { StoryLayout, TimelineMissing, useConfirmedTimelineRedirect } from "@/widgets/story-layout";
+import StoryTimelineSkeleton from "./story-timeline-skeleton";
 
-const SKELETON_CARD_COUNT = 4;
 const LEADER_GUIDE = "장소를 꾹 눌러서 순서를 변경할 수 있어요";
 const MEMBER_GUIDE = "방장이 확정하면 시작돼요";
 
@@ -83,6 +83,11 @@ function StoryTimelineContent({ group, itineraryId, onGroupRefetch }: StoryTimel
   const dates = getTripDates(group.startDate ?? "", group.endDate ?? "");
   const isMissing = itineraryId === null || isApiError(error, 404);
   const router = useRouter();
+  const confirmedHref = withItineraryId(
+    `/groups/${group.id}/story/timeline/confirmed`,
+    itineraryId,
+  );
+  usePrefetchRoute(confirmedHref);
   const userId = useSessionStore((state) => state.session?.userId ?? null);
   // 순서 변경·확정은 대표자만 함. 멤버에게는 읽기 전용 목록을 보여줌
   const isLeader = getGroupRole(group, userId) === "leader";
@@ -122,7 +127,7 @@ function StoryTimelineContent({ group, itineraryId, onGroupRefetch }: StoryTimel
     confirmTimeline(undefined, {
       onSuccess: () => {
         setHasConfirmed(true);
-        router.push(withItineraryId(`/groups/${group.id}/story/timeline/confirmed`, itineraryId));
+        router.push(confirmedHref);
       },
       onError: handleConfirmError,
     });
@@ -210,19 +215,5 @@ function StoryTimelineContent({ group, itineraryId, onGroupRefetch }: StoryTimel
       )}
       <Toast open={toastMessage !== null} message={toastMessage ?? ""} />
     </StoryLayout>
-  );
-}
-
-function StoryTimelineSkeleton() {
-  return (
-    <Screen>
-      <div className="mt-5 flex flex-col gap-5">
-        <Skeleton className="h-8 w-1/2" />
-        <Skeleton className="h-6 w-2/3" />
-        {Array.from({ length: SKELETON_CARD_COUNT }, (_, index) => (
-          <Skeleton key={index} className="h-15" />
-        ))}
-      </div>
-    </Screen>
   );
 }

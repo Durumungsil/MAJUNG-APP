@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { isApiError } from "@/shared/api";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
-import { useToast } from "@/shared/lib";
+import { usePrefetchRoute, useToast } from "@/shared/lib";
 import { Button, Toast } from "@/shared/ui";
 import { useLoadPreviousPreference, useSavePreference } from "../api/save-preference";
 import {
@@ -44,6 +44,7 @@ function readSurveyValues(form: HTMLFormElement): SurveyValues {
  */
 export default function SurveyForm({ groupId, submittedHref }: SurveyFormProps) {
   const router = useRouter();
+  usePrefetchRoute(submittedHref);
   const { toastMessage, showToast } = useToast();
   const [defaults, setDefaults] = useState<SurveyDefaults>();
   // 이전 취향을 불러오면 입력칸을 새 기본값으로 다시 그림

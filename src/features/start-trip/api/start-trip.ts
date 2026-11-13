@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createTrip, groupKeys } from "@/entities/group";
+import { createTrip, groupKeys, patchGroupDetail } from "@/entities/group";
 
 type StartTripValues = {
   region: string;
@@ -14,6 +14,19 @@ export function useStartTrip(groupId: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (values: StartTripValues) => createTrip(groupId, values),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: groupKeys.all }),
+    // 새 회차를 캐시에 바로 넣고, 다시 받기는 기다리지 않아 모드 선택 화면으로 바로 넘어감
+    onSuccess: (trip) => {
+      patchGroupDetail(queryClient, groupId, {
+        tripId: trip.id,
+        status: trip.status,
+        mode: trip.mode,
+        region: trip.region,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        preferencesCompletedCount: 0,
+        myPreferencesCompleted: false,
+      });
+      void queryClient.invalidateQueries({ queryKey: groupKeys.all });
+    },
   });
 }
