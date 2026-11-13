@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { getModeStartHref, useGroupByParam } from "@/entities/group";
 import { isPreferenceReady, usePreferenceSummary } from "@/entities/preference";
 import { Button, Screen, Spinner } from "@/shared/ui";
+import { usePrefetchRoute } from "@/shared/lib";
 
 type SurveyWaitingPageProps = {
   groupId: string;
@@ -19,6 +20,7 @@ export default function SurveyWaitingPage({ groupId }: SurveyWaitingPageProps) {
   const { data: group } = useGroupByParam(groupId);
   const { data: summary } = usePreferenceSummary(group?.id ?? null, SUMMARY_POLL_INTERVAL_MS);
   const nextHref = group ? getModeStartHref(group) : `/groups/${groupId}`;
+  usePrefetchRoute(nextHref);
   const everyoneDone = summary !== undefined && isPreferenceReady(summary);
 
   // 전원이 입력을 마치고 그룹 취향 프로필이 만들어지면 다음 단계로 자동 이동

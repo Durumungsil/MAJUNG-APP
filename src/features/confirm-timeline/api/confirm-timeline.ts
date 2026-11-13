@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { groupKeys } from "@/entities/group";
+import { groupKeys, patchGroupDetail } from "@/entities/group";
 import { apiRequest, isApiError } from "@/shared/api";
 
 /** POST /api/v1/groups/{groupId}/itineraries/{itineraryId}/confirm 응답 (snake_case 그대로) */
@@ -27,7 +27,11 @@ export function useConfirmTimeline(groupId: number, itineraryId: number) {
   return useMutation({
     mutationFn: () => confirmTimeline(groupId, itineraryId),
     // 여행 상태가 IN_PROGRESS로 바뀌어 그룹 상세의 다음 할 일이 달라짐
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: groupKeys.all }),
+    // 확정 상태를 캐시에 바로 넣고, 다시 받기는 기다리지 않아 확정 화면으로 바로 넘어감
+    onSuccess: (response) => {
+      patchGroupDetail(queryClient, groupId, { status: response.status });
+      void queryClient.invalidateQueries({ queryKey: groupKeys.all });
+    },
     // 409는 다른 기기에서 먼저 확정한 경우일 수 있어 그룹 상태를 다시 받아 화면을 맞춤
     onError: (error) => {
       if (isApiError(error, 409)) return queryClient.invalidateQueries({ queryKey: groupKeys.all });

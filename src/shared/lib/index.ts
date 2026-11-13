@@ -4,4 +4,5 @@ export { getTodayInSeoul } from "./seoul-date";
 export { toLatLng } from "./to-lat-lng";
 export { useDragScroll } from "./use-drag-scroll";
 export { useIntersection } from "./use-intersection";
+export { usePrefetchRoute } from "./use-prefetch-route";
 export { TOAST_DURATION_MS, useToast } from "./use-toast";

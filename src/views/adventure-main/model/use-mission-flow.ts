@@ -16,7 +16,7 @@ import { useSessionStore } from "@/entities/session";
 import { useAutoCompleteMission } from "@/features/complete-mission";
 import { useAutoStartMission } from "@/features/start-mission";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
-import { useToast } from "@/shared/lib";
+import { usePrefetchRoute, useToast } from "@/shared/lib";
 import { useCurrentPosition } from "@/shared/lib/use-current-position";
 
 /**
@@ -26,6 +26,7 @@ import { useCurrentPosition } from "@/shared/lib/use-current-position";
  */
 export function useMissionFlow(groupId: number) {
   const router = useRouter();
+  usePrefetchRoute(`/groups/${groupId}/adventure/journey`);
   const { position, accuracyMeters } = useCurrentPosition();
   const currentMissionQuery = useCurrentMission(groupId, CURRENT_MISSION_POLLING_MS);
   const mission = currentMissionQuery.data ?? null;

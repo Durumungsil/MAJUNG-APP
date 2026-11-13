@@ -20,10 +20,10 @@ import {
   useConfirmedTimelineRedirect,
   useStoryConflictRedirect,
 } from "@/widgets/story-layout";
-import { ErrorState, Screen, Skeleton, Toast } from "@/shared/ui";
+import { ErrorState, Screen, Toast } from "@/shared/ui";
+import StoryPlacesSkeleton, { PlaceListSkeleton } from "./story-places-skeleton";
 
 const GUIDE = "원하는 장소를 선택해 타임라인을 생성하세요";
-const SKELETON_CARD_COUNT = 4;
 
 type StoryPlacesPageProps = {
   groupId: string;
@@ -164,27 +164,5 @@ function StoryPlacesContent({ group, onGroupRefetch }: StoryPlacesContentProps) 
       />
       <Toast open={generateToastMessage !== null} message={generateToastMessage ?? ""} />
     </StoryLayout>
-  );
-}
-
-function StoryPlacesSkeleton() {
-  return (
-    <Screen>
-      <div className="mt-5 flex flex-col gap-5">
-        <Skeleton className="h-8 w-1/2" />
-        <Skeleton className="h-6 w-2/3" />
-        <PlaceListSkeleton />
-      </div>
-    </Screen>
-  );
-}
-
-function PlaceListSkeleton() {
-  return (
-    <div className="flex flex-col gap-5">
-      {Array.from({ length: SKELETON_CARD_COUNT }, (_, index) => (
-        <Skeleton key={index} className="h-12" />
-      ))}
-    </div>
   );
 }

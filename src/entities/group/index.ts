@@ -20,6 +20,7 @@ export { getModeStartHref } from "./lib/mode-route";
 export { isTripEnded } from "./lib/trip-status";
 export { isValidMaxMembers } from "./lib/validate-max-members";
 export { createTrip, verifyInviteCode } from "./api/group-api";
+export { patchGroupDetail } from "./api/group-cache";
 export { groupKeys } from "./api/query-keys";
 export {
   useGroup,

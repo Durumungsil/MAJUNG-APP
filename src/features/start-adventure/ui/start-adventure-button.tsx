@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { isApiError } from "@/shared/api";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
-import { useToast } from "@/shared/lib";
+import { usePrefetchRoute, useToast } from "@/shared/lib";
 import { Button, Toast } from "@/shared/ui";
 import { useStartAdventure } from "../api/start-adventure";
 
@@ -21,6 +21,7 @@ function getStartAdventureErrorMessage(error: unknown): string {
 
 export default function StartAdventureButton({ groupId, className }: StartAdventureButtonProps) {
   const router = useRouter();
+  usePrefetchRoute(`/groups/${groupId}/adventure/map`);
   const { mutate: startAdventure, isPending } = useStartAdventure(groupId);
   const { toastMessage, showToast } = useToast();
 

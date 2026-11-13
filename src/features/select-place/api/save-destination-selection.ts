@@ -16,6 +16,9 @@ export function useSaveDestinationSelection(groupId: number) {
   return useMutation({
     mutationFn: (days: readonly SelectionDay[]) => saveDestinationSelection(groupId, days),
     // 선택을 저장하면 추천 중심이 선택한 장소 쪽으로 바뀌므로, 이전 cursor를 버리고 첫 페이지부터 다시 받음
-    onSuccess: () => queryClient.resetQueries({ queryKey: placeKeys.recommendations(groupId) }),
+    // 추천 목록을 다시 받는 동안 기다리면 다음 단계(타임라인 생성·확정)가 늦어지므로 기다리지 않음
+    onSuccess: () => {
+      void queryClient.resetQueries({ queryKey: placeKeys.recommendations(groupId) });
+    },
   });
 }

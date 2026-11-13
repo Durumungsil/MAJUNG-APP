@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { isApiError } from "@/shared/api";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
-import { useToast } from "@/shared/lib";
+import { usePrefetchRoute, useToast } from "@/shared/lib";
 import { useEndMode } from "../api/end-mode";
 
 type UseEndModeExitOptions = {
@@ -21,6 +21,7 @@ export function useEndModeExit({ groupId, isLeader }: UseEndModeExitOptions) {
   const { mutateAsync, isPending } = useEndMode(groupId);
   const { toastMessage, showToast } = useToast();
   const groupHref = `/groups/${groupId}`;
+  usePrefetchRoute(groupHref);
 
   /** 종료(또는 멤버의 나가기)에 성공하면 true */
   async function exit(): Promise<boolean> {

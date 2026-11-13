@@ -10,7 +10,7 @@ import {
 } from "@/entities/group";
 import { isApiError } from "@/shared/api";
 import { ERROR_MESSAGES } from "@/shared/config/error-messages";
-import { useToast } from "@/shared/lib";
+import { usePrefetchRoute, useToast } from "@/shared/lib";
 import { Toast } from "@/shared/ui";
 import { useUpdateGroup } from "../api/update-group";
 
@@ -31,6 +31,7 @@ function getUpdateErrorMessage(error: unknown): string {
 
 export default function EditGroupForm({ group }: EditGroupFormProps) {
   const router = useRouter();
+  usePrefetchRoute(`/groups/${group.id}`);
   const { mutate: updateGroup, isPending } = useUpdateGroup(group.id);
   const { toastMessage, showToast } = useToast();
 

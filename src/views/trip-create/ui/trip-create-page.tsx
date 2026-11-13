@@ -2,7 +2,8 @@
 
 import { GroupTitleBar, useGroupByParam } from "@/entities/group";
 import { StartTripForm } from "@/features/start-trip";
-import { BackHeader, ErrorState, Screen, Skeleton } from "@/shared/ui";
+import { BackHeader, ErrorState, Screen } from "@/shared/ui";
+import TripCreateSkeleton from "./trip-create-skeleton";
 
 type TripCreatePageProps = {
   groupId: string;
@@ -15,16 +16,12 @@ export default function TripCreatePage({ groupId }: TripCreatePageProps) {
     void refetch();
   }
 
+  if (isPending) return <TripCreateSkeleton groupId={groupId} />;
+
   return (
     <Screen>
       <BackHeader backHref={`/groups/${groupId}`} size="sm" title="새 여행 시작하기" />
-      {isPending ? (
-        <div className="mt-8 flex flex-col gap-6">
-          <Skeleton className="h-12" />
-          <Skeleton className="h-9" />
-          <Skeleton className="h-9" />
-        </div>
-      ) : isError ? (
+      {isError ? (
         <ErrorState onRetry={handleRetry} />
       ) : (
         <>

@@ -14,12 +14,13 @@ import {
 import { useSessionStore } from "@/entities/session";
 import { AvatarStack, findLeaderName, useGroupMembers } from "@/entities/user";
 import { getTodayInSeoul } from "@/shared/lib";
-import { Button, CopyButton, ErrorState, InfoRow, Screen, Skeleton, TextLink } from "@/shared/ui";
+import { Button, CopyButton, ErrorState, InfoRow, Screen, TextLink } from "@/shared/ui";
 import { getGroupPollInterval } from "../lib/poll-interval";
 import { getPrimaryAction } from "../lib/primary-action";
 import { canEndTrip } from "../lib/trip-period";
 import { useAutoEndTrip } from "../model/use-auto-end-trip";
 import GroupDetailHeader from "./group-detail-header";
+import GroupDetailSkeleton from "./group-detail-skeleton";
 
 type GroupDetailPageProps = {
   groupId: string;
@@ -129,23 +130,6 @@ function GroupDetailContent({ group }: { group: Group }) {
           {primaryAction.label}
         </Button>
       )}
-    </Screen>
-  );
-}
-
-function GroupDetailSkeleton() {
-  return (
-    <Screen>
-      <Skeleton className="h-6 w-6" />
-      <div className="mt-8 flex flex-col gap-10">
-        <Skeleton className="h-12" />
-        <div className="flex flex-col gap-6">
-          <Skeleton className="h-5 w-1/2" />
-          <Skeleton className="h-5 w-1/2" />
-          <Skeleton className="h-5 w-1/2" />
-        </div>
-      </div>
-      <Skeleton className="mt-12.5 h-32" />
     </Screen>
   );
 }

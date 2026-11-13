@@ -9,7 +9,8 @@ import {
   useRouletteResult,
 } from "@/features/extreme-roulette";
 import { isApiError } from "@/shared/api";
-import { ErrorState, Screen, Skeleton, Toast } from "@/shared/ui";
+import { ErrorState, Screen, Toast } from "@/shared/ui";
+import ExtremeNavigationSkeleton from "./extreme-navigation-skeleton";
 
 type ExtremeNavigationPageProps = {
   groupId: string;
@@ -39,16 +40,7 @@ export default function ExtremeNavigationPage({
 
   if (isApiError(error, 404)) notFound();
   if (isConflict) return <Toast open={toastMessage !== null} message={toastMessage ?? ""} />;
-  if (isPending) {
-    return (
-      <main className="flex h-dvh flex-col">
-        <Skeleton className="min-h-0 flex-1 rounded-none" />
-        <div className="px-8 pt-8 pb-[max(--spacing(7.5),var(--safe-bottom))]">
-          <Skeleton className="h-12 w-full" />
-        </div>
-      </main>
-    );
-  }
+  if (isPending) return <ExtremeNavigationSkeleton />;
   if (isError) {
     return (
       <Screen>
