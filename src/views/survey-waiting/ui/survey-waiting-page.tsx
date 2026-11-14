@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { getModeStartHref, useGroupByParam } from "@/entities/group";
+import { useQueryClient } from "@tanstack/react-query";
+import { getModeStartHref, patchGroupDetail, useGroupByParam } from "@/entities/group";
 import { isPreferenceReady, usePreferenceSummary } from "@/entities/preference";
 import { Button, Screen, Spinner } from "@/shared/ui";
 import { usePrefetchRoute } from "@/shared/lib";
@@ -16,6 +17,7 @@ const SUMMARY_POLL_INTERVAL_MS = 5000;
 
 export default function SurveyWaitingPage({ groupId }: SurveyWaitingPageProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   // 그룹에 접근할 수 없으면 404로 보냄. 이 화면은 원래 대기 스피너라 로딩·실패 중에도 같은 화면을 유지함
   const { data: group } = useGroupByParam(groupId);
   const { data: summary } = usePreferenceSummary(group?.id ?? null, SUMMARY_POLL_INTERVAL_MS);
@@ -24,9 +26,15 @@ export default function SurveyWaitingPage({ groupId }: SurveyWaitingPageProps) {
   const everyoneDone = summary !== undefined && isPreferenceReady(summary);
 
   // 전원이 입력을 마치고 그룹 취향 프로필이 만들어지면 다음 단계로 자동 이동
+  // 대기 중에는 그룹 상세를 다시 받지 않으므로, 다음 화면이 옛 완료 인원으로 그려지지 않게 집계 값을 캐시에 반영함
   useEffect(() => {
-    if (everyoneDone) router.replace(nextHref);
-  }, [everyoneDone, nextHref, router]);
+    if (!everyoneDone || group === undefined) return;
+    patchGroupDetail(queryClient, group.id, {
+      preferencesCompletedCount: summary.completedMemberCount,
+      memberCount: summary.memberCount,
+    });
+    router.replace(nextHref);
+  }, [everyoneDone, group, summary, nextHref, queryClient, router]);
 
   return (
     <Screen className="items-center">
